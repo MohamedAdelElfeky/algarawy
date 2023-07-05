@@ -22,8 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-Route::apiResource('p-jobs', JobController::class);
-Route::apiResource('p-courses', CourseController::class);
-Route::apiResource('p-meetings', MeetingController::class);
-Route::apiResource('p-bank-accounts', BankAccountController::class);
+Route::apiResources([
+    'p-jobs' => JobController::class, // jobs Resource
+    'p-courses' => CourseController::class, // courses Resource
+    'p-meetings' => MeetingController::class, // meetings Resource
+    'p-bank-accounts' => BankAccountController::class, // bank-accounts Resource
+]);
