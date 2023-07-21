@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Http\Resources\BankAccountResource;
 use App\Models\BankAccount;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class BankAccountService
@@ -21,16 +23,17 @@ class BankAccountService
             'bank_name' => 'required',
             'swift_number' => 'required',
             'type' => 'required|in:saving,charity',
-            'user_id' => 'required|exists:users,id',
         ]);
+        $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
-
         $bankAccount = BankAccount::create($data);
-
-        return response()->json(['message' => 'Bank account created successfully', 'data' => $bankAccount]);
+        return response()->json([
+            'message' => 'Bank account created successfully',
+            'data' => new BankAccountResource($bankAccount)
+        ]);
     }
 
     public function getBankAccountById(string $id): JsonResponse
@@ -41,19 +44,19 @@ class BankAccountService
             return response()->json(['message' => 'Bank account not found'], 404);
         }
 
-        return response()->json(['data' => $bankAccount]);
+        return new BankAccountResource($bankAccount);
     }
 
     public function updateBankAccount(string $id, array $data): JsonResponse
     {
         $validator = Validator::make($data, [
             'account_number' => 'required',
-            'iban_number' => 'required',
+            'iban' => 'required',
             'bank_name' => 'required',
             'swift_number' => 'required',
-            'type' => 'required|in:حساب ادخار,حساب صدقة',
-            'user_id' => 'required|exists:users,id',
+            'type' => 'required|in:saving,charity',
         ]);
+        $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
@@ -67,7 +70,10 @@ class BankAccountService
 
         $bankAccount->update($data);
 
-        return response()->json(['message' => 'Bank account updated successfully', 'data' => $bankAccount]);
+        return response()->json([
+            'message' => 'Bank account updated successfully',
+            'data' => new BankAccountResource($bankAccount)
+        ]);
     }
 
     public function deleteBankAccount(string $id): JsonResponse
@@ -81,5 +87,17 @@ class BankAccountService
         $bankAccount->delete();
 
         return response()->json(['message' => 'Bank account deleted successfully']);
+    }
+
+    public function getSavingBankAccounts()
+    {
+        $bankAccounts = BankAccount::where('type', 'saving')->get();
+        return BankAccountResource::collection($bankAccounts);
+    }
+
+    public function getCharityBankAccounts()
+    {
+        $bankAccounts = BankAccount::where('type', 'charity')->get();
+        return BankAccountResource::collection($bankAccounts);
     }
 }

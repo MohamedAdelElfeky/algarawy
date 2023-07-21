@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('meetings', function (Blueprint $table) {
             $table->id();
             $table->datetime('datetime');
+            $table->string('name');
             $table->string('link');
             $table->string('description');
             $table->unsignedBigInteger('user_id');
+            $table->integer('from'); 
+            $table->integer('to'); 
             $table->timestamps();
+            
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

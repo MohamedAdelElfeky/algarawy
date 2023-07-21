@@ -17,6 +17,8 @@ class Job extends Model
         'contact_information',
         'user_id',
         'photo',
+        'company_type',
+        'company_logo',
     ];
 
     public function user()

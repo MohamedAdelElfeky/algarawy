@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\BankAccountController;
-use App\Http\Controllers\CourseController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\ApiBankAccountController;
+use App\Http\Controllers\Api\ApiCourseController;
+use App\Http\Controllers\Api\ApiJobController;
+use App\Http\Controllers\Api\ApiMeetingController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\JobController;
-use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,13 +19,27 @@ use App\Http\Controllers\MeetingController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::POST('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::apiResources([
-    'p-jobs' => JobController::class, // jobs Resource
-    'p-courses' => CourseController::class, // courses Resource
-    'p-meetings' => MeetingController::class, // meetings Resource
-    'p-bank-accounts' => BankAccountController::class, // bank-accounts Resource
-]);
+Route::middleware('auth:sanctum')->group(function () {
+    // User related routes
+    Route::prefix('user')->group(function () {
+        Route::get('/meetings', [UserController::class, 'getMeetings']);
+        Route::get('/courses', [UserController::class, 'getCourses']);
+        Route::get('/data', [UserController::class, 'getUser']);
+    });
+
+    Route::apiResources([
+        'p-jobs' => ApiJobController::class, // jobs Resource
+        'p-courses' => ApiCourseController::class, // courses Resource
+        'p-meetings' => ApiMeetingController::class, // meetings Resource
+        'p-bank-accounts' => ApiBankAccountController::class, // bank-accounts Resource
+    ]);
+
+    // Bank related routes
+    Route::prefix('bank')->group(function () {
+        Route::get('/getSavings', [ApiBankAccountController::class, 'getSavings']);
+        Route::get('/getCharities', [ApiBankAccountController::class, 'getCharities']);
+    });
+});

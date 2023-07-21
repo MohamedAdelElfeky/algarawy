@@ -12,6 +12,9 @@ class Meeting extends Model
     protected $fillable = [
         'datetime',
         'link',
+        'name',
+        'from',
+        'to',
         'description',
         'user_id',
     ];

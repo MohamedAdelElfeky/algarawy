@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Http\Resources\MeetingResource;
 use App\Models\Meeting;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class MeetingService
 {
@@ -14,9 +16,12 @@ class MeetingService
         $validator = Validator::make($data, [
             'datetime' => 'required|date',
             'link' => 'required|string',
+            'name' => 'required|string',
+            'from' => 'required|integer',
+            'to' => 'required|integer',
             'description' => 'required|string',
-            'user_id' => 'required|exists:users,id',
         ]);
+        $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {
             return response()->json([
@@ -29,7 +34,7 @@ class MeetingService
 
         return response()->json([
             'message' => 'Meeting created successfully',
-            'data' => $meeting,
+            'data' => new MeetingResource($meeting),
         ]);
     }
 
@@ -38,10 +43,13 @@ class MeetingService
     {
         $validator = Validator::make($data, [
             'datetime' => 'required|date',
+            'name' => 'required|string',
+            'from' => 'required|integer',
+            'to' => 'required|integer',
             'link' => 'required|string',
             'description' => 'required|string',
-            'user_id' => 'required|exists:users,id',
         ]);
+        $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {
             return response()->json([
@@ -51,16 +59,14 @@ class MeetingService
         }
 
         $meeting->update($data);
-
         return response()->json([
             'message' => 'Meeting updated successfully',
-            'data' => $meeting,
+            'data' => new MeetingResource($meeting),
         ]);
     }
 
     public function deleteMeeting(Meeting $meeting)
     {
-        // Delete the meeting
         $meeting->delete();
     }
 
@@ -71,7 +77,7 @@ class MeetingService
 
     public function getAllMeetings()
     {
-        // Retrieve all meetings
-        return Meeting::all();
+        $meetings = Meeting::all();
+        return MeetingResource::collection($meetings);
     }
 }

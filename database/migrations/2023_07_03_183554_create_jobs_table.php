@@ -17,6 +17,8 @@ return new class extends Migration
             $table->text('description');
             $table->text('qualifications');
             $table->string('location');
+            $table->string('company_type');
+            $table->string('company_logo')->nullable();
             $table->string('contact_information');
             $table->string('photo')->nullable();
             $table->unsignedBigInteger('user_id');

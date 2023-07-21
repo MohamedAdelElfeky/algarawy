@@ -97,10 +97,7 @@ class CourseController extends Controller
      */
     public function destroy(string $id)
     {
-        $course = Course::findOrFail($id);
-
-        $response = $this->courseService->deleteCourse($course);
-
+        $response = $this->courseService->deleteCourse($id);
         return response()->json([
             'message' => $response['message'],
         ]);
