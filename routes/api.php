@@ -4,9 +4,10 @@ use App\Http\Controllers\Api\ApiBankAccountController;
 use App\Http\Controllers\Api\ApiCourseController;
 use App\Http\Controllers\Api\ApiJobController;
 use App\Http\Controllers\Api\ApiMeetingController;
+use App\Http\Controllers\Api\ApiProjectController;
 use App\Http\Controllers\AuthController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
         'p-courses' => ApiCourseController::class, // courses Resource
         'p-meetings' => ApiMeetingController::class, // meetings Resource
         'p-bank-accounts' => ApiBankAccountController::class, // bank-accounts Resource
+        'p-projects' => ApiProjectController::class,
+
     ]);
 
     // Bank related routes

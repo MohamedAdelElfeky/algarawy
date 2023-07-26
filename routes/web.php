@@ -5,6 +5,7 @@ use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,9 +35,9 @@ Route::resource('jobs', JobController::class);
 Route::resource('courses', CourseController::class);
 Route::resource('meetings', MeetingController::class);
 Route::resource('bank-accounts', BankAccountController::class);
-
+Route::resource('projects', ProjectController::class);
 Route::view('/family', 'admin.family.index')->name('families');
 Route::view('/discount', 'admin.discount.index')->name('discounts');
-Route::view('/project', 'admin.project.index')->name('projects');
+// Route::view('/project', 'admin.project.index')->name('projects');
 // Route::view('/course', 'admin.course.index')->name('courses');
 Route::view('/type_of_relationships', 'admin.type_of_relationships.index')->name('type.of.relationships');

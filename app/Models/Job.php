@@ -15,10 +15,18 @@ class Job extends Model
         'qualifications',
         'location',
         'contact_information',
-        'user_id',
         'photo',
-        'company_type',
-        'company_logo',
+        'company_name', 
+        'company_location', 
+        'company_type', 
+        'company_link', 
+        'company_logo', 
+        'job_type',
+        'is_training', 
+        'is_full_time', 
+        'price',
+        'job_status', 
+        'user_id',
     ];
 
     public function user()

@@ -25,6 +25,9 @@ class ApiJobController extends Controller
     public function show($id): JsonResponse
     {
         $job = $this->jobService->getJobById($id);
+        if (!$job) {
+            return response()->json(['message' => 'Job not found'], 404);
+        }
         return response()->json($job, 200);
     }
     public function store(Request $request): JsonResponse
@@ -37,7 +40,6 @@ class ApiJobController extends Controller
     {
         $job = $this->jobService->getJobById($id);
         $updatedJob = $this->jobService->updateJob($job, $request->all());
-
         return response()->json($updatedJob);
     }
     public function destroy($id): JsonResponse

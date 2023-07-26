@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('link');
             $table->string('description');
             $table->unsignedBigInteger('user_id');
-            $table->integer('from'); 
-            $table->integer('to'); 
+            $table->double('from'); 
+            $table->double('to'); 
+            $table->string('type');
             $table->timestamps();
             
 

@@ -13,11 +13,15 @@ class CourseService
     public function createCourse(array $data)
     {
         $validator = Validator::make($data, [
+            'name' => 'required',
             'description' => 'required',
             'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
             'location' => 'nullable',
             'discount' => 'nullable',
+            'link' => 'nullable|url',
+            'images_and_videos' => 'nullable|array',
+            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
         ]);
         $data['user_id'] = Auth::id();
 
@@ -40,12 +44,16 @@ class CourseService
     public function updateCourse(Course $course, array $data)
     {
         $validator = Validator::make($data, [
-            'description' => 'required',
+            'name' => 'sometimes|required',
+            'description' => 'sometimes|required',
             'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
             'location' => 'nullable',
             'discount' => 'nullable',
-            'user_id' => 'required|exists:users,id',
+            'link' => 'nullable|url',
+            'images_and_videos' => 'nullable|array',
+            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+
         ]);
         $data['user_id'] = Auth::id();
 
@@ -63,13 +71,12 @@ class CourseService
             'message' => 'Course updated successfully',
             'data' => new CourseResource($course),
         ];
-    }  
+    }
 
     public function getAllCourses()
     {
         $course = Course::all();
         return CourseResource::collection($course);
-
     }
 
     public function getCourseById($id)

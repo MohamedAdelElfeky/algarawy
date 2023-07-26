@@ -26,13 +26,19 @@ class User extends Authenticatable
         'last_name',
         'name',
         'email',
+        'phone',
         'password',
         'location',
-        'birthdate',
+        'birth_date',
         'national_id',
         'avatar',
         'card_images',
+        'governorate',
+        'city',
+        'area',
         'registration_confirmed',
+        'national_card_image_front',
+        'national_card_image_back',
     ];
 
     /**

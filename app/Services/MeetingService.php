@@ -20,6 +20,8 @@ class MeetingService
             'from' => 'required|integer',
             'to' => 'required|integer',
             'description' => 'required|string',
+            'type' => 'required|in:remotely,normal',
+
         ]);
         $data['user_id'] = Auth::id();
 
@@ -48,6 +50,8 @@ class MeetingService
             'to' => 'required|integer',
             'link' => 'required|string',
             'description' => 'required|string',
+            'type' => 'required|in:remotely,normal',
+
         ]);
         $data['user_id'] = Auth::id();
 

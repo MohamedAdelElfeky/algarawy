@@ -22,9 +22,10 @@ class MeetingResource extends JsonResource
             'from' => $this->from,
             'to' => $this->to,
             'description' => $this->description,
-            'user_id' => $this->user_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'user' => $this->user,
+            'type' => $this->type,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 }

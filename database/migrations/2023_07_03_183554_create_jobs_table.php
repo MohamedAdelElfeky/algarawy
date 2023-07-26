@@ -17,12 +17,19 @@ return new class extends Migration
             $table->text('description');
             $table->text('qualifications');
             $table->string('location');
-            $table->string('company_type');
-            $table->string('company_logo')->nullable();
-            $table->string('contact_information');
+            $table->text('contact_information');
             $table->string('photo')->nullable();
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('company_name');
+            $table->string('company_location');
+            $table->string('company_type');
+            $table->string('company_link')->nullable();
+            $table->string('company_logo')->nullable();
+            $table->string('job_type');
+            $table->boolean('is_training');
+            $table->boolean('is_full_time');
+            $table->decimal('price', 10, 2);
+            $table->boolean('job_status')->default(false);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
