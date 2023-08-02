@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class MeetingService
 {
 
-    public function createMeeting(array $data): JsonResponse
+    public function createMeeting(array $data)
     {
         $validator = Validator::make($data, [
             'datetime' => 'required|date',
@@ -34,14 +34,14 @@ class MeetingService
 
         $meeting = Meeting::create($data);
 
-        return response()->json([
+        return [
             'message' => 'Meeting created successfully',
             'data' => new MeetingResource($meeting),
-        ]);
+        ];
     }
 
 
-    public function updateMeeting(Meeting $meeting, array $data): JsonResponse
+    public function updateMeeting(Meeting $meeting, array $data)
     {
         $validator = Validator::make($data, [
             'datetime' => 'required|date',
@@ -63,10 +63,10 @@ class MeetingService
         }
 
         $meeting->update($data);
-        return response()->json([
+        return[
             'message' => 'Meeting updated successfully',
             'data' => new MeetingResource($meeting),
-        ]);
+        ];
     }
 
     public function deleteMeeting(Meeting $meeting)

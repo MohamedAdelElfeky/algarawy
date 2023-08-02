@@ -25,7 +25,7 @@ class ProjectService
         return $project;
     }
 
-    public function createProject(array $data): JsonResponse
+    public function createProject(array $data)
     {
         $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
@@ -44,13 +44,13 @@ class ProjectService
         }
 
         $project = Project::create($data);
-        return response()->json([
+        return[
             'message' => 'Project created successfully',
             'data' => new ProjectResource($project),
-        ]);
+        ];
     }
 
-    public function updateProject(Project $project, array $data): JsonResponse
+    public function updateProject(Project $project, array $data)
     {
         $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
@@ -70,10 +70,10 @@ class ProjectService
 
         $project->update($data);
 
-        return response()->json([
+        return [
             'message' => 'Project updated successfully',
             'data' => new ProjectResource($project),
-        ]);
+        ];
         return new ProjectResource($project);
     }
 

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
+use App\Models\Neighborhood;
+use App\Models\Region;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +27,9 @@ class AuthController extends Controller
             'national_id' => 'required|string|unique:users',
             'avatar' => 'nullable|string',
             'card_images' => 'nullable|array',
-            'governorate' => 'required|string',
-            'city' => 'required|string',
-            'area' => 'required|string',
+            'region_id' => 'required|exists:regions,id',
+            'city_id' => 'required|exists:cities,id',
+            'neighborhood_id' => 'required|exists:neighborhoods,id',
             'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -56,7 +59,9 @@ class AuthController extends Controller
         if ($backImage) {
             $backImagePath = $backImage->store('public/images/backImage');
         }
-
+        $region = Region::findOrFail($request->input('region_id'));
+        $city = City::findOrFail($request->input('city_id'));
+        $neighborhood = Neighborhood::findOrFail($request->input('neighborhood_id'));
         // Create the user
         $user = User::create([
             'first_name' => $request->input('first_name'),
@@ -70,9 +75,9 @@ class AuthController extends Controller
             'national_id' => $request->input('national_id'),
             'avatar' => $request->input('avatar'),
             'card_images' => $request->input('card_images'),
-            'governorate' => $request->input('governorate'),
-            'city' => $request->input('city'),
-            'area' => $request->input('area'),
+            'region_id' => $region->id,
+            'city_id' => $city->id,
+            'neighborhood_id' => $neighborhood->id,
             'national_card_image_front' => $frontImagePath,
             'national_card_image_back' => $backImagePath,
         ]);

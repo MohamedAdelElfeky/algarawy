@@ -53,7 +53,7 @@ class MeetingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id)
     {
         $meeting = $this->meetingService->getMeeting($id);
 
@@ -73,7 +73,7 @@ class MeetingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $id)
     {
         $data = $request->all();
 
@@ -87,7 +87,7 @@ class MeetingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id)
     {
         $meeting = $this->meetingService->getMeeting($id);
 

@@ -27,14 +27,14 @@ class ProjectController extends Controller
         return $this->projectService->getProjectById($id);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $data = $request->all();
         $project = $this->projectService->createProject($data);
         return response()->json($project, 201);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, $id)
     {
         $project = $this->projectService->getProjectById($id);
         $updatedProject = $this->projectService->updateProject($project, $request->all());

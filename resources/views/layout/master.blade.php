@@ -60,6 +60,7 @@
     {!! sprintf('<script src="%s"></script>', asset($path)) !!}
 @endforeach
 <!--end::Vendors Javascript-->
+@yield('script')
 
 <!--begin::Custom Javascript(optional)-->
 @foreach(getCustomJs() as $path)

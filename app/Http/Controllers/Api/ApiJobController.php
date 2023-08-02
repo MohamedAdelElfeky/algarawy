@@ -16,13 +16,13 @@ class ApiJobController extends Controller
         $this->jobService = $jobService;
     }
 
-    public function index(): JsonResponse
+    public function index()
     {
         $jobs = $this->jobService->getAllJobs();
-        return response()->json($jobs, 200);
+        return response()->json(['data' => $jobs], 200);
     }
 
-    public function show($id): JsonResponse
+    public function show($id)
     {
         $job = $this->jobService->getJobById($id);
         if (!$job) {
@@ -30,19 +30,19 @@ class ApiJobController extends Controller
         }
         return response()->json($job, 200);
     }
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $data = $request->all();
         $job = $this->jobService->createJob($data);
         return response()->json($job, 201);
     }
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, $id)
     {
         $job = $this->jobService->getJobById($id);
         $updatedJob = $this->jobService->updateJob($job, $request->all());
         return response()->json($updatedJob);
     }
-    public function destroy($id): JsonResponse
+    public function destroy($id)
     {
         $job = $this->jobService->getJobById($id);
         $this->jobService->deleteJob($job);

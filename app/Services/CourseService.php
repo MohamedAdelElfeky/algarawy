@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
-use Illuminate\Http\JsonResponse;
+use App\Models\CourseFile;
+use App\Models\CourseImageVideo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class CourseService
 {
@@ -15,27 +18,57 @@ class CourseService
         $validator = Validator::make($data, [
             'name' => 'required',
             'description' => 'required',
-            'files' => 'nullable|array',
-            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
+            'files' => 'required',
+            'files.*' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
             'location' => 'nullable',
             'discount' => 'nullable',
             'link' => 'nullable|url',
-            'images_and_videos' => 'nullable|array',
-            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'images_and_videos' => 'required',
+            'images_and_videos.*' => 'required|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
         ]);
         $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {
             return [
-                'success' => false,
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
             ];
         }
+        // return $data;
         $course = Course::create($data);
 
+        if (isset($data['files'])) {
+            foreach ($data['files'] as $file) {
+                $extension = $file->getClientOriginalExtension();
+                $filename = time() . '.' . $extension;
+                // Move the uploaded file to the desired directory
+                $file->move('public/upload/courses', $filename);
+
+                // Save the file path in the database for later retrieval if needed
+                CourseFile::create([
+                    'course_id' => $course->id,
+                    'file_path' => 'upload/courses/' . $filename, // Save the file path relative to the 'public' disk
+                ]);
+            }
+        }
+
+        // Handle 'images_and_videos' array
+        if (isset($data['images_and_videos'])) {
+            foreach ($data['images_and_videos'] as $imageOrVideoFile) {
+                $extension = $imageOrVideoFile->getClientOriginalExtension();
+                $filename = time() . '.' . $extension;
+                // Move the uploaded file to the desired directory
+                $imageOrVideoFile->move('public/upload/courses', $filename);
+
+                // Save the file path in the database for later retrieval if needed
+                CourseImageVideo::create([
+                    'course_id' => $course->id,
+                    'file_path' => 'upload/courses/' . $filename, // Save the file path relative to the 'public' disk
+                ]);
+            }
+        }
+
         return [
-            'success' => true,
             'message' => 'Course created successfully',
             'data' => new CourseResource($course),
         ];
@@ -59,7 +92,6 @@ class CourseService
 
         if ($validator->fails()) {
             return [
-                'success' => false,
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
             ];
@@ -67,8 +99,6 @@ class CourseService
         $course->update($data);
 
         return [
-            'success' => true,
-            'message' => 'Course updated successfully',
             'data' => new CourseResource($course),
         ];
     }
@@ -88,16 +118,16 @@ class CourseService
         return $course;
     }
 
-    public function deleteCourse(string $id): JsonResponse
+    public function deleteCourse(string $id)
     {
         $course = Course::findOrFail($id);
 
         if (!$course) {
-            return response()->json(['message' => 'Course not found'], 404);
+            return ['message' => 'Course not found'];
         }
 
         $course->delete();
 
-        return response()->json(['message' => 'Course deleted successfully']);
+        return ['message' => 'Course deleted successfully'];
     }
 }

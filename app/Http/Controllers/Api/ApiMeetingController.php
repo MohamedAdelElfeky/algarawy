@@ -16,14 +16,14 @@ class ApiMeetingController extends Controller
         $this->meetingService = $meetingService;
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $meeting = $this->meetingService->createMeeting($request->all());
 
-        return response()->json($meeting, 201);
+        return response()->json( $meeting, 201);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, $id)
     {
         $meeting = $this->meetingService->getMeeting($id);
 
@@ -32,7 +32,7 @@ class ApiMeetingController extends Controller
         return response()->json($updatedMeeting);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy($id)
     {
         $meeting = $this->meetingService->getMeeting($id);
 
@@ -41,14 +41,14 @@ class ApiMeetingController extends Controller
         return response()->json(['message' => 'Meeting deleted successfully'], 200);
     }
 
-    public function index(): JsonResponse
+    public function index()
     {
         $meetings = $this->meetingService->getAllMeetings();
 
-        return response()->json($meetings);
+        return response()->json(['data' => $meetings],200);
     }
 
-    public function show($id): JsonResponse
+    public function show($id)
     {
         $meeting = $this->meetingService->getMeeting($id);
 

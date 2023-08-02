@@ -5,8 +5,13 @@ use App\Http\Controllers\Api\ApiCourseController;
 use App\Http\Controllers\Api\ApiJobController;
 use App\Http\Controllers\Api\ApiMeetingController;
 use App\Http\Controllers\Api\ApiProjectController;
+use App\Http\Controllers\Api\DiscountController;
+use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\RegionController;
+use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\NeighborhoodController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +28,12 @@ use Illuminate\Support\Facades\Route;
 Route::POST('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::get('/regions', [RegionController::class, 'index']);
+Route::get('/cities', [CityController::class, 'index']);
+Route::get('/neighborhoods', [NeighborhoodController::class, 'index']);
+Route::get('/regions/{region}/cities', [CityController::class, 'getCitiesByRegion']);
+Route::get('/cities/{city}/neighborhoods', [NeighborhoodController::class, 'getNeighborhoodsByCity']);
+
 Route::middleware('auth:sanctum')->group(function () {
     // User related routes
     Route::prefix('user')->group(function () {
@@ -37,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
         'p-meetings' => ApiMeetingController::class, // meetings Resource
         'p-bank-accounts' => ApiBankAccountController::class, // bank-accounts Resource
         'p-projects' => ApiProjectController::class,
+        'p-discounts' => DiscountController::class,
+        'p-services' => ServiceController::class,
 
     ]);
 

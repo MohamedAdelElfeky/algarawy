@@ -16,34 +16,33 @@ class ApiCourseController extends Controller
         $this->courseService = $courseService;
     }
 
-    public function index(): JsonResponse
+    public function index()
     {
         $courses = $this->courseService->getAllCourses();
-        return response()->json(['courses' => $courses]);
+        return response()->json(['data' => $courses], 200);
     }
 
-    public function show($id): JsonResponse
+    public function show($id)
     {
         $course = $this->courseService->getCourseById($id);
-        return response()->json(['course' => $course]);
+        return response()->json(['data' => $course], 200);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
+    {   
+        // return $request;
+        $course = $this->courseService->createCourse($request->all());
+        return response()->json($course);
+    }
+
+    public function update(Request $request, $id)
     {
-        $data = $request->all();
-        $result = $this->courseService->createCourse($data);
+        $course = $this->courseService->getCourseById($id);
+        $result = $this->courseService->updateCourse($course, $request->all());
         return response()->json($result);
     }
 
-    public function update(Request $request, $id): JsonResponse
-    {
-        $data = $request->all();
-        $course = $this->courseService->getCourseById($id);
-        $result = $this->courseService->updateCourse($course, $data);
-        return response()->json($result);
-    }
-
-    public function destroy($id): JsonResponse
+    public function destroy($id)
     {
         $result = $this->courseService->deleteCourse($id);
         return response()->json($result);

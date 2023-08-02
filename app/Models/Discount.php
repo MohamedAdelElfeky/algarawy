@@ -5,30 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Course extends Model
+class Discount extends Model
 {
-    use HasFactory;
-    protected $table = 'courses';
+    protected $table = 'discounts';
     protected $fillable = [
-        'name',
         'description',
+        'images',
+        'files',
         'location',
         'discount',
+        'price',
         'user_id',
-        'link',
     ];
-
+    protected $casts = [
+        'images' => 'array',
+        'files' => 'array',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-    public function files()
-    {
-        return $this->hasMany(CourseFile::class);
-    }
-
-    public function images_and_videos()
-    {
-        return $this->hasMany(CourseImageVideo::class);
     }
 }

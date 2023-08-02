@@ -24,9 +24,6 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('location');
-            $table->string('governorate');
-            $table->string('city');
-            $table->string('area');
             $table->date('birth_date');
             $table->string('national_card_image_front')->nullable();
             $table->string('national_card_image_back')->nullable();

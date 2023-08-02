@@ -25,7 +25,7 @@ class JobService
         return $job;
     }
 
-    public function createJob(array $data): JsonResponse
+    public function createJob(array $data)
     {
         $validator = Validator::make($data, [
             'name' => 'required',
@@ -55,13 +55,13 @@ class JobService
         }
         // Create a new job
         $job = Job::create($data);
-        return response()->json([
+        return [
             'message' => 'Job created successfully',
             'data' => new JobResource($job),
-        ]);
+        ];
     }
 
-    public function updateJob(Job $job, array $data): JsonResponse
+    public function updateJob(Job $job, array $data)
     {
         $validator = Validator::make($data, [
             'name' => 'required',
@@ -98,7 +98,7 @@ class JobService
         ]);
     }
 
-    public function deleteJob(Job $job): JsonResponse
+    public function deleteJob(Job $job)
     {
         // Delete the job
         $job->delete();
