@@ -10,10 +10,24 @@ use Illuminate\Http\JsonResponse;
 
 class ProjectService
 {
-    public function getAllProjects()
+    protected $paginationService;
+
+    public function __construct(PaginationService $paginationService)
     {
-        $projects = Project::all();
-        return ProjectResource::collection($projects);
+        $this->paginationService = $paginationService;
+    }
+
+
+    public function getAllProjects($perPage = 10, $page = 1)
+    {
+        $projects = Project::paginate($perPage, ['*'], 'page', $page);
+        $projectResource = ProjectResource::collection($projects);
+        $paginationData = $this->paginationService->getPaginationData($projects);
+
+        return [
+            'data' => $projectResource,
+            'metadata' => $paginationData,
+        ];
     }
 
     public function getProjectById($id)
@@ -32,7 +46,11 @@ class ProjectService
             'description' => 'required|string',
             'images_or_videos' => 'nullable|array',
             'files_pdf' => 'nullable|array',
-            'location' => 'nullable|string|max:255',
+            'location' => ['string', function ($attribute, $value, $fail) {
+                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
+                    $fail($attribute . ' must be a valid Google Maps link.');
+                }
+            }],
         ]);
         $data['user_id'] = Auth::id();
 
@@ -44,7 +62,7 @@ class ProjectService
         }
 
         $project = Project::create($data);
-        return[
+        return [
             'message' => 'Project created successfully',
             'data' => new ProjectResource($project),
         ];

@@ -48,7 +48,7 @@ class MeetingService
             'name' => 'required|string',
             'from' => 'required|integer',
             'to' => 'required|integer',
-            'link' => 'required|string',
+            'link' => 'required|string|url',
             'description' => 'required|string',
             'type' => 'required|in:remotely,normal',
 

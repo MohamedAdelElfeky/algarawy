@@ -16,10 +16,12 @@ class ApiCourseController extends Controller
         $this->courseService = $courseService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $courses = $this->courseService->getAllCourses();
-        return response()->json(['data' => $courses], 200);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+        $courses = $this->courseService->getAllCourses($perPage, $page);
+        return response()->json($courses, 200);
     }
 
     public function show($id)
@@ -29,8 +31,8 @@ class ApiCourseController extends Controller
     }
 
     public function store(Request $request)
-    {   
-        // return $request;
+    {
+        // return $request->file('files');
         $course = $this->courseService->createCourse($request->all());
         return response()->json($course);
     }

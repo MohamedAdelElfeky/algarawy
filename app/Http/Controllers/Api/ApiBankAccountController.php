@@ -19,7 +19,7 @@ class ApiBankAccountController extends Controller
     {
         $bankAccounts = $this->bankAccountService->getAllBankAccounts();
 
-        return response()->json(['data' => $bankAccounts],200);
+        return response()->json($bankAccounts,200);
     }
 
     public function store(Request $request)
@@ -54,13 +54,13 @@ class ApiBankAccountController extends Controller
     {
         $bankAccounts = $this->bankAccountService->getSavingBankAccounts();
 
-        return response()->json(['data' => $bankAccounts],200);
+        return response()->json( $bankAccounts,200);
     }
 
     public function getCharities()
     {
         $bankAccounts = $this->bankAccountService->getCharityBankAccounts();
 
-        return response()->json(['data' => $bankAccounts],200);
+        return response()->json($bankAccounts,200);
     }
 }

@@ -4,17 +4,34 @@ namespace App\Services;
 
 use App\Http\Resources\JobResource;
 use App\Models\Job;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class JobService
 {
-    public function getAllJobs()
+    protected $paginationService;
+
+    public function __construct(PaginationService $paginationService)
     {
-        $jobs = Job::all();
-        return JobResource::collection($jobs);
+        $this->paginationService = $paginationService;
     }
+
+    
+    public function getAllJobs($perPage = 10, $page = 1)
+    {
+        $jobs = Job::paginate($perPage, ['*'], 'page', $page);
+        $jobCollection = JobResource::collection($jobs);
+
+        $paginationData = $this->paginationService->getPaginationData($jobs);
+
+        return [
+            'data' => $jobCollection,
+            'metadata' => $paginationData,
+        ];
+    }
+
+    
 
     public function getJobById($id)
     {
@@ -31,11 +48,20 @@ class JobService
             'name' => 'required',
             'description' => 'required',
             'qualifications' => 'required',
-            'location' => 'required',
+            'location' => ['required', 'string', function ($attribute, $value, $fail) {
+                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
+                    $fail($attribute . ' must be a valid Google Maps link.');
+                }
+            }],
             'contact_information' => 'required',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'company_name' => 'required|string',
-            'company_location' => 'required|string',
+            'company_location' => ['required', 'string', function ($attribute, $value, $fail) {
+                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
+                    $fail($attribute . ' must be a valid Google Maps link.');
+                }
+            }],
+            // 'company_location' => 'required|string',
             'company_type' => 'required|string',
             'company_link' => 'nullable|url',
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -46,7 +72,19 @@ class JobService
             'job_status' => 'required|boolean',
         ]);
         $data['user_id'] = Auth::id();
+        // Handle photo upload and save it temporarily
+        // if (request()->hasFile('photo')) { 
+        //     $photoPath = request()->file('photo')->store('temp', 'public');
+        // } else {
+        //     $photoPath = null;
+        // }
 
+        // Handle company logo upload and save it temporarily
+        // if (request()->hasFile('company_logo')) { dd(request()->file('company_logo'));
+        //     $logoPath = request()->file('company_logo')->store('temp', 'public');
+        // } else {
+        //     $logoPath = null;
+        // }
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation error',
@@ -55,6 +93,18 @@ class JobService
         }
         // Create a new job
         $job = Job::create($data);
+        // if ($photoPath) {
+        //     $newPhotoPath = "photos/{$job->id}/" . uniqid() . '.' . request()->file('photo')->getClientOriginalExtension();
+        //     Storage::disk('public')->move($photoPath, $newPhotoPath);
+        //     $job->update(['photo' => $newPhotoPath]);
+        // }
+
+        // if ($logoPath) {
+        //     $newLogoPath = "logos/{$job->id}/" . uniqid() . '.' . request()->file('company_logo')->getClientOriginalExtension();
+        //     Storage::disk('public')->move($logoPath, $newLogoPath);
+        //     $job->update(['company_logo' => $newLogoPath]);
+        // }
+
         return [
             'message' => 'Job created successfully',
             'data' => new JobResource($job),
@@ -63,6 +113,11 @@ class JobService
 
     public function updateJob(Job $job, array $data)
     {
+        if (($job->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'Job not Created',
+            ], 200);
+        }
         $validator = Validator::make($data, [
             'name' => 'required',
             'description' => 'sometimes|required',
@@ -80,9 +135,8 @@ class JobService
             'is_full_time' => 'sometimes|required|boolean',
             'price' => 'sometimes|required|numeric',
             'job_status' => 'sometimes|required|boolean',
-            
+
         ]);
-        $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {
             return response()->json([
@@ -100,6 +154,11 @@ class JobService
 
     public function deleteJob(Job $job)
     {
+        if (($job->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'Job not Created',
+            ], 200);
+        }
         // Delete the job
         $job->delete();
         return response()->json([

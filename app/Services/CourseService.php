@@ -8,19 +8,28 @@ use App\Models\CourseFile;
 use App\Models\CourseImageVideo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class CourseService
 {
+    protected $paginationService;
+
+    public function __construct(PaginationService $paginationService)
+    {
+        $this->paginationService = $paginationService;
+    }     
+
     public function createCourse(array $data)
     {
         $validator = Validator::make($data, [
-            'name' => 'required',
+            // 'name' => 'required',
             'description' => 'required',
             'files' => 'required',
             'files.*' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'nullable',
+            'location' => ['string', function ($attribute, $value, $fail) {
+                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
+                    $fail($attribute . ' must be a valid Google Maps link.');
+                }
+            }],
             'discount' => 'nullable',
             'link' => 'nullable|url',
             'images_and_videos' => 'required',
@@ -37,8 +46,10 @@ class CourseService
         // return $data;
         $course = Course::create($data);
 
-        if (isset($data['files'])) {
-            foreach ($data['files'] as $file) {
+        if (request()->hasFile('files')) {
+            dd(sizeof(request()->file('files')));
+            foreach (request()->file('files') as $file) {
+                dd($file);
                 $extension = $file->getClientOriginalExtension();
                 $filename = time() . '.' . $extension;
                 // Move the uploaded file to the desired directory
@@ -77,11 +88,15 @@ class CourseService
     public function updateCourse(Course $course, array $data)
     {
         $validator = Validator::make($data, [
-            'name' => 'sometimes|required',
+            // 'name' => 'sometimes|required',
             'description' => 'sometimes|required',
             'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'nullable',
+            'location' => ['string', function ($attribute, $value, $fail) {
+                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
+                    $fail($attribute . ' must be a valid Google Maps link.');
+                }
+            }],
             'discount' => 'nullable',
             'link' => 'nullable|url',
             'images_and_videos' => 'nullable|array',
@@ -103,10 +118,17 @@ class CourseService
         ];
     }
 
-    public function getAllCourses()
+    public function getAllCourses($perPage = 10, $page = 1)
     {
-        $course = Course::all();
-        return CourseResource::collection($course);
+        $courses = Course::paginate($perPage, ['*'], 'page', $page);
+        $courseResource = CourseResource::collection($courses);
+        $paginationData = $this->paginationService->getPaginationData($courses);
+
+        return [
+            'data' => $courseResource,
+            'metadata' => $paginationData,
+        ];
+        return ;
     }
 
     public function getCourseById($id)

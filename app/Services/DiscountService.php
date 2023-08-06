@@ -49,8 +49,11 @@ class DiscountService
             'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
             'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'nullable',
-            'discount' => 'nullable',
+            'location' => ['string', function ($attribute, $value, $fail) {
+                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
+                    $fail($attribute . ' must be a valid Google Maps link.');
+                }
+            }],            'discount' => 'nullable',
             'price' => 'sometimes|required|numeric',
         ]);
 

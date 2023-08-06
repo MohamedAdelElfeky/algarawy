@@ -10,7 +10,7 @@ class Course extends Model
     use HasFactory;
     protected $table = 'courses';
     protected $fillable = [
-        'name',
+        // 'name',
         'description',
         'location',
         'discount',
@@ -30,5 +30,9 @@ class Course extends Model
     public function images_and_videos()
     {
         return $this->hasMany(CourseImageVideo::class);
+    }
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
     }
 }

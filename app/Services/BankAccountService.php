@@ -12,7 +12,8 @@ class BankAccountService
 {
     public function getAllBankAccounts()
     {
-        return BankAccount::all();
+        $bankAccounts = BankAccount::paginate(5);
+        return BankAccountResource::collection($bankAccounts);
     }
 
     public function createBankAccount(array $data)
@@ -91,13 +92,13 @@ class BankAccountService
 
     public function getSavingBankAccounts()
     {
-        $bankAccounts = BankAccount::where('type', 'saving')->get();
+        $bankAccounts = BankAccount::where('type', 'saving')->paginate(5);
         return BankAccountResource::collection($bankAccounts);
     }
 
     public function getCharityBankAccounts()
     {
-        $bankAccounts = BankAccount::where('type', 'charity')->get();
+        $bankAccounts = BankAccount::where('type', 'charity')->paginate(5);
         return BankAccountResource::collection($bankAccounts);
     }
 }

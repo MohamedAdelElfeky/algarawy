@@ -60,4 +60,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'card_images' => 'array',
     ];
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class, 'user_id');
+    }
 }
