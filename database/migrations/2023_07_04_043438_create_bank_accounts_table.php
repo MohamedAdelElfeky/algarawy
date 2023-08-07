@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('account_number');
-            $table->string('iban');
-            $table->string('bank_name');
-            $table->string('swift_number');
-            $table->string('type');
+            $table->string('account_number')->nullable();
+            $table->string('iban')->nullable();
+            $table->string('bank_name')->nullable();
+            $table->string('swift_number')->nullable();
+            $table->string('type')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
 

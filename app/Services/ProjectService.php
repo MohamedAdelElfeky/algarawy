@@ -46,7 +46,7 @@ class ProjectService
             'description' => 'required|string',
             'images' => 'nullable|file',
             'files_pdf' => 'nullable|file',
-            'location' => 'required|string|location',
+            'location' => 'string|location',
         ]);
         $data['user_id'] = Auth::id();
 

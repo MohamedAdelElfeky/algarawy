@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->string('images')->nullable();
             $table->string('files')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->string('location')->nullable();
-            $table->integer('discount');
-            $table->decimal('price', 10, 2);
+            $table->integer('discount')->nullable();
+            $table->decimal('price', 10, 2)->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

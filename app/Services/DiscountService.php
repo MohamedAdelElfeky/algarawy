@@ -33,7 +33,7 @@ class DiscountService
             'description' => 'required',
             'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'nullable',
+            'location' => 'string|location',
             'discount' => 'nullable',
             'price' => 'required|numeric',
         ]);

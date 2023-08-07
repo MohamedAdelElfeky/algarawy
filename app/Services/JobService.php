@@ -48,7 +48,7 @@ class JobService
             'name' => 'required',
             'description' => 'required',
             'qualifications' => 'required',
-            'location' => 'required|string|location',
+            'location' => 'string|location',
             'contact_information' => 'required',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'company_name' => 'required|string',            

@@ -24,7 +24,7 @@ class CourseService
             // 'name' => 'required',
             'description' => 'required',
             'files.*' => '|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'required|string|location',
+            'location' => 'string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
             'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',

@@ -82,7 +82,7 @@ class AuthController extends Controller
             'national_card_image_back' => $backImagePath,
         ]);
 
-        return response()->json(['message' => 'Registration successful'], 200);
+        return response()->json(['message' => 'تم التسجيل بنجاح'], 200);
     }
 
 
@@ -97,7 +97,7 @@ class AuthController extends Controller
         $user = User::where('national_id', $credentials['national_id'])->first();
         // Check if the user exists and the provided password is correct
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'بيانات الاعتماد غير صالحة'], 401);
         }
         // Generate a new API token for the user
         $token = $user->createToken('authToken')->plainTextToken;

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->json('images_or_videos')->nullable();
             $table->json('files_pdf')->nullable();
             $table->string('location')->nullable();
