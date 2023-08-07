@@ -34,7 +34,7 @@ class ProjectService
     {
         $project = Project::findOrFail($id);
         if (!$project) {
-            abort(404, 'Project not found');
+            abort(404, 'المشروع غير موجود');
         }
         return $project;
     }
@@ -42,10 +42,9 @@ class ProjectService
     public function createProject(array $data)
     {
         $validator = Validator::make($data, [
-            'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'images_or_videos' => 'nullable|array',
-            'files_pdf' => 'nullable|array',
+            'images_or_videos' => 'nullable|file',
+            'files_pdf' => 'nullable|file',
             'location' => ['string', function ($attribute, $value, $fail) {
                 if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
                     $fail($attribute . ' must be a valid Google Maps link.');
@@ -62,23 +61,41 @@ class ProjectService
         }
 
         $project = Project::create($data);
+        // Handle images/videos
+        if (request()->hasFile('images_or_videos')) {  //dd(request()->file('images_or_videos'));
+            foreach (request()->file('images_or_videos') as $image) {
+                $imagePath = $image->store('images_or_videos', 'public');dd($imagePath); // Store the image and get the path
+                $project->imagesOrVideos()->create(['url' => $imagePath]);
+            }
+        }
+
+        // Handle PDF files
+        if (request()->hasFile('files_pdf')) {
+            foreach (request()->file('files_pdf') as $pdf) {
+                $pdfPath = $pdf->store('files_pdf', 'public'); // Store the PDF file and get the path
+                $project->filesPdf()->create(['url' => $pdfPath]);
+            }
+        }
         return [
-            'message' => 'Project created successfully',
+            'message' => 'تم إنشاء المشروع بنجاح',
             'data' => new ProjectResource($project),
         ];
     }
 
     public function updateProject(Project $project, array $data)
     {
+        if (($project->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'هذا المشروع ليس من إنشائك',
+            ], 200);
+        }
         $validator = Validator::make($data, [
-            'name' => 'required|string|max:255',
             'description' => 'required|string',
             'images_or_videos' => 'nullable|array',
             'files_pdf' => 'nullable|array',
             'location' => 'nullable|string|max:255',
         ]);
 
-        $data['user_id'] = Auth::id();
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation error',
@@ -89,7 +106,7 @@ class ProjectService
         $project->update($data);
 
         return [
-            'message' => 'Project updated successfully',
+            'message' => 'تم تحديث المشروع بنجاح',
             'data' => new ProjectResource($project),
         ];
         return new ProjectResource($project);
@@ -97,8 +114,25 @@ class ProjectService
 
     public function deleteProject($id)
     {
-        $project = Project::findOrFail($id);
+        $project = $this->getProjectById($id);
+
+        if (($project->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'هذا المشروع ليس من إنشائك',
+            ], 200);
+        }
+
         $project->delete();
         return new ProjectResource($project);
+    }
+
+    public function searchProject($searchTerm)
+    {
+        return Project::where(function ($query) use ($searchTerm) {
+            $fields = ['description'];
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $searchTerm . '%');
+            }
+        })->get();
     }
 }

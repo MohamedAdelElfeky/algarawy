@@ -178,180 +178,117 @@
                     <!--begin::Tab Content-->
                     <div class="tab-content">
                         <!--begin::Tap pane-->
-                        <div class="tab-pane fade " id="kt_stats_widget_16_tab_1">
+                        <div class="tab-pane fade" id="kt_stats_widget_16_tab_1">
                             <div class="row g-5 g-xxl-8">
-
-                                <div class="col-xl-6">
-                                    <!--begin::Feeds Widget 5-->
-                                    <div class="card mb-5 mb-xl-8">
-                                        <!--begin::Body-->
-                                        <div class="card-body pb-0">
-                                            <!--begin::Header-->
-                                            <div class="d-flex align-items-center mb-5">
-                                                <!--begin::User-->
-                                                <div class="d-flex align-items-center flex-grow-1">
-                                                    <!--begin::Avatar-->
-                                                    <div class="symbol symbol-45px me-5">
-                                                        <img src="assets/media/avatars/300-25.jpg" alt="" />
-                                                    </div>
-                                                    <!--end::Avatar-->
-                                                    <!--begin::Info-->
-                                                    <div class="d-flex flex-column">
-                                                        <a href="#"
-                                                            class="text-gray-900 text-hover-primary fs-6 fw-bold">اسم
-                                                            الناشر</a>
-                                                        <span class="text-gray-400 fw-bold">Yestarday at 5:06 PM</span>
-                                                    </div>
-                                                    <!--end::Info-->
-                                                </div>
-                                                <!--end::User-->
-                                            </div>
-                                            <!--end::Header-->
-                                            <!--begin::Post-->
-                                            <div class="mb-5">
-                                                <!--begin::Image-->
-                                                <div class="bgi-no-repeat bgi-size-cover rounded min-h-250px mb-5"
-                                                    style="background-image:url('assets/media/stock/900x600/20.jpg');">
-                                                </div>
-                                                <!--end::Image-->
-                                                <!--begin::Text-->
-                                                <div class="text-gray-800 mb-5">هو ببساطة نص شكلي (بمعنى أن الغاية هي
-                                                    الشكل
-                                                    وليس
-                                                    المحتوى) ويُستخدم في صناعات المطابع ودور النشر. كان ولايزال المعيار
-                                                    للنص
-                                                    الشكلي
-                                                    منذ القرن الخامس عشر عندما قامت مطبعة قرائه المزيد...</div>
-                                                <!--end::Text-->
-                                                <!--begin::Toolbar-->
+                                @foreach ($jobData as $data)
+                                    <div class="col-xl-6">
+                                        <!--begin::Feeds Widget 5-->
+                                        <div class="card mb-5 mb-xl-8">
+                                            <!--begin::Body-->
+                                            <div class="card-body pb-0">
+                                                <!--begin::Header-->
                                                 <div class="d-flex align-items-center mb-5">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-light btn-color-muted btn-active-light-success px-4 py-2 me-4">
-                                                        <i class="ki-duotone ki-eye">
-                                                            <i class="path1"></i>
-                                                            <i class="path2"></i>
-                                                            <i class="path3"></i>
-                                                        </i>12</a>
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-light btn-color-muted btn-active-light-danger px-4 py-2">
-                                                        <i class="ki-duotone ki-like-shapes">
-                                                            <i class="path1"></i>
-                                                            <i class="path2"></i>
-                                                        </i>150</a>
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-light btn-color-muted btn-active-light-info px-4 py-2">
-                                                        <i class="ki-duotone ki-share">
-                                                            <i class="path1"></i>
-                                                            <i class="path2"></i>
-                                                            <i class="path3"></i>
-                                                            <i class="path4"></i>
-                                                            <i class="path5"></i>
-                                                            <i class="path6"></i>
-                                                        </i>
-                                                        10</a>
-                                                </div>
-                                                <!--end::Toolbar-->
-                                            </div>
-                                            <!--end::Post-->
-                                            <!--begin::Separator-->
-                                            <div class="separator mb-4"></div>
-                                            <!--end::Separator-->
-                                        </div>
-                                        <!--end::Body-->
-                                    </div>
-                                    <!--end::Feeds Widget 5-->
-                                </div>
-
-                                <div class="col-xl-6">
-                                    <!--begin::Feeds Widget 5-->
-                                    <div class="card mb-5 mb-xl-8">
-                                        <!--begin::Body-->
-                                        <div class="card-body pb-0">
-                                            <!--begin::Header-->
-                                            <div class="d-flex align-items-center mb-5">
-                                                <!--begin::User-->
-                                                <div class="d-flex align-items-center flex-grow-1">
-                                                    <!--begin::Avatar-->
-                                                    <div class="symbol symbol-45px me-5">
-                                                        <img src="assets/media/avatars/300-25.jpg" alt="" />
+                                                    <!--begin::User-->
+                                                    <div class="d-flex align-items-center flex-grow-1">
+                                                        <!--begin::Avatar-->
+                                                        <div class="symbol symbol-45px me-5">
+                                                            <img src="assets/media/avatars/300-25.jpg" alt="" />
+                                                        </div>
+                                                        <!--end::Avatar-->
+                                                        <!--begin::Info-->
+                                                        <div class="d-flex flex-column">
+                                                            <a href="#"
+                                                                class="text-gray-900 text-hover-primary fs-6 fw-bold">{{ $data['company_name'] }}</a>
+                                                            <span
+                                                                class="text-gray-400 fw-bold">{{ $data['description'] }}</span>
+                                                        </div>
+                                                        <!--end::Info-->
                                                     </div>
-                                                    <!--end::Avatar-->
-                                                    <!--begin::Info-->
-                                                    <div class="d-flex flex-column">
+                                                    <!--end::User-->
+                                                </div>
+                                                <!--end::Header-->
+                                                <!--begin::Post-->
+                                                <div class="mb-5">
+                                                    <!--begin::Image-->
+                                                    <div class="bgi-no-repeat bgi-size-cover rounded min-h-250px mb-5"
+                                                        style="background-image:url('{{ $data['image'] }}');"></div>
+                                                    <!--end::Image-->
+                                                    <!--begin::Text-->
+                                                    <div class="text-gray-800 mb-5">{{ $data['text'] }}</div>
+                                                    <!--end::Text-->
+                                                    <!--begin::Toolbar-->
+                                                    <div class="d-flex align-items-center mb-5">
                                                         <a href="#"
-                                                            class="text-gray-900 text-hover-primary fs-6 fw-bold">اسم
-                                                            الناشر</a>
-                                                        <span class="text-gray-400 fw-bold">Yestarday at 5:06 PM</span>
+                                                            class="btn btn-sm btn-light btn-color-muted btn-active-light-success px-4 py-2 me-4">
+                                                            <i class="ki-duotone ki-eye">
+                                                                <i class="path1"></i>
+                                                                <i class="path2"></i>
+                                                                <i class="path3"></i>
+                                                            </i>{{ $data['views'] }}</a>
+                                                        <a href="#"
+                                                            class="btn btn-sm btn-light btn-color-muted btn-active-light-danger px-4 py-2">
+                                                            <i class="ki-duotone ki-like-shapes">
+                                                                <i class="path1"></i>
+                                                                <i class="path2"></i>
+                                                            </i>{{ $data['likes'] }}</a>
+                                                        <a href="#"
+                                                            class="btn btn-sm btn-light btn-color-muted btn-active-light-info px-4 py-2">
+                                                            <i class="ki-duotone ki-share">
+                                                                <i class="path1"></i>
+                                                                <i class="path2"></i>
+                                                                <i class="path3"></i>
+                                                                <i class="path4"></i>
+                                                                <i class="path5"></i>
+                                                                <i class="path6"></i>
+                                                            </i>{{ $data['shares'] }}</a>
                                                     </div>
-                                                    <!--end::Info-->
+                                                    <!--end::Toolbar-->
                                                 </div>
-                                                <!--end::User-->
+                                                <!--end::Post-->
+                                                <!--begin::Separator-->
+                                                <div class="separator mb-4"></div>
+                                                <!--end::Separator-->
                                             </div>
-                                            <!--end::Header-->
-                                            <!--begin::Post-->
-                                            <div class="mb-5">
-                                                <!--begin::Image-->
-                                                <div class="bgi-no-repeat bgi-size-cover rounded min-h-250px mb-5"
-                                                    style="background-image:url('assets/media/stock/900x600/20.jpg');">
-                                                </div>
-                                                <!--end::Image-->
-                                                <!--begin::Text-->
-                                                <div class="text-gray-800 mb-5">هو ببساطة نص شكلي (بمعنى أن الغاية هي
-                                                    الشكل
-                                                    وليس
-                                                    المحتوى) ويُستخدم في صناعات المطابع ودور النشر. كان ولايزال المعيار
-                                                    للنص
-                                                    الشكلي
-                                                    منذ القرن الخامس عشر عندما قامت مطبعة قرائه المزيد...</div>
-                                                <!--end::Text-->
-                                                <!--begin::Toolbar-->
-                                                <div class="d-flex align-items-center mb-5">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-light btn-color-muted btn-active-light-success px-4 py-2 me-4">
-                                                        <i class="ki-duotone ki-eye">
-                                                            <i class="path1"></i>
-                                                            <i class="path2"></i>
-                                                            <i class="path3"></i>
-                                                        </i>12</a>
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-light btn-color-muted btn-active-light-danger px-4 py-2">
-                                                        <i class="ki-duotone ki-like-shapes">
-                                                            <i class="path1"></i>
-                                                            <i class="path2"></i>
-                                                        </i>150</a>
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-light btn-color-muted btn-active-light-info px-4 py-2">
-                                                        <i class="ki-duotone ki-share">
-                                                            <i class="path1"></i>
-                                                            <i class="path2"></i>
-                                                            <i class="path3"></i>
-                                                            <i class="path4"></i>
-                                                            <i class="path5"></i>
-                                                            <i class="path6"></i>
-                                                        </i>
-                                                        10</a>
-                                                </div>
-                                                <!--end::Toolbar-->
-                                            </div>
-                                            <!--end::Post-->
-                                            <!--begin::Separator-->
-                                            <div class="separator mb-4"></div>
-                                            <!--end::Separator-->
+                                            <!--end::Body-->
                                         </div>
-                                        <!--end::Body-->
+                                        <!--end::Feeds Widget 5-->
                                     </div>
-                                    <!--end::Feeds Widget 5-->
-                                </div>
-
+                                @endforeach
                             </div>
-
                         </div>
                         <!--end::Tap pane-->
+
                         <!--begin::Tap pane-->
                         <div class="tab-pane fade" id="kt_stats_widget_16_tab_2">
+                            <div class="project-content">
+                                @foreach ($projects as $project)
+                                    <div class="col-xl-6">
+                                        <!--begin::Feeds Widget 5-->
+                                        <div class="card mb-5 mb-xl-8">
+                                            <!-- ... (rest of the Feeds Widget 5 code) ... -->
+                                        </div>
+                                        <!--end::Feeds Widget 5-->
 
+                                        <!--begin::Tab pane (Projects)-->
+                                        <div class="project-content">
+                                            <div class="project">
+                                                <h3>{{ $project->id }}</h3>
+                                                <p>{{ $project->description }}</p>
+                                                <p>Location: {{ $project->location }}</p>
+                                                <!-- Add code to display images or videos and files in the project -->
+                                                <!-- Add code to display user information related to the project -->
+                                                <p>Created at: {{ $project->created_at }}</p>
+                                                <p>Updated at: {{ $project->updated_at }}</p>
+                                            </div>
+
+                                        </div>
+                                        <!--end::Tab pane (Projects)-->
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         <!--end::Tap pane-->
+
                         <!--begin::Tap pane-->
                         <div class="tab-pane fade" id="kt_stats_widget_16_tab_3">
                             <div class="row g-5 g-xl-10 mb-xl-10">
@@ -3193,34 +3130,34 @@
         </div>
     </div>
     @section('script')
-    <script>
-        function generateTenDays() {
-            const today = new Date();
-            const tenDays = [];
-    
-            for (let i = 0; i < 10; i++) {
-                const day = new Date(today);
-                day.setDate(today.getDate() + i);
-                tenDays.push({
-                    dayOfWeek: day.toLocaleString('en-US', {
-                        weekday: 'short'
-                    }),
-                    dayOfMonth: day.getDate(),
-                    contentId: `kt_timeline_widget_3_tab_content_${i + 1}`
-                });
+        <script>
+            function generateTenDays() {
+                const today = new Date();
+                const tenDays = [];
+
+                for (let i = 0; i < 10; i++) {
+                    const day = new Date(today);
+                    day.setDate(today.getDate() + i);
+                    tenDays.push({
+                        dayOfWeek: day.toLocaleString('en-US', {
+                            weekday: 'short'
+                        }),
+                        dayOfMonth: day.getDate(),
+                        contentId: `kt_timeline_widget_3_tab_content_${i + 1}`
+                    });
+                }
+
+                return tenDays;
             }
-    
-            return tenDays;
-        }
-    
-        function renderTenDays() {
-            const navList = document.getElementById('navList');
-            const days = generateTenDays();
-    
-            for (const day of days) {
-                const listItem = document.createElement('li');
-                listItem.className = 'nav-item p-0 ms-0';
-                listItem.innerHTML = `
+
+            function renderTenDays() {
+                const navList = document.getElementById('navList');
+                const days = generateTenDays();
+
+                for (const day of days) {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'nav-item p-0 ms-0';
+                    listItem.innerHTML = `
                     <!--begin::Date-->
                     <a class="nav-link btn d-flex flex-column flex-center rounded-pill min-w-45px py-4 px-3 btn-active-danger"
                         data-bs-toggle="tab"
@@ -3230,43 +3167,43 @@
                     </a>
                     <!--end::Date-->
                 `;
-                navList.appendChild(listItem);
-            }
-        }
-    
-        // Render the ten days when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            renderTenDays();
-        });
-    
-        // Function to fetch meetings using AJAX
-        function fetchMeetings() {
-            $.ajax({
-                url: '{{ route('meet') }}', // Replace with the actual PHP backend file path
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response && response.data) {
-                        const meetings = response.data;
-                        renderMeetings(meetings);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching meetings:', error);
+                    navList.appendChild(listItem);
                 }
+            }
+
+            // Render the ten days when the page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                renderTenDays();
             });
-        }
-    
-        // Function to render meetings on the page
-        function renderMeetings(meetings) {
-            for (let i = 0; i < 10; i++) {
-                const tabContent = $(`#kt_timeline_widget_3_tab_content_${i + 1}`);
-                tabContent.empty();
-    
-                const meetingsForDay = meetings.filter((meeting) => meeting.day === i + 1);
-    
-                meetingsForDay.forEach(function(meeting) {
-                    const meetingHTML = `
+
+            // Function to fetch meetings using AJAX
+            function fetchMeetings() {
+                $.ajax({
+                    url: '{{ route('meet') }}', // Replace with the actual PHP backend file path
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response && response.data) {
+                            const meetings = response.data;
+                            renderMeetings(meetings);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching meetings:', error);
+                    }
+                });
+            }
+
+            // Function to render meetings on the page
+            function renderMeetings(meetings) {
+                for (let i = 0; i < 10; i++) {
+                    const tabContent = $(`#kt_timeline_widget_3_tab_content_${i + 1}`);
+                    tabContent.empty();
+
+                    const meetingsForDay = meetings.filter((meeting) => meeting.day === i + 1);
+
+                    meetingsForDay.forEach(function(meeting) {
+                        const meetingHTML = `
                         <div class="d-flex align-items-center mb-6">
                             <span data-kt-element="bullet" class="bullet bullet-vertical d-flex align-items-center min-h-70px mh-100 me-4 ${meeting.color}"></span>
                             <div class="flex-grow-1 me-5">
@@ -3279,16 +3216,15 @@
                             <a href="#" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#kt_modal_create_project">View</a>
                         </div>
                     `;
-                    tabContent.append(meetingHTML);
-                });
+                        tabContent.append(meetingHTML);
+                    });
+                }
             }
-        }
-    
-        // Fetch meetings when the page loads
-        $(document).ready(function() {
-            fetchMeetings();
-        });
-    </script>
-    
+
+            // Fetch meetings when the page loads
+            $(document).ready(function() {
+                fetchMeetings();
+            });
+        </script>
     @endsection
 </x-default-layout>

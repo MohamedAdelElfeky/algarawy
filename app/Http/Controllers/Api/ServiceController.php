@@ -16,10 +16,12 @@ class ServiceController extends Controller
         $this->serviceService = $serviceService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $services = $this->serviceService->getAllServices();
-        return ServiceResource::collection($services);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+        $services = $this->serviceService->getAllServices($perPage, $page);
+        return response()->json($services, 200);
     }
 
     public function show($id)

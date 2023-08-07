@@ -6,10 +6,27 @@ use App\Models\Discount;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\DiscountResource;
-use Illuminate\Http\JsonResponse;
 
 class DiscountService
 {
+    protected $paginationService;
+
+    public function __construct(PaginationService $paginationService)
+    {
+        $this->paginationService = $paginationService;
+    }
+
+    public function getAllDiscounts($perPage = 10, $page = 1)
+    {
+        $discounts = Discount::paginate($perPage, ['*'], 'page', $page);
+        $discountResource = DiscountResource::collection($discounts);
+        $paginationData = $this->paginationService->getPaginationData($discounts);
+        return [
+            'data' => $discountResource,
+            'metadata' => $paginationData,
+        ];
+    }
+
     public function createDiscount(array $data): array
     {
         $validator = Validator::make($data, [
@@ -75,11 +92,7 @@ class DiscountService
         ];
     }
 
-    public function getAllDiscounts()
-    {
-        $discounts = Discount::all();
-        return DiscountResource::collection($discounts);
-    }
+
 
     public function getDiscountById($id): Discount
     {

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\MeetingService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ApiMeetingController extends Controller
@@ -20,7 +19,7 @@ class ApiMeetingController extends Controller
     {
         $meeting = $this->meetingService->createMeeting($request->all());
 
-        return response()->json( $meeting, 201);
+        return response()->json($meeting, 201);
     }
 
     public function update(Request $request, $id)
@@ -41,11 +40,12 @@ class ApiMeetingController extends Controller
         return response()->json(['message' => 'Meeting deleted successfully'], 200);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $meetings = $this->meetingService->getAllMeetings();
-
-        return response()->json(['data' => $meetings],200);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+        $meetings = $this->meetingService->getAllMeetings($perPage, $page);
+        return response()->json($meetings, 200);
     }
 
     public function show($id)

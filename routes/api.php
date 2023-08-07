@@ -11,7 +11,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\JobApplicationController;
 use App\Http\Controllers\Api\NeighborhoodController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,10 +53,21 @@ Route::middleware('auth:sanctum')->group(function () {
         'p-projects' => ApiProjectController::class,
         'p-discounts' => DiscountController::class,
         'p-services' => ServiceController::class,
-
+        'p-job-application' => JobApplicationController::class,
     ]);
+    
     Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'addFavorite']);
     Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
+    Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
+
+    // Search 
+    Route::get('/p-projectsSearch', [ApiProjectController::class, 'search']);
+    Route::get('/p-coursesSearch', [ApiCourseController::class, 'search']);
+    Route::get('/p-meetingsSearch', [ApiMeetingController::class, 'search']);
+    Route::get('/p-jobsSearch', [ApiJobController::class, 'search']);
+    Route::get('/p-discountsSearch', [DiscountController::class, 'search']);
+    Route::get('/p-servicesSearch', [ServiceController::class, 'search']);
+
     // Bank related routes
     Route::prefix('bank')->group(function () {
         Route::get('/getSavings', [ApiBankAccountController::class, 'getSavings']);

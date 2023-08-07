@@ -16,7 +16,7 @@ class CourseService
     public function __construct(PaginationService $paginationService)
     {
         $this->paginationService = $paginationService;
-    }     
+    }
 
     public function createCourse(array $data)
     {
@@ -80,13 +80,18 @@ class CourseService
         }
 
         return [
-            'message' => 'Course created successfully',
+            'message' => 'تم إنشاء الدورة التدريبية بنجاح',
             'data' => new CourseResource($course),
         ];
     }
 
     public function updateCourse(Course $course, array $data)
     {
+        if (($course->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'هذا الدورة ليس من إنشائك',
+            ], 200);
+        }
         $validator = Validator::make($data, [
             // 'name' => 'sometimes|required',
             'description' => 'sometimes|required',
@@ -128,14 +133,14 @@ class CourseService
             'data' => $courseResource,
             'metadata' => $paginationData,
         ];
-        return ;
+        return;
     }
 
     public function getCourseById($id)
     {
         $course = Course::find($id);
         if (!$course) {
-            abort(404, 'Course not found');
+            abort(404, 'الدورة غير موجودة');
         }
         return $course;
     }
@@ -145,11 +150,24 @@ class CourseService
         $course = Course::findOrFail($id);
 
         if (!$course) {
-            return ['message' => 'Course not found'];
+            return ['message' => 'الدورة غير موجودة'];
         }
-
+        if (($course->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'هذا الدورة ليس من إنشائك',
+            ], 200);
+        }
         $course->delete();
 
-        return ['message' => 'Course deleted successfully'];
+        return ['message' => 'تم حذف الدورة بنجاح'];
+    }
+    public function searchCourse($searchTerm)
+    {
+        return Course::where(function ($query) use ($searchTerm) {
+            $fields = ['description'];
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $searchTerm . '%');
+            }
+        })->get();
     }
 }

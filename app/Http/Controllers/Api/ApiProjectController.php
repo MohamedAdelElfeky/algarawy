@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class ApiProjectController extends Controller
 {
@@ -16,10 +15,12 @@ class ApiProjectController extends Controller
         $this->projectService = $projectService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $projects = $this->projectService->getAllProjects();
-        return response()->json(['data' => $projects], 200);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+        $projects = $this->projectService->getAllProjects($perPage, $page);
+        return response()->json($projects, 200);
     }
 
 
@@ -45,5 +46,12 @@ class ApiProjectController extends Controller
     public function destroy($id)
     {
         return $this->projectService->deleteProject($id);
+    }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $results = $this->projectService->searchProject($searchTerm);
+        return response()->json(['data' => $results]);
     }
 }

@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('job_applications', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
-            $table->json('images_or_videos')->nullable();
-            $table->json('files_pdf')->nullable();
-            $table->string('location')->nullable();
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('job_id');
+            $table->binary('file');
+            $table->string('type_file');
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        
+            // Add foreign key constraints if required
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('job_id')->references('id')->on('jobs');
         });
     }
 
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('job_applications');
     }
 };

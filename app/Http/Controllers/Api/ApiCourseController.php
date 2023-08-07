@@ -49,4 +49,10 @@ class ApiCourseController extends Controller
         $result = $this->courseService->deleteCourse($id);
         return response()->json($result);
     }
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $results = $this->courseService->searchCourse($searchTerm);
+        return response()->json(['data' => $results]);
+    }
 }

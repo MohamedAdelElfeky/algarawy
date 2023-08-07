@@ -10,17 +10,19 @@ use Illuminate\Http\JsonResponse;
 
 class DiscountController extends Controller
 {
-    protected $discountService;
+        protected $discountService;
 
     public function __construct(DiscountService $discountService)
     {
-        $this->discountService = $discountService;
+            $this->discountService = $discountService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $discounts = $this->discountService->getAllDiscounts();
-        return DiscountResource::collection($discounts);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+        $discounts = $this->discountService->getAllDiscounts($perPage, $page);
+        return response()->json($discounts, 200);
     }
 
     public function show($id)

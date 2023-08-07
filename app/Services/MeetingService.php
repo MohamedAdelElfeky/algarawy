@@ -10,9 +10,16 @@ use Illuminate\Support\Facades\Auth;
 
 class MeetingService
 {
+    protected $paginationService;
+
+    public function __construct(PaginationService $paginationService)
+    {
+        $this->paginationService = $paginationService;
+    }
 
     public function createMeeting(array $data)
     {
+       
         $validator = Validator::make($data, [
             'datetime' => 'required|date',
             'link' => 'required|string',
@@ -63,7 +70,7 @@ class MeetingService
         }
 
         $meeting->update($data);
-        return[
+        return [
             'message' => 'Meeting updated successfully',
             'data' => new MeetingResource($meeting),
         ];
@@ -79,9 +86,15 @@ class MeetingService
         return Meeting::findOrFail($id);
     }
 
-    public function getAllMeetings()
+    public function getAllMeetings($perPage = 10, $page = 1)
     {
-        $meetings = Meeting::all();
-        return MeetingResource::collection($meetings);
+        $meetings = Meeting::paginate($perPage, ['*'], 'page', $page);
+        $meetingResource =  MeetingResource::collection($meetings);
+        $paginationData = $this->paginationService->getPaginationData($meetings);
+
+        return  [
+            'data' => $meetingResource,
+            'metadata' => $paginationData,
+        ];;
     }
 }

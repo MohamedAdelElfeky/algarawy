@@ -6,11 +6,16 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ServiceResource;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Database\Eloquent\Collection;
 
 class ServiceService
 {
+    protected $paginationService;
+
+    public function __construct(PaginationService $paginationService)
+    {
+        $this->paginationService = $paginationService;
+    }
+
     public function createService(array $data): array
     {
         $validator = Validator::make($data, [
@@ -43,6 +48,11 @@ class ServiceService
 
     public function updateService(Service $service, array $data): array
     {
+        if (($service->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'Service not Created',
+            ], 200);
+        }
         $validator = Validator::make($data, [
             'description' => 'sometimes|required|string',
             'images' => 'nullable|array',
@@ -67,10 +77,16 @@ class ServiceService
         ];
     }
 
-    public function getAllServices()
+    public function getAllServices($perPage = 10, $page = 1)
     {
-        $services = Service::all();
-        return ServiceResource::collection($services);
+        $services = Service::paginate($perPage, ['*'], 'page', $page);
+        $serviceResource = ServiceResource::collection($services);
+        $paginationData = $this->paginationService->getPaginationData($services);
+
+        return [
+            'data' => $serviceResource,
+            'metadata' => $paginationData,
+        ];
     }
 
     public function getServiceById($id): Service
@@ -85,11 +101,14 @@ class ServiceService
     public function deleteService(string $id)
     {
         $service = Service::findOrFail($id);
-
         if (!$service) {
             return response()->json(['message' => 'Service not found'], 404);
         }
-
+        if (($service->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'Service not Created',
+            ], 200);
+        }
         $service->delete();
 
         return response()->json(['message' => 'Service deleted successfully']);
