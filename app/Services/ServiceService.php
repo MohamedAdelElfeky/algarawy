@@ -21,7 +21,6 @@ class ServiceService
     {
         $validator = Validator::make($data, [
             'description' => 'required|string',
-            'images' => 'nullable|array',
             'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
             'location' => 'required|string|location',
         ]);

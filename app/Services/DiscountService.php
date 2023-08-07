@@ -31,9 +31,7 @@ class DiscountService
     {
         $validator = Validator::make($data, [
             'description' => 'required',
-            'images' => 'nullable|array',
             'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
             'location' => 'nullable',
             'discount' => 'nullable',
