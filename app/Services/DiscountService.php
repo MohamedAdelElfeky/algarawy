@@ -84,6 +84,7 @@ class DiscountService
             }
         }
         return [
+            'success' => true,
             'message' => 'Discount created successfully',
             'data' => new DiscountResource($discount),
         ];

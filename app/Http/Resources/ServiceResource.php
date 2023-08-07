@@ -17,7 +17,7 @@ class ServiceResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'images_or_videos' => ImageResource::collection($this->images),
+            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
             'location' => $this->location,
             'user' => $this->user,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),

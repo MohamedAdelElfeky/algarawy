@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('link')->nullable();
             $table->string('description')->nullable();
             $table->unsignedBigInteger('user_id');
-            $table->double('from')->nullable();
-            $table->double('to')->nullable();
+            $table->time('from')->nullable();
+            $table->time('to')->nullable();
             $table->string('type')->nullable();
             $table->timestamps();
-            
+
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

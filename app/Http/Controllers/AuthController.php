@@ -22,9 +22,8 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'phone' => 'required|string|unique:users',
             'password' => 'required|string|min:6',
-            'location' => 'required|string',
             'birth_date' => 'required|date',
-            'national_id' => 'required|string|unique:users',
+            'national_id' => 'required|string|size:11|unique:users',
             'avatar' => 'nullable|string',
             'card_images' => 'nullable|array',
             'region_id' => 'required|exists:regions,id',
@@ -39,26 +38,26 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Handle the file uploads and save the file paths
-        // $frontImage = $request->file('national_card_image_front')->store('public/images/frontImage');
-        // $file = request()->file('path');
-        // $file_name = time() . rand(0, 9999999999999) . '_image.' . $file->getClientOriginalExtension();
-        // $file->move(public_path('images/category'), $file_name);
-        // $backImage = $request->file('national_card_image_back')->store('public/images/backImage');
-
-        $frontImage = $request->file('national_card_image_front');
-        $backImage = $request->file('national_card_image_back');
-
-        $frontImagePath = null;
-        $backImagePath = null;
-
-        if ($frontImage) {
-            $frontImagePath = $frontImage->store('public/images/frontImage');
+        if (request()->hasFile('avatar')) {
+            $imageAvatar = request()->file('avatar');
+            $file_name_avatar = time() . rand(0, 9999999999999) . '_avatar.' . $imageAvatar->getClientOriginalExtension();
+            $imageAvatar->move(public_path('user/'), $file_name_avatar);
+            $imagePathAvatar = "user/" . $file_name_avatar;
+        }
+        if (request()->hasFile('national_card_image_front')) {
+            $imageFront = request()->file('national_card_image_front');
+            $file_name_front = time() . rand(0, 9999999999999) . '_avatar.' . $imageFront->getClientOriginalExtension();
+            $imageFront->move(public_path('user/'), $file_name_front);
+            $imagePathFront = "user/" . $file_name_front;
+        }
+        if (request()->hasFile('national_card_image_back')) {
+            $imageBack = request()->file('national_card_image_back');
+            $file_name_back = time() . rand(0, 9999999999999) . '_avatar.' . $imageBack->getClientOriginalExtension();
+            $imageBack->move(public_path('user/'), $file_name_back);
+            $imagePathBack = "user/" . $file_name_back;
         }
 
-        if ($backImage) {
-            $backImagePath = $backImage->store('public/images/backImage');
-        }
+
         $region = Region::findOrFail($request->input('region_id'));
         $city = City::findOrFail($request->input('city_id'));
         $neighborhood = Neighborhood::findOrFail($request->input('neighborhood_id'));
@@ -73,13 +72,13 @@ class AuthController extends Controller
             'location' => $request->input('location'),
             'birth_date' => $request->input('birth_date'),
             'national_id' => $request->input('national_id'),
-            'avatar' => $request->input('avatar'),
+            'avatar' => $imagePathAvatar,
             'card_images' => $request->input('card_images'),
             'region_id' => $region->id,
             'city_id' => $city->id,
             'neighborhood_id' => $neighborhood->id,
-            'national_card_image_front' => $frontImagePath,
-            'national_card_image_back' => $backImagePath,
+            'national_card_image_front' => $imagePathFront,
+            'national_card_image_back' => $imagePathBack,
         ]);
 
         return response()->json(['message' => 'تم التسجيل بنجاح'], 200);
