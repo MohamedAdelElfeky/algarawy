@@ -40,8 +40,7 @@ class ServiceService
         $service = Service::create($data);
 
         return [
-            'success' => true,
-            'message' => 'Service created successfully',
+            'message' => 'تم إنشاء الخدمة بنجاح',
             'data' => new ServiceResource($service),
         ];
     }
@@ -50,7 +49,7 @@ class ServiceService
     {
         if (($service->user_id) != Auth::id()); {
             return response()->json([
-                'message' => 'Service not Created',
+                'message' => 'هذا الخدمة ليس من إنشائك',
             ], 200);
         }
         $validator = Validator::make($data, [
@@ -71,8 +70,7 @@ class ServiceService
         $service->update($data);
 
         return [
-            'success' => true,
-            'message' => 'Service updated successfully',
+            'message' => 'تم تحديث الخدمة بنجاح',
             'data' => new ServiceResource($service),
         ];
     }
@@ -93,7 +91,7 @@ class ServiceService
     {
         $service = Service::find($id);
         if (!$service) {
-            abort(404, 'Service not found');
+            abort(404, 'الخدمة غير موجودة');
         }
         return $service;
     }
@@ -106,11 +104,20 @@ class ServiceService
         }
         if (($service->user_id) != Auth::id()); {
             return response()->json([
-                'message' => 'Service not Created',
+                'message' => 'هذا الخدمة ليس من إنشائك',
             ], 200);
         }
         $service->delete();
 
         return response()->json(['message' => 'Service deleted successfully']);
+    }
+    public function searchService($searchTerm)
+    {
+        return Service::where(function ($query) use ($searchTerm) {
+            $fields = ['description'];
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $searchTerm . '%');
+            }
+        })->get();
     }
 }

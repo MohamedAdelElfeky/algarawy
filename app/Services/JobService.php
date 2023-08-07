@@ -17,7 +17,7 @@ class JobService
         $this->paginationService = $paginationService;
     }
 
-    
+
     public function getAllJobs($perPage = 10, $page = 1)
     {
         $jobs = Job::paginate($perPage, ['*'], 'page', $page);
@@ -31,13 +31,13 @@ class JobService
         ];
     }
 
-    
+
 
     public function getJobById($id)
     {
         $job = Job::find($id);
         if (!$job) {
-            abort(404, 'Job not found');
+            abort(404, 'لم يتم العثور على الوظيفة');
         }
         return $job;
     }
@@ -106,7 +106,7 @@ class JobService
         // }
 
         return [
-            'message' => 'Job created successfully',
+            'message' => 'تم إنشاء الوظيفة بنجاح',
             'data' => new JobResource($job),
         ];
     }
@@ -115,7 +115,7 @@ class JobService
     {
         if (($job->user_id) != Auth::id()); {
             return response()->json([
-                'message' => 'Job not Created',
+                'message' => 'هذا الوظيفية ليس من إنشائك',
             ], 200);
         }
         $validator = Validator::make($data, [
@@ -137,17 +137,15 @@ class JobService
             'job_status' => 'sometimes|required|boolean',
 
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
             ], 422);
         }
-        // Update the job
         $job->update($data);
         return response()->json([
-            'message' => 'Job updated successfully',
+            'message' => 'تم تحديث الوظيفة بنجاح',
             'data' => new JobResource($job),
         ]);
     }
@@ -156,13 +154,22 @@ class JobService
     {
         if (($job->user_id) != Auth::id()); {
             return response()->json([
-                'message' => 'Job not Created',
+                'message' => 'هذا الوظيفية ليس من إنشائك',
             ], 200);
         }
-        // Delete the job
         $job->delete();
         return response()->json([
-            'message' => 'Job deleted successfully',
+            'message' => 'تم حذف الوظيفة بنجاح',
         ]);
+    }
+
+    public function searchJob($searchTerm)
+    {
+        return Job::where(function ($query) use ($searchTerm) {
+            $fields = ['description', 'name', 'qualifications', 'contact_information', 'company_name', 'price'];
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $searchTerm . '%');
+            }
+        })->get();
     }
 }

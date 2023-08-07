@@ -87,7 +87,7 @@ class DiscountService
 
         return [
             'success' => true,
-            'message' => 'Discount updated successfully',
+            'message' => 'تم تحديث الخصم بنجاح',
             'data' => new DiscountResource($discount),
         ];
     }
@@ -98,7 +98,7 @@ class DiscountService
     {
         $discount = Discount::find($id);
         if (!$discount) {
-            abort(404, 'Discount not found');
+            abort(404, 'الخصم غير موجود');
         }
         return $discount;
     }
@@ -108,11 +108,20 @@ class DiscountService
         $discount = Discount::findOrFail($id);
 
         if (!$discount) {
-            return response()->json(['message' => 'Discount not found'], 404);
+            return response()->json(['message' => 'الخصم غير موجود'], 404);
         }
 
         $discount->delete();
 
-        return response()->json(['message' => 'Discount deleted successfully']);
+        return response()->json(['message' => 'تم حذف الخصم بنجاح']);
+    }
+    public function searchDiscount($searchTerm)
+    {
+        return Discount::where(function ($query) use ($searchTerm) {
+            $fields = ['description'];
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $searchTerm . '%');
+            }
+        })->get();
     }
 }

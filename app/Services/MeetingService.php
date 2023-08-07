@@ -19,7 +19,7 @@ class MeetingService
 
     public function createMeeting(array $data)
     {
-       
+
         $validator = Validator::make($data, [
             'datetime' => 'required|date',
             'link' => 'required|string',
@@ -42,7 +42,7 @@ class MeetingService
         $meeting = Meeting::create($data);
 
         return [
-            'message' => 'Meeting created successfully',
+            'message' => 'تم إنشاء الاجتماع بنجاح',
             'data' => new MeetingResource($meeting),
         ];
     }
@@ -50,6 +50,11 @@ class MeetingService
 
     public function updateMeeting(Meeting $meeting, array $data)
     {
+        if (($meeting->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'هذا الاجتماع ليس من إنشائك',
+            ], 200);
+        }
         $validator = Validator::make($data, [
             'datetime' => 'required|date',
             'name' => 'required|string',
@@ -71,13 +76,19 @@ class MeetingService
 
         $meeting->update($data);
         return [
-            'message' => 'Meeting updated successfully',
+            'message' => 'تم تحديث الاجتماع بنجاح',
             'data' => new MeetingResource($meeting),
         ];
     }
 
     public function deleteMeeting(Meeting $meeting)
     {
+        if (($meeting->user_id) != Auth::id()); {
+            return response()->json([
+                'message' => 'هذا الاجتماع ليس من إنشائك',
+            ], 200);
+        }
+
         $meeting->delete();
     }
 
@@ -96,5 +107,14 @@ class MeetingService
             'data' => $meetingResource,
             'metadata' => $paginationData,
         ];;
+    }
+    public function searchMeeting($searchTerm)
+    {
+        return Meeting::where(function ($query) use ($searchTerm) {
+            $fields = ['description', 'name', 'from', 'to'];
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $searchTerm . '%');
+            }
+        })->get();
     }
 }

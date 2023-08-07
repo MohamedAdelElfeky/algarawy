@@ -26,7 +26,7 @@ class ApiJobController extends Controller
     {
         $job = $this->jobService->getJobById($id);
         if (!$job) {
-            return response()->json(['message' => 'Job not found'], 404);
+            return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
         }
         return response()->json($job, 200);
     }
@@ -46,6 +46,13 @@ class ApiJobController extends Controller
     {
         $job = $this->jobService->getJobById($id);
         $this->jobService->deleteJob($job);
-        return response()->json(['message' => 'Job deleted successfully'], 200);
+        return response()->json(['message' => 'تم حذف الوظيفة بنجاح'], 200);
+    }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $results = $this->jobService->searchJob($searchTerm);
+        return response()->json(['data' => $results]);
     }
 }

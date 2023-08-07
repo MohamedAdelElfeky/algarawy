@@ -10,11 +10,11 @@ use Illuminate\Http\JsonResponse;
 
 class DiscountController extends Controller
 {
-        protected $discountService;
+    protected $discountService;
 
     public function __construct(DiscountService $discountService)
     {
-            $this->discountService = $discountService;
+        $this->discountService = $discountService;
     }
 
     public function index(Request $request)
@@ -38,7 +38,7 @@ class DiscountController extends Controller
             return new DiscountResource($result['data']);
         } else {
             return response()->json([
-                'message' => 'Failed to create discount',
+                'message' => 'فشل إنشاء الخصم',
                 'errors' => $result['errors'],
             ], 422);
         }
@@ -49,7 +49,7 @@ class DiscountController extends Controller
         $discount = $this->discountService->getDiscountById($id);
 
         if (!$discount) {
-            return response()->json(['message' => 'Discount not found'], 404);
+            return response()->json(['message' => 'الخصم غير موجود'], 404);
         }
 
         $result = $this->discountService->updateDiscount($discount, $request->all());
@@ -58,7 +58,7 @@ class DiscountController extends Controller
             return new DiscountResource($result['data']);
         } else {
             return response()->json([
-                'message' => 'Failed to update discount',
+                'message' => 'فشل تحديث الخصم',
                 'errors' => $result['errors'],
             ], 422);
         }
@@ -69,11 +69,17 @@ class DiscountController extends Controller
         $discount = $this->discountService->getDiscountById($id);
 
         if (!$discount) {
-            return response()->json(['message' => 'Discount not found'], 404);
+            return response()->json(['message' => 'الخصم غير موجود'], 404);
         }
 
         $this->discountService->deleteDiscount($discount);
 
-        return response()->json(['message' => 'Discount deleted successfully']);
+        return response()->json(['message' => 'تم حذف الخصم بنجاح']);
+    }
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $results = $this->discountService->searchDiscount($searchTerm);
+        return response()->json(['data' => $results]);
     }
 }

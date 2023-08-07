@@ -37,7 +37,7 @@ class ApiMeetingController extends Controller
 
         $this->meetingService->deleteMeeting($meeting);
 
-        return response()->json(['message' => 'Meeting deleted successfully'], 200);
+        return response()->json(['message' => 'تم حذف الاجتماع بنجاح'], 200);
     }
 
     public function index(Request $request)
@@ -53,9 +53,15 @@ class ApiMeetingController extends Controller
         $meeting = $this->meetingService->getMeeting($id);
 
         if (!$meeting) {
-            return response()->json(['message' => 'Meeting not found'], 404);
+            return response()->json(['message' => 'الاجتماع غير موجود'], 404);
         }
 
         return response()->json($meeting);
+    }
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $results = $this->meetingService->searchMeeting($searchTerm);
+        return response()->json(['data' => $results]);
     }
 }

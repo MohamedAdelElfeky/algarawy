@@ -38,7 +38,7 @@ class ServiceController extends Controller
             return new ServiceResource($result['data']);
         } else {
             return response()->json([
-                'message' => 'Failed to create service',
+                'message' => 'فشل إنشاء الخدمة',
                 'errors' => $result['errors'],
             ], 422);
         }
@@ -55,7 +55,7 @@ class ServiceController extends Controller
             return new ServiceResource($result['data']);
         } else {
             return response()->json([
-                'message' => 'Failed to update service',
+                'message' => 'فشل تحديث الخدمة',
                 'errors' => $result['errors'],
             ], 422);
         }
@@ -66,11 +66,17 @@ class ServiceController extends Controller
         $service = $this->serviceService->getServiceById($id);
 
         if (!$service) {
-            return response()->json(['message' => 'Service not found'], 404);
+            return response()->json(['message' => 'الخدمة غير موجودة'], 404);
         }
 
         $this->serviceService->deleteService($service);
 
-        return response()->json(['message' => 'Service deleted successfully']);
+        return response()->json(['message' => 'تم حذف الخدمة بنجاح']);
+    }
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $results = $this->serviceService->searchService($searchTerm);
+        return response()->json(['data' => $results]);
     }
 }
