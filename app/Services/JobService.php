@@ -47,7 +47,6 @@ class JobService
     public function createJob(array $data)
     {
         $validator = Validator::make($data, [
-            'name' => 'required',
             'description' => 'required',
             'qualifications' => 'required',
             'location' => 'string|location',
