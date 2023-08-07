@@ -16,8 +16,8 @@ class ProjectResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'images_or_videos' => ImageResource::collection($this->images),
-            'files_pdf' => FilePdfResource::collection($this->files_pdf),
+            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
+            'files_pdf' => $this->files_pdf ? FilePdfResource::collection($this->pdfs) : null,
             'location' => $this->location,
             'user' => $this->user,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),

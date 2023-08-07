@@ -33,15 +33,7 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         $result = $this->serviceService->createService($request->all());
-
-        if ($result['success']) {
-            return new ServiceResource($result['data']);
-        } else {
-            return response()->json([
-                'message' => 'فشل إنشاء الخدمة',
-                'errors' => $result['errors'],
-            ], 422);
-        }
+        return new ServiceResource($result['data']);
     }
 
     public function update(Request $request, $id)
