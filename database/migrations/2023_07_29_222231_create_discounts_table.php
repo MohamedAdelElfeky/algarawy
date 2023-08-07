@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->string('description')->nullable();
-            $table->string('images')->nullable();
-            $table->string('files')->nullable();
+            $table->string('description')->nullable();          
             $table->unsignedBigInteger('user_id');
             $table->string('location')->nullable();
             $table->integer('discount')->nullable();

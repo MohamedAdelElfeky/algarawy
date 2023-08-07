@@ -169,6 +169,6 @@
         <!--begin::Body-->
     </div>
     <!--end::Tables Widget 9-->
-    @include('admin/family/_add_model')
+    @include('admin/project/_add_model')
 
 </x-default-layout>

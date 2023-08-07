@@ -21,7 +21,7 @@ class ServiceService
     {
         $validator = Validator::make($data, [
             'description' => 'required|string',
-            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
             'location' => 'string|location',
         ]);
 
@@ -35,11 +35,14 @@ class ServiceService
         $data['user_id'] = Auth::id();
         $service = Service::create($data);
         // Handle images/videos
-        if (request()->hasFile('images')) {
-            foreach (request()->file('images') as $image) {
-                $imagePath = $image->store('images/Service/img', 'public');
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
                 $imageType = $image->getClientOriginalExtension();
                 $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_service.' . $image->getClientOriginalExtension();
+                $image->move(public_path('service/images/'), $file_name);
+                $imagePath = "service/images/" . $file_name;
                 $imageObject = new Image([
                     'url' => $imagePath,
                     'mime' => $mimeType,
@@ -48,6 +51,7 @@ class ServiceService
                 $service->images()->save($imageObject);
             }
         }
+
         return [
             'message' => 'تم إنشاء الخدمة بنجاح',
             'data' => new ServiceResource($service),

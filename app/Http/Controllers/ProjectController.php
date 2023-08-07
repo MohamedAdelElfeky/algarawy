@@ -31,15 +31,15 @@ class ProjectController extends Controller
     {
         $data = $request->all();
         $project = $this->projectService->createProject($data);
-        return response()->json($project, 201);
+        return response()->json($project);
     }
 
-    public function update(Request $request, $id)
-    {
-        $project = $this->projectService->getProjectById($id);
-        $updatedProject = $this->projectService->updateProject($project, $request->all());
-        return response()->json($updatedProject);
-    }
+    // public function update(Request $request, $id)
+    // {
+    //     $project = $this->projectService->getProjectById($id);
+    //     $updatedProject = $this->projectService->updateProject($project, $request->all());
+    //     return response()->json($updatedProject);
+    // }
 
     public function destroy($id)
     {

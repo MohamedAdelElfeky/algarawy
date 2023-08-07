@@ -1,34 +1,66 @@
-<!--begin::Modal - Invite Friends-->
 <div class="modal fade" id="kt_modal_family" tabindex="-1" aria-hidden="true">
-    <!--begin::Modal dialog-->
     <div class="modal-dialog mw-650px">
-        <!--begin::Modal content-->
         <div class="modal-content">
-            <!--begin::Modal header-->
             <div class="modal-header pb-0 border-0 justify-content-end">
-                <!--begin::Close-->
-                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">{!! getIcon('cross', 'fs-1') !!}
-                </div>
-                <!--end::Close-->
+                <button type="button" class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    X
+                </button>
             </div>
-            <!--begin::Modal header-->
-            <!--begin::Modal body-->
             <div class="modal-body scroll-y mx-5 mx-xl-18 pt-0 pb-15">
-           
-				<div class="fv-row mb-8">
-					<label class="fs-6 fw-semibold mb-2">Family Name</label>
-					<input type="text" class="form-control form-control-solid" placeholder="Enter Family Name" name="Project Launch" />
-				</div>
-    
-                <!--begin::Textarea-->
-                {{-- <textarea class="form-control form-control-solid mb-8" rows="3" placeholder="Type or paste emails here"></textarea> --}}
-                <!--end::Textarea-->
-                <!--begin::Users-->
+                <form id="familyForm" enctype="multipart/form-data">
+                    <div class="fv-row mb-8">
+                        <label class="fs-6 fw-semibold mb-2">Description</label>
+                        <input type="text" class="form-control form-control-solid" placeholder="Enter Description" name="description" required />
+                    </div>
+                    <div class="fv-row mb-8">
+                        <label class="fs-6 fw-semibold mb-2">Location</label>
+                        <input type="text" class="form-control form-control-solid" placeholder="Enter Location" name="location" required />
+                    </div>
+                    <div class="fv-row mb-8">
+                        <label class="fs-6 fw-semibold mb-2">Upload Images</label>
+                        <input type="file" class="form-control form-control-solid" name="images[]" multiple required />
+                    </div>
+                    <div class="fv-row mb-8">
+                        <label class="fs-6 fw-semibold mb-2">Upload PDF</label>
+                        <input type="file" class="form-control form-control-solid" name="files_pdf[]" multiple required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
             </div>
-            <!--end::Modal body-->
         </div>
-        <!--end::Modal content-->
     </div>
-    <!--end::Modal dialog-->
 </div>
-<!--end::Modal - Invite Friend-->
+<!-- Modal - Invite Friends -->
+
+@section('script')
+    <script>
+        function addFamily() {
+            // Get the form data
+            const formData = new FormData(document.getElementById('familyForm'));
+
+            // Send the AJAX request
+            fetch('save-family', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data here (e.g., show success message)
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle errors here (e.g., show error message)
+                    console.error(error);
+                });
+        }
+
+        // Optional: Trigger the AJAX request when the form is submitted
+        document.getElementById('familyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            addFamily();
+        });
+    </script>
+@endsection

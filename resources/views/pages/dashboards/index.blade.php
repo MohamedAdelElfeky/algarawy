@@ -257,12 +257,85 @@
                             </div>
                         </div>
                         <!--end::Tap pane-->
-
+                        
                         <!--begin::Tap pane-->
                         <div class="tab-pane fade" id="kt_stats_widget_16_tab_2">
-                            <div class="project-content">
+                            <div class="row g-5 g-xxl-8">
                                 @foreach ($projects as $project)
                                     <div class="col-xl-6">
+                                        <!--begin::Feeds Widget 5-->
+                                        <div class="card mb-5 mb-xl-8">
+                                            <!--begin::Body-->
+                                            <div class="card-body pb-0">
+                                                <!--begin::Header-->
+                                                <div class="d-flex align-items-center mb-5">
+                                                    <!--begin::User-->
+                                                    <div class="d-flex align-items-center flex-grow-1">
+                                                        <!--begin::Avatar-->
+                                                        <div class="symbol symbol-45px me-5">
+                                                            <img src="assets/media/avatars/300-25.jpg"
+                                                                alt="" />
+                                                        </div>
+                                                        <!--end::Avatar-->
+                                                        <!--begin::Info-->
+                                                        <div class="d-flex flex-column">
+                                                            <a href="#"
+                                                                class="text-gray-900 text-hover-primary fs-6 fw-bold">{{ $project->description }}</a>
+                                                            <span
+                                                                class="text-gray-400 fw-bold">{{ $project->description }}</span>
+                                                        </div>
+                                                        <!--end::Info-->
+                                                    </div>
+                                                    <!--end::User-->
+                                                </div>
+                                                <!--end::Header-->
+                                                <!--begin::Post-->
+                                                <div class="mb-5">
+                                                    <!--begin::Image-->
+                                                    <div class="bgi-no-repeat bgi-size-cover rounded min-h-250px mb-5"
+                                                        style="background-image:url('{{ $data['image'] }}');"></div>
+                                                    <!--end::Image-->
+                                                    <!--begin::Text-->
+                                                    <div class="text-gray-800 mb-5">{{ $project->description }}</div>
+                                                    <!--end::Text-->
+                                                    <!--begin::Toolbar-->
+                                                    <div class="d-flex align-items-center mb-5">
+                                                        <a href="#"
+                                                            class="btn btn-sm btn-light btn-color-muted btn-active-light-success px-4 py-2 me-4">
+                                                            <i class="ki-duotone ki-eye">
+                                                                <i class="path1"></i>
+                                                                <i class="path2"></i>
+                                                                <i class="path3"></i>
+                                                            </i>{{ $data['views'] }}</a>
+                                                        <a href="#"
+                                                            class="btn btn-sm btn-light btn-color-muted btn-active-light-danger px-4 py-2">
+                                                            <i class="ki-duotone ki-like-shapes">
+                                                                <i class="path1"></i>
+                                                                <i class="path2"></i>
+                                                            </i>{{ $data['likes'] }}</a>
+                                                        <a href="#"
+                                                            class="btn btn-sm btn-light btn-color-muted btn-active-light-info px-4 py-2">
+                                                            <i class="ki-duotone ki-share">
+                                                                <i class="path1"></i>
+                                                                <i class="path2"></i>
+                                                                <i class="path3"></i>
+                                                                <i class="path4"></i>
+                                                                <i class="path5"></i>
+                                                                <i class="path6"></i>
+                                                            </i>{{ $data['shares'] }}</a>
+                                                    </div>
+                                                    <!--end::Toolbar-->
+                                                </div>
+                                                <!--end::Post-->
+                                                <!--begin::Separator-->
+                                                <div class="separator mb-4"></div>
+                                                <!--end::Separator-->
+                                            </div>
+                                            <!--end::Body-->
+                                        </div>
+                                        <!--end::Feeds Widget 5-->
+                                    </div>
+                                    {{-- <div class="col-xl-6">
                                         <!--begin::Feeds Widget 5-->
                                         <div class="card mb-5 mb-xl-8">
                                             <!-- ... (rest of the Feeds Widget 5 code) ... -->
@@ -283,7 +356,7 @@
 
                                         </div>
                                         <!--end::Tab pane (Projects)-->
-                                    </div>
+                                    </div> --}}
                                 @endforeach
                             </div>
                         </div>

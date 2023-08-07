@@ -16,17 +16,15 @@ class CourseResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            // 'name' => $this->name,
             'description' => $this->description,
-            'files' => $this->files,
+            'images_or_videos' => ImageResource::collection($this->images),
+            'files_pdf' => FilePdfResource::collection($this->files_pdf),
             'location' => $this->location,
             'discount' => $this->discount,
             'link' => $this->link,
-            'images_and_videos' => $this->images_and_videos,
             'user' => $this->user,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
-        
     }
 }

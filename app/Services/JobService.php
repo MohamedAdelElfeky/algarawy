@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Http\Resources\JobResource;
+use App\Models\FilePdf;
+use App\Models\Image;
 use App\Models\Job;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -61,21 +63,11 @@ class JobService
             'is_full_time' => 'required|boolean',
             'price' => 'required|numeric',
             'job_status' => 'required|boolean',
+            'images_or_video.*' => 'required|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files_pdf.*' => 'required|file',
         ]);
         $data['user_id'] = Auth::id();
-        // Handle photo upload and save it temporarily
-        // if (request()->hasFile('photo')) { 
-        //     $photoPath = request()->file('photo')->store('temp', 'public');
-        // } else {
-        //     $photoPath = null;
-        // }
-
-        // Handle company logo upload and save it temporarily
-        // if (request()->hasFile('company_logo')) { dd(request()->file('company_logo'));
-        //     $logoPath = request()->file('company_logo')->store('temp', 'public');
-        // } else {
-        //     $logoPath = null;
-        // }
+       
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation error',
@@ -84,17 +76,40 @@ class JobService
         }
         // Create a new job
         $job = Job::create($data);
-        // if ($photoPath) {
-        //     $newPhotoPath = "photos/{$job->id}/" . uniqid() . '.' . request()->file('photo')->getClientOriginalExtension();
-        //     Storage::disk('public')->move($photoPath, $newPhotoPath);
-        //     $job->update(['photo' => $newPhotoPath]);
-        // }
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_job.' . $image->getClientOriginalExtension();
+                $image->move(public_path('job/images/'), $file_name);
+                $imagePath = "job/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $job->images()->save($imageObject);
+            }
+        }
 
-        // if ($logoPath) {
-        //     $newLogoPath = "logos/{$job->id}/" . uniqid() . '.' . request()->file('company_logo')->getClientOriginalExtension();
-        //     Storage::disk('public')->move($logoPath, $newLogoPath);
-        //     $job->update(['company_logo' => $newLogoPath]);
-        // }
+        // Handle images/videos
+        if (request()->hasFile('files_pdf')) {
+            foreach (request()->file('files_pdf') as $key => $item) {
+                $pdf = $data['files_pdf'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_job.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('job/pdf/'), $file_name);
+                $pdfPath = "job/pdf/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $job->pdfs()->save($pdfObject);
+            }
+        }
 
         return [
             'message' => 'تم إنشاء الوظيفة بنجاح',

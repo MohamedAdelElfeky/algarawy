@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Resources\ProjectResource;
+use App\Models\FilePdf;
 use App\Models\Image;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
@@ -44,8 +45,8 @@ class ProjectService
     {
         $validator = Validator::make($data, [
             'description' => 'required|string',
-            'images' => 'nullable|file',
-            'files_pdf' => 'nullable|file',
+            'images_or_video.*' => 'required|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files_pdf.*' => 'required|file',
             'location' => 'string|location',
         ]);
         $data['user_id'] = Auth::id();
@@ -56,15 +57,16 @@ class ProjectService
                 'errors' => $validator->errors(),
             ], 422);
         }
-
         $project = Project::create($data);
-
         // Handle images/videos
-        if (request()->hasFile('images')) {
-            foreach (request()->file('images') as $image) {
-                $imagePath = $image->store('images/project/img', 'public');
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
                 $imageType = $image->getClientOriginalExtension();
                 $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_project.' . $image->getClientOriginalExtension();
+                $image->move(public_path('project/images/'), $file_name);
+                $imagePath = "project/images/" . $file_name;
                 $imageObject = new Image([
                     'url' => $imagePath,
                     'mime' => $mimeType,
@@ -74,13 +76,24 @@ class ProjectService
             }
         }
 
-        // Handle PDF files
+        // Handle images/videos
         if (request()->hasFile('files_pdf')) {
-            foreach (request()->file('files_pdf') as $pdf) {
-                $pdfPath = $pdf->store('files_pdf', 'public'); // Store the PDF file and get the path
-                $project->filesPdf()->create(['url' => $pdfPath]);
+            foreach (request()->file('files_pdf') as $key => $item) {
+                $pdf = $data['files_pdf'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_project.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('project/pdf/'), $file_name);
+                $pdfPath = "project/pdf/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $project->pdfs()->save($pdfObject);
             }
         }
+
         return [
             'message' => 'تم إنشاء المشروع بنجاح',
             'data' => new ProjectResource($project),
@@ -139,7 +152,7 @@ class ProjectService
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })->get();
-        
+
         return ProjectResource::collection($projects);
     }
 }

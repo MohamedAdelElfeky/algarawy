@@ -24,5 +24,8 @@ class Project extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
-   
+    public function pdfs(): MorphMany
+    {
+        return $this->morphMany(FilePdf::class, 'pdfable');
+    }
 }

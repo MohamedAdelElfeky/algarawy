@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('file_pdfs', function (Blueprint $table) {
             $table->id();
-            $table->string('description')->nullable();
-            $table->string('location')->nullable();
-            $table->unsignedBigInteger('user_id');
+            $table->string('url');
+            $table->string('pdfable_type'); 
+            $table->unsignedBigInteger('pdfable_id'); 
+            $table->string('type')->nullable();
+            $table->string('mime')->nullable();
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('file_pdfs');
     }
 };

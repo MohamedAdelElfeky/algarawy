@@ -32,6 +32,8 @@ class JobResource extends JsonResource
             'is_full_time' => $this->is_full_time,
             'price' => $this->price,
             'job_status' => $this->job_status,
+            'images_or_videos' => ImageResource::collection($this->images),
+            'files_pdf' => FilePdfResource::collection($this->files_pdf),
             'user' => $this->user,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),

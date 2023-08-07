@@ -6,6 +6,8 @@ use App\Models\Discount;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\DiscountResource;
+use App\Models\FilePdf;
+use App\Models\Image;
 
 class DiscountService
 {
@@ -31,8 +33,8 @@ class DiscountService
     {
         $validator = Validator::make($data, [
             'description' => 'required',
-            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'files_pdf.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
             'location' => 'string|location',
             'discount' => 'nullable',
             'price' => 'required|numeric',
@@ -40,7 +42,6 @@ class DiscountService
 
         if ($validator->fails()) {
             return [
-                'success' => false,
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
             ];
@@ -48,9 +49,41 @@ class DiscountService
 
         $data['user_id'] = Auth::id();
         $discount = Discount::create($data);
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_discount.' . $image->getClientOriginalExtension();
+                $image->move(public_path('discount/images'), $file_name);
+                $imagePath = "discount/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $discount->images()->save($imageObject);
+            }
+        }
 
+        // Handle images/videos
+        if (request()->hasFile('files_pdf')) {
+            foreach (request()->file('files_pdf') as $key => $item) {
+                $pdf = $data['files_pdf'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_discount.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('discount/pdf/'), $file_name);
+                $pdfPath = "discount/pdf/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $discount->pdfs()->save($pdfObject);
+            }
+        }
         return [
-            'success' => true,
             'message' => 'Discount created successfully',
             'data' => new DiscountResource($discount),
         ];

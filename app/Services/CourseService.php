@@ -6,6 +6,8 @@ use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Models\CourseFile;
 use App\Models\CourseImageVideo;
+use App\Models\FilePdf;
+use App\Models\Image;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -39,39 +41,42 @@ class CourseService
         }
         // return $data;
         $course = Course::create($data);
-
-        if (request()->hasFile('files')) {
-            dd(sizeof(request()->file('files')));
-            foreach (request()->file('files') as $file) {
-                dd($file);
-                $extension = $file->getClientOriginalExtension();
-                $filename = time() . '.' . $extension;
-                // Move the uploaded file to the desired directory
-                $file->move('public/upload/courses', $filename);
-
-                // Save the file path in the database for later retrieval if needed
-                CourseFile::create([
-                    'course_id' => $course->id,
-                    'file_path' => 'upload/courses/' . $filename, // Save the file path relative to the 'public' disk
+        // Handle images/videos
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_course.' . $image->getClientOriginalExtension();
+                $image->move(public_path('course/images/'), $file_name);
+                $imagePath = "course/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
                 ]);
+                $course->images()->save($imageObject);
             }
         }
 
-        // Handle 'images_and_videos' array
-        if (isset($data['images_and_videos'])) {
-            foreach ($data['images_and_videos'] as $imageOrVideoFile) {
-                $extension = $imageOrVideoFile->getClientOriginalExtension();
-                $filename = time() . '.' . $extension;
-                // Move the uploaded file to the desired directory
-                $imageOrVideoFile->move('public/upload/courses', $filename);
-
-                // Save the file path in the database for later retrieval if needed
-                CourseImageVideo::create([
-                    'course_id' => $course->id,
-                    'file_path' => 'upload/courses/' . $filename, // Save the file path relative to the 'public' disk
+        // Handle images/videos
+        if (request()->hasFile('files_pdf')) {
+            foreach (request()->file('files_pdf') as $key => $item) {
+                $pdf = $data['files_pdf'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_course.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('course/pdf/'), $file_name);
+                $pdfPath = "course/pdf/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
                 ]);
+                $course->pdfs()->save($pdfObject);
             }
         }
+
 
         return [
             'message' => 'تم إنشاء الدورة التدريبية بنجاح',

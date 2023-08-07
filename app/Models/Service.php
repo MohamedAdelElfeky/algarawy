@@ -11,13 +11,10 @@ class Service extends Model
     use HasFactory;
     protected $fillable = [
         'description',
-        'images',
         'location',
         'user_id',
     ];
-    protected $casts = [
-        'images' => 'array',
-    ];
+ 
     public function user()
     {
         return $this->belongsTo(User::class);
