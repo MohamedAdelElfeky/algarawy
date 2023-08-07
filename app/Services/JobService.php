@@ -48,20 +48,11 @@ class JobService
             'name' => 'required',
             'description' => 'required',
             'qualifications' => 'required',
-            'location' => ['required', 'string', function ($attribute, $value, $fail) {
-                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
-                    $fail($attribute . ' must be a valid Google Maps link.');
-                }
-            }],
+            'location' => 'required|string|location',
             'contact_information' => 'required',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'company_name' => 'required|string',
-            'company_location' => ['required', 'string', function ($attribute, $value, $fail) {
-                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
-                    $fail($attribute . ' must be a valid Google Maps link.');
-                }
-            }],
-            // 'company_location' => 'required|string',
+            'company_name' => 'required|string',            
+            'company_location' => 'required|string|location',
             'company_type' => 'required|string',
             'company_link' => 'nullable|url',
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -165,11 +156,12 @@ class JobService
 
     public function searchJob($searchTerm)
     {
-        return Job::where(function ($query) use ($searchTerm) {
+        $jobs = Job::where(function ($query) use ($searchTerm) {
             $fields = ['description', 'name', 'qualifications', 'contact_information', 'company_name', 'price'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })->get();
+        return JobResource::collection($jobs);
     }
 }

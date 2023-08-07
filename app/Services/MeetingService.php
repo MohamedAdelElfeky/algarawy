@@ -110,11 +110,12 @@ class MeetingService
     }
     public function searchMeeting($searchTerm)
     {
-        return Meeting::where(function ($query) use ($searchTerm) {
+        $meetings = Meeting::where(function ($query) use ($searchTerm) {
             $fields = ['description', 'name', 'from', 'to'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })->get();
+        return MeetingResource::collection($meetings);
     }
 }

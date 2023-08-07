@@ -25,11 +25,7 @@ class CourseService
             'description' => 'required',
             'files' => 'required',
             'files.*' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => ['string', function ($attribute, $value, $fail) {
-                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
-                    $fail($attribute . ' must be a valid Google Maps link.');
-                }
-            }],
+            'location' => 'required|string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
             'images_and_videos' => 'required',
@@ -97,11 +93,7 @@ class CourseService
             'description' => 'sometimes|required',
             'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => ['string', function ($attribute, $value, $fail) {
-                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
-                    $fail($attribute . ' must be a valid Google Maps link.');
-                }
-            }],
+            'location' => 'required|string|google_maps_location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
             'images_and_videos' => 'nullable|array',
@@ -163,11 +155,12 @@ class CourseService
     }
     public function searchCourse($searchTerm)
     {
-        return Course::where(function ($query) use ($searchTerm) {
+        $courses = Course::where(function ($query) use ($searchTerm) {
             $fields = ['description'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })->get();
+        return CourseResource::collection($courses);
     }
 }

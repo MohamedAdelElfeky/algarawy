@@ -66,11 +66,8 @@ class DiscountService
             'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
             'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => ['string', function ($attribute, $value, $fail) {
-                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
-                    $fail($attribute . ' must be a valid Google Maps link.');
-                }
-            }],            'discount' => 'nullable',
+            'location' => 'required|string|location',
+            'discount' => 'nullable',
             'price' => 'sometimes|required|numeric',
         ]);
 
@@ -117,11 +114,12 @@ class DiscountService
     }
     public function searchDiscount($searchTerm)
     {
-        return Discount::where(function ($query) use ($searchTerm) {
+        $discounts = Discount::where(function ($query) use ($searchTerm) {
             $fields = ['description'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })->get();
+        return  DiscountResource::collection($discounts);
     }
 }

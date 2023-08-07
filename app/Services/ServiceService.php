@@ -6,6 +6,7 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ServiceResource;
+use App\Models\Image;
 
 class ServiceService
 {
@@ -22,23 +23,32 @@ class ServiceService
             'description' => 'required|string',
             'images' => 'nullable|array',
             'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            'location' => ['string', function ($attribute, $value, $fail) {
-                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
-                    $fail($attribute . ' must be a valid Google Maps link.');
-                }
-            }],
+            'location' => 'required|string|location',
         ]);
 
         if ($validator->fails()) {
             return [
-                'success' => false,
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
             ];
         }
+
         $data['user_id'] = Auth::id();
         $service = Service::create($data);
-
+        // Handle images/videos
+        if (request()->hasFile('images')) {
+            foreach (request()->file('images') as $image) {
+                $imagePath = $image->store('images/Service/img', 'public');
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $service->images()->save($imageObject);
+            }
+        }
         return [
             'message' => 'تم إنشاء الخدمة بنجاح',
             'data' => new ServiceResource($service),
@@ -113,11 +123,12 @@ class ServiceService
     }
     public function searchService($searchTerm)
     {
-        return Service::where(function ($query) use ($searchTerm) {
+        $services = Service::where(function ($query) use ($searchTerm) {
             $fields = ['description'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })->get();
+        return ServiceResource::collection($services);
     }
 }

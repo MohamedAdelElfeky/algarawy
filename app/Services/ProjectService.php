@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Resources\ProjectResource;
+use App\Models\Image;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -36,20 +37,16 @@ class ProjectService
         if (!$project) {
             abort(404, 'المشروع غير موجود');
         }
-        return $project;
+        return new ProjectResource($project);
     }
 
     public function createProject(array $data)
     {
         $validator = Validator::make($data, [
             'description' => 'required|string',
-            'images_or_videos' => 'nullable|file',
+            'images' => 'nullable|file',
             'files_pdf' => 'nullable|file',
-            'location' => ['string', function ($attribute, $value, $fail) {
-                if (!preg_match('/^https:\/\/www\.google\.com\/maps\/.*$/', $value)) {
-                    $fail($attribute . ' must be a valid Google Maps link.');
-                }
-            }],
+            'location' => 'required|string|location',
         ]);
         $data['user_id'] = Auth::id();
 
@@ -61,11 +58,19 @@ class ProjectService
         }
 
         $project = Project::create($data);
+
         // Handle images/videos
-        if (request()->hasFile('images_or_videos')) {  //dd(request()->file('images_or_videos'));
-            foreach (request()->file('images_or_videos') as $image) {
-                $imagePath = $image->store('images_or_videos', 'public');dd($imagePath); // Store the image and get the path
-                $project->imagesOrVideos()->create(['url' => $imagePath]);
+        if (request()->hasFile('images')) {
+            foreach (request()->file('images') as $image) {
+                $imagePath = $image->store('images/project/img', 'public');
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $project->images()->save($imageObject);
             }
         }
 
@@ -128,11 +133,13 @@ class ProjectService
 
     public function searchProject($searchTerm)
     {
-        return Project::where(function ($query) use ($searchTerm) {
+        $projects = Project::where(function ($query) use ($searchTerm) {
             $fields = ['description'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })->get();
+        
+        return ProjectResource::collection($projects);
     }
 }
