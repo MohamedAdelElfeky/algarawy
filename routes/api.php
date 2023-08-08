@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::POST('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::get('/regions', [RegionController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
