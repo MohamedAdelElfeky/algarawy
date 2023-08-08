@@ -15,29 +15,29 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    public function addFavorite(Request $request, $type, $id)
+    public function toggleFavorite(Request $request, $type, $id)
     {
         $user = Auth::user();
         $validModels = ['course', 'job', 'discount', 'meeting', 'project', 'service'];
         if (!in_array($type, $validModels)) {
-            return response()->json(['message' => 'Invalid model type'], 400);
+            return response()->json(['message' => 'نوع النموذج غير صالح'], 400);
         }
         $modelClass = 'App\Models\\' . ucfirst($type);
         $model = $modelClass::find($id);
         if (!$model) {
-            return response()->json(['message' => 'Model not found'], 404);
+            return response()->json(['message' => 'النموذج غير موجود'], 404);
         }
         $existingFavorite = $user->favorites()->where('favoritable_type', $modelClass)
             ->where('favoritable_id', $id)
             ->first();
         if ($existingFavorite) {
-            return response()->json(['message' => 'Model is already a favorite'], 409);
-        }
+            $existingFavorite->delete();
+            return response()->json(['message' => 'تم إزالة من المفضلة'], 200);        }
         $favorite = new Favorite();
         $favorite->favoritable_id = $id;
         $favorite->favoritable_type = $modelClass;
         $user->favorites()->save($favorite);
-        return response()->json(['message' => 'Model added to favorites'], 201);
+        return response()->json(['message' => 'تمت إضافة النموذج إلى المفضلة'], 201);
     }
 
     public function getUserFavorites()

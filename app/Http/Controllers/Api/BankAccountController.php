@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\BankAccountService;
 use Illuminate\Http\Request;
 
-class ApiBankAccountController extends Controller
+class BankAccountController extends Controller
 {
     protected $bankAccountService;
 

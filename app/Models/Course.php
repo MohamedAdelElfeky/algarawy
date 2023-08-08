@@ -35,4 +35,9 @@ class Course extends Model
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
+    
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likable');
+    }
 }

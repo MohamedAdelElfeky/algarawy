@@ -17,16 +17,16 @@ class Job extends Model
         'location',
         'contact_information',
         'photo',
-        'company_name', 
-        'company_location', 
-        'company_type', 
-        'company_link', 
-        'company_logo', 
+        'company_name',
+        'company_location',
+        'company_type',
+        'company_link',
+        'company_logo',
         'job_type',
-        'is_training', 
-        'is_full_time', 
+        'is_training',
+        'is_full_time',
         'price',
-        'job_status', 
+        'job_status',
         'user_id',
     ];
 
@@ -42,5 +42,14 @@ class Job extends Model
     public function pdfs(): MorphMany
     {
         return $this->morphMany(FilePdf::class, 'pdfable');
+    }
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likable');
     }
 }

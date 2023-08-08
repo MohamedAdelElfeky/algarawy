@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CourseResource;
 use App\Services\CourseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ApiCourseController extends Controller
+class CourseController extends Controller
 {
     protected $courseService;
 
@@ -18,15 +19,15 @@ class ApiCourseController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page', 10);
-        $page = $request->header('page', 1);
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
         $courses = $this->courseService->getAllCourses($perPage, $page);
         return response()->json($courses, 200);
     }
 
     public function show($id)
     {
-        $course = $this->courseService->getCourseById($id);
+        $course = new CourseResource($this->courseService->getCourseById($id));
         return response()->json(['data' => $course], 200);
     }
 

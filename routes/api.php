@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\ApiBankAccountController;
-use App\Http\Controllers\Api\ApiCourseController;
-use App\Http\Controllers\Api\ApiJobController;
-use App\Http\Controllers\Api\ApiMeetingController;
-use App\Http\Controllers\Api\ApiProjectController;
+use App\Http\Controllers\Api\BankAccountController;
+use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\JobController;
+use App\Http\Controllers\Api\MeetingController;
+use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\AuthController;
@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\JobApplicationController;
+use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\NeighborhoodController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,31 +47,33 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::apiResources([
-        'p-jobs' => ApiJobController::class, // jobs Resource
-        'p-courses' => ApiCourseController::class, // courses Resource
-        'p-meetings' => ApiMeetingController::class, // meetings Resource
-        'p-bank-accounts' => ApiBankAccountController::class, // bank-accounts Resource
-        'p-projects' => ApiProjectController::class,
+        'p-jobs' => JobController::class, // jobs Resource
+        'p-courses' => CourseController::class, // courses Resource
+        'p-meetings' => MeetingController::class, // meetings Resource
+        'p-bank-accounts' => BankAccountController::class, // bank-accounts Resource
+        'p-projects' => ProjectController::class,
         'p-discounts' => DiscountController::class,
         'p-services' => ServiceController::class,
         'p-job-application' => JobApplicationController::class,
     ]);
-    
-    Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'addFavorite']);
+
+    Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'toggleFavorite']);
+    Route::post('/p-add-like/{type}/{id}', [LikeController::class, 'toggleLike']);
+
     Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
     Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
 
     // Search 
-    Route::get('/p-projectsSearch', [ApiProjectController::class, 'search']);
-    Route::get('/p-coursesSearch', [ApiCourseController::class, 'search']);
-    Route::get('/p-meetingsSearch', [ApiMeetingController::class, 'search']);
-    Route::get('/p-jobsSearch', [ApiJobController::class, 'search']);
+    Route::get('/p-projectsSearch', [ProjectController::class, 'search']);
+    Route::get('/p-coursesSearch', [CourseController::class, 'search']);
+    Route::get('/p-meetingsSearch', [MeetingController::class, 'search']);
+    Route::get('/p-jobsSearch', [JobController::class, 'search']);
     Route::get('/p-discountsSearch', [DiscountController::class, 'search']);
     Route::get('/p-servicesSearch', [ServiceController::class, 'search']);
 
     // Bank related routes
     Route::prefix('bank')->group(function () {
-        Route::get('/getSavings', [ApiBankAccountController::class, 'getSavings']);
-        Route::get('/getCharities', [ApiBankAccountController::class, 'getCharities']);
+        Route::get('/getSavings', [BankAccountController::class, 'getSavings']);
+        Route::get('/getCharities', [BankAccountController::class, 'getCharities']);
     });
 });

@@ -28,4 +28,13 @@ class Project extends Model
     {
         return $this->morphMany(FilePdf::class, 'pdfable');
     }
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
+    
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likable');
+    }
 }

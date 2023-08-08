@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class MeetingResource extends JsonResource
 {
@@ -24,6 +25,8 @@ class MeetingResource extends JsonResource
             'description' => $this->description,
             'user' => $this->user,
             'type' => $this->type,
+            'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
+            'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];

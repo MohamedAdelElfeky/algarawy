@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProjectResource;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 
-class ApiProjectController extends Controller
+class ProjectController extends Controller
 {
     protected $projectService;
 
@@ -26,7 +27,7 @@ class ApiProjectController extends Controller
 
     public function show($id)
     {
-        return $this->projectService->getProjectById($id);
+        return new ProjectResource($this->projectService->getProjectById($id));
     }
 
     public function store(Request $request)

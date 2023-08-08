@@ -23,4 +23,13 @@ class Service extends Model
     {
         return $this->morphMany(Image::class, 'imageable');
     }
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
+    
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likable');
+    }
 }

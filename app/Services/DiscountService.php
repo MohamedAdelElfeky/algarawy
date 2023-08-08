@@ -34,7 +34,7 @@ class DiscountService
         $validator = Validator::make($data, [
             'description' => 'required',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            'files_pdf.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
+            // 'files_pdf.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
             'location' => 'string|location',
             'discount' => 'nullable',
             'price' => 'required|numeric',
@@ -67,22 +67,22 @@ class DiscountService
         }
 
         // Handle images/videos
-        if (request()->hasFile('files_pdf')) {
-            foreach (request()->file('files_pdf') as $key => $item) {
-                $pdf = $data['files_pdf'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_discount.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('discount/pdf/'), $file_name);
-                $pdfPath = "discount/pdf/" . $file_name;
-                $pdfObject = new FilePdf([
-                    'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
-                ]);
-                $discount->pdfs()->save($pdfObject);
-            }
-        }
+        // if (request()->hasFile('files_pdf')) {
+        //     foreach (request()->file('files_pdf') as $key => $item) {
+        //         $pdf = $data['files_pdf'][$key];
+        //         $pdfType = $pdf->getClientOriginalExtension();
+        //         $mimeType = $pdf->getMimeType();
+        //         $file_name = time() . rand(0, 9999999999999) . '_discount.' . $pdf->getClientOriginalExtension();
+        //         $pdf->move(public_path('discount/pdf/'), $file_name);
+        //         $pdfPath = "discount/pdf/" . $file_name;
+        //         $pdfObject = new FilePdf([
+        //             'url' => $pdfPath,
+        //             'mime' => $mimeType,
+        //             'type' => $pdfType,
+        //         ]);
+        //         $discount->pdfs()->save($pdfObject);
+        //     }
+        // }
         return [
             'success' => true,
             'message' => 'Discount created successfully',

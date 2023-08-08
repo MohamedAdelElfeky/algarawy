@@ -18,8 +18,8 @@ class ServiceController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page', 10);
-        $page = $request->header('page', 1);
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
         $services = $this->serviceService->getAllServices($perPage, $page);
         return response()->json($services, 200);
     }

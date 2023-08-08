@@ -30,12 +30,12 @@ class DashboardController extends Controller
         $discounts = DiscountResource::collection(Discount::paginate(5));
         $services = ServiceResource::collection(Service::paginate(5));
         $oneRowArray = [
-            'الوظيفة' => $jobs,
             'الدورات والاستشارات' => $courses,
             'دعم المشاريع' => $projects,
             'الاجتماعات عائلية' => $meetings,
             'الخصومات والعروض' => $discounts,
             'خدمات' => $services,
+            // 'الوظيفة' => $jobs,
         ];
         $result = [
             "date" => [],

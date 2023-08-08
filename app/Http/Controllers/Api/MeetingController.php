@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\MeetingService;
 use Illuminate\Http\Request;
 
-class ApiMeetingController extends Controller
+class MeetingController extends Controller
 {
     protected $meetingService;
 
@@ -42,8 +42,8 @@ class ApiMeetingController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page', 10);
-        $page = $request->header('page', 1);
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
         $meetings = $this->meetingService->getAllMeetings($perPage, $page);
         return response()->json($meetings, 200);
     }

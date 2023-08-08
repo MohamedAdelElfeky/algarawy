@@ -38,7 +38,7 @@ class ProjectService
         if (!$project) {
             abort(404, 'المشروع غير موجود');
         }
-        return new ProjectResource($project);
+        return $project;
     }
 
     public function createProject(array $data)

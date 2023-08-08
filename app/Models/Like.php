@@ -5,13 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ImageOrVideoProject extends Model
+class Like extends Model
 {
     use HasFactory;
-    protected $fillable = ['url'];
-
-    public function project()
+    public function likable()
     {
-        return $this->belongsTo(Project::class);
+        return $this->morphTo();
     }
 }

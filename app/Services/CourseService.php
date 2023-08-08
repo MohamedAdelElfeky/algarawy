@@ -23,13 +23,12 @@ class CourseService
     public function createCourse(array $data)
     {
         $validator = Validator::make($data, [
-            // 'name' => 'required',
             'description' => 'required',
-            'files.*' => '|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
+            'files.*' => 'file|mimes:jpeg,png,jpg,gif,pdf,mp4',
             'location' => 'string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
-            'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
         ]);
         $data['user_id'] = Auth::id();
 
@@ -92,17 +91,14 @@ class CourseService
             ], 200);
         }
         $validator = Validator::make($data, [
-            // 'name' => 'sometimes|required',
-            'description' => 'sometimes|required',
-            'files' => 'nullable|array',
-            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'required|string|google_maps_location',
+            'description' => 'required',
+            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4',
+            'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
-            'images_and_videos' => 'nullable|array',
-            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-
+            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
         ]);
+       
         $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {

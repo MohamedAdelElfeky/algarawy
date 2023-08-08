@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\JobService;
 use Illuminate\Http\Request;
 
-class ApiJobController extends Controller
+class JobController extends Controller
 {
     protected $jobService;
 
@@ -17,8 +17,8 @@ class ApiJobController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page', 10);
-        $page = $request->header('page', 1);
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
         $jobs = $this->jobService->getAllJobs($perPage, $page);
         return response()->json($jobs, 200);
     }
