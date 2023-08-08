@@ -37,19 +37,21 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
+        $imagePathAvatar = "";
         if (request()->hasFile('avatar')) {
             $imageAvatar = request()->file('avatar');
             $file_name_avatar = time() . rand(0, 9999999999999) . '_avatar.' . $imageAvatar->getClientOriginalExtension();
             $imageAvatar->move(public_path('user/'), $file_name_avatar);
             $imagePathAvatar = "user/" . $file_name_avatar;
         }
+        $imagePathFront = "";
         if (request()->hasFile('national_card_image_front')) {
             $imageFront = request()->file('national_card_image_front');
             $file_name_front = time() . rand(0, 9999999999999) . '_avatar.' . $imageFront->getClientOriginalExtension();
             $imageFront->move(public_path('user/'), $file_name_front);
             $imagePathFront = "user/" . $file_name_front;
         }
+        $imagePathBack = "";
         if (request()->hasFile('national_card_image_back')) {
             $imageBack = request()->file('national_card_image_back');
             $file_name_back = time() . rand(0, 9999999999999) . '_avatar.' . $imageBack->getClientOriginalExtension();
