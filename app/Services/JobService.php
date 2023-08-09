@@ -47,23 +47,25 @@ class JobService
     public function createJob(array $data)
     {
         $validator = Validator::make($data, [
-            'description' => 'required',
-            'qualifications' => 'required',
-            'location' => 'string|location',
-            'contact_information' => 'required',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'company_name' => 'required|string',            
-            'company_location' => 'required|string|location',
-            'company_type' => 'required|string',
+            'description' => 'nullable',
+            'title' => 'nullable',
+            'company_name' => 'nullable|string',            
+            'company_location' => 'nullable|string|location',
+            'company_type' => 'nullable|string',
             'company_link' => 'nullable|url',
-            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'job_type' => 'required|string',
-            'is_training' => 'required|boolean',
-            'is_full_time' => 'required|boolean',
-            'price' => 'required|numeric',
-            'job_status' => 'required|boolean',
-            'images_or_video.*' => 'required|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files_pdf.*' => 'required|file',
+            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'job_type' => 'nullable|string',
+            'job_duration' => 'nullable',
+            'price' => 'nullable|numeric',
+            'job_status' => 'nullable|boolean',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files_pdf.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'region_id' => 'nullable|exists:regions,id',
+            'city_id' => 'nullable|exists:cities,id',
+            'neighborhood_id' => 'nullable|exists:neighborhoods,id',
+            'company_region_id' => 'nullable|exists:regions,id',
+            'company_city_id' => 'nullable|exists:cities,id',
+            'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
         ]);
         $data['user_id'] = Auth::id();
        
@@ -73,6 +75,14 @@ class JobService
                 'errors' => $validator->errors(),
             ], 422);
         }
+        $imagePathCompanyLogo = "";
+        if (request()->hasFile('company_logo')) {
+            $imageCompanyLogo = request()->file('company_logo');
+            $file_name_company_logo = time() . rand(0, 9999999999999) . '_company_logo.' . $imageCompanyLogo->getClientOriginalExtension();
+            $imageCompanyLogo->move(public_path('job/img'), $file_name_company_logo);
+            $imagePathCompanyLogo = "job/img" . $file_name_company_logo;
+        }
+        $data['company_logo'] =  $imagePathCompanyLogo;
         // Create a new job
         $job = Job::create($data);
         if (request()->hasFile('images_or_video')) {
@@ -171,7 +181,7 @@ class JobService
     public function searchJob($searchTerm)
     {
         $jobs = Job::where(function ($query) use ($searchTerm) {
-            $fields = ['description', 'name', 'qualifications', 'contact_information', 'company_name', 'price'];
+            $fields = ['description', 'title', 'company_name', 'job_type', 'job_duration', 'price'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }

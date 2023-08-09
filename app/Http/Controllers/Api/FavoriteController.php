@@ -48,32 +48,32 @@ class FavoriteController extends Controller
             switch ($favorite->favoritable_type) {
                 case 'App\Models\Course':
                     return [
-                        'model' => 'Course',
+                        'type' => 'Course',
                         'data' => new CourseResource($favorite->favoritable)
                     ];
                 case 'App\Models\Job':
                     return [
-                        'model' => 'Job',
+                        'type' => 'Job',
                         'data' => new JobResource($favorite->favoritable)
                     ];
                 case 'App\Models\Discount':
                     return [
-                        'model' => 'Discount',
+                        'type' => 'Discount',
                         'data' => new DiscountResource($favorite->favoritable)
                     ];
                 case 'App\Models\Meeting':
                     return [
-                        'model' => 'Meeting',
+                        'type' => 'Meeting',
                         'data' => new MeetingResource($favorite->favoritable)
                     ];
                 case 'App\Models\Project':
                     return [
-                        'model' => 'Project',
+                        'type' => 'Project',
                         'data' => new ProjectResource($favorite->favoritable)
                     ];
                 case 'App\Models\Service':
                     return [
-                        'model' => 'Service',
+                        'type' => 'Service',
                         'data' => new ServiceResource($favorite->favoritable)
                     ];
                 default:

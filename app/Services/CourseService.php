@@ -25,7 +25,7 @@ class CourseService
         $validator = Validator::make($data, [
             'description' => 'required',
             'files.*' => 'file|mimes:jpeg,png,jpg,gif,pdf,mp4',
-            'location' => 'string|location',
+            'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
             'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',

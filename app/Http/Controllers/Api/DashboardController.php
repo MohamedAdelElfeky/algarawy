@@ -30,25 +30,25 @@ class DashboardController extends Controller
         $discounts = DiscountResource::collection(Discount::paginate(5));
         $services = ServiceResource::collection(Service::paginate(5));
         $oneRowArray = [
-            'الدورات والاستشارات' => $courses,
-            'دعم المشاريع' => $projects,
-            'الاجتماعات عائلية' => $meetings,
-            'الخصومات والعروض' => $discounts,
-            'خدمات' => $services,
+            'Course' => $courses,
+            'Project' => $projects,
+            'Meeting' => $meetings,
+            'Discount' => $discounts,
+            'Service' => $services,
             // 'الوظيفة' => $jobs,
         ];
         $result = [
             "date" => [],
         ];
-        foreach ($oneRowArray as $name => $data) {
+        foreach ($oneRowArray as $type => $data) {
             $formattedData = [
-                "name" => $name,
+                "type" => $type,
                 "data" => $data,
             ];
 
             $result["date"][] = $formattedData;
         }
         $jsonResult = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-        return $jsonResult;
+        return response()->json($jsonResult);
     }
 }

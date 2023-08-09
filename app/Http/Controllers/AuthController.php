@@ -26,9 +26,9 @@ class AuthController extends Controller
             'national_id' => 'required|string|size:11|unique:users',
             'avatar' => 'nullable|string',
             'card_images' => 'nullable|array',
-            'region_id' => 'required|exists:regions,id',
-            'city_id' => 'required|exists:cities,id',
-            'neighborhood_id' => 'required|exists:neighborhoods,id',
+            'region_id' => 'nullable|exists:regions,id',
+            'city_id' => 'nullable|exists:cities,id',
+            'neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
