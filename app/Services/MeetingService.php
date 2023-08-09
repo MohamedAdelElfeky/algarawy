@@ -56,10 +56,10 @@ class MeetingService
             ], 200);
         }
         $validator = Validator::make($data, [
-            'datetime' => 'required|date',
-            'name' => 'required|string',
-            'from' => 'required|date_format:H:i',
-            'to' => 'required|date_format:H:i',
+            'datetime' => 'nullable|date',
+            'name' => 'nullable|string',
+            'from' => 'nullable|date_format:H:i',
+            'to' => 'nullable|date_format:H:i',
             'link' => 'nullable|string|url',
             'description' => 'nullable|string',
             'type' => 'required|in:remotely,normal',
