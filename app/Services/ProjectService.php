@@ -44,10 +44,10 @@ class ProjectService
     public function createProject(array $data)
     {
         $validator = Validator::make($data, [
-            'description' => 'required|string',
-            'images_or_video.*' => 'required|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files_pdf.*' => 'required|file',
-            'location' => 'string|location',
+            'description' => 'nullable|string',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files_pdf.*' => 'nullable|file',
+            'location' => 'nullable|string|location',
         ]);
         $data['user_id'] = Auth::id();
 
