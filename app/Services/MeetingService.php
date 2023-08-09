@@ -21,13 +21,13 @@ class MeetingService
     {
 
         $validator = Validator::make($data, [
-            'datetime' => 'required|date',
-            'link' => 'required|string',
-            'name' => 'required|string',
-            'from' => 'required|integer',
-            'to' => 'required|integer',
-            'description' => 'required|string',
-            'type' => 'required|in:remotely,normal',
+            'datetime' => 'nullable|date',
+            'link' => 'nullable|string',
+            'name' => 'nullable|string',
+            'start_time' => 'nullable|integer',
+            'end_time' => 'nullable|integer',
+            'description' => 'nullable|string',
+            'type' => 'nullable|in:remotely,normal',
 
         ]);
         $data['user_id'] = Auth::id();
@@ -58,8 +58,8 @@ class MeetingService
         $validator = Validator::make($data, [
             'datetime' => 'nullable|date',
             'name' => 'nullable|string',
-            'from' => 'nullable|date_format:H:i',
-            'to' => 'nullable|date_format:H:i',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
             'link' => 'nullable|string|url',
             'description' => 'nullable|string',
             'type' => 'required|in:remotely,normal',
