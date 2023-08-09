@@ -48,7 +48,7 @@ class DashboardController extends Controller
 
             $result["date"][] = $formattedData;
         }
-        $jsonResult = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-        return response()->json($jsonResult);
+        // $jsonResult = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        return $result;
     }
 }
