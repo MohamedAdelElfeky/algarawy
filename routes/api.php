@@ -77,4 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/getSavings', [BankAccountController::class, 'getSavings']);
         Route::get('/getCharities', [BankAccountController::class, 'getCharities']);
     });
+
+    Route::put('/profile/{user}', [AuthController::class, 'updateProfile']);
+
 });

@@ -46,7 +46,7 @@ class ProjectService
         $validator = Validator::make($data, [
             'description' => 'nullable|string',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files_pdf.*' => 'nullable|file',
+            'files*' => 'nullable|file',
             'location' => 'nullable|string|location',
         ]);
         $data['user_id'] = Auth::id();
@@ -77,9 +77,9 @@ class ProjectService
         }
 
         // Handle images/videos
-        if (request()->hasFile('files_pdf')) {
-            foreach (request()->file('files_pdf') as $key => $item) {
-                $pdf = $data['files_pdf'][$key];
+        if (request()->hasFile('files')) {
+            foreach (request()->file('files') as $key => $item) {
+                $pdf = $data['files'][$key];
                 $pdfType = $pdf->getClientOriginalExtension();
                 $mimeType = $pdf->getMimeType();
                 $file_name = time() . rand(0, 9999999999999) . '_project.' . $pdf->getClientOriginalExtension();

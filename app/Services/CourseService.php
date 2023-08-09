@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
-use App\Models\CourseFile;
-use App\Models\CourseImageVideo;
 use App\Models\FilePdf;
 use App\Models\Image;
 use Illuminate\Support\Facades\Auth;

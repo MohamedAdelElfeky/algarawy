@@ -32,14 +32,14 @@ class DiscountService
     public function createDiscount(array $data): array
     {
         $validator = Validator::make($data, [
-            'description' => 'required',
-            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'description' => 'nullable',
+            'images_or_video' => 'nullable',
+            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
             // 'files_pdf.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'string|location',
+            'location' => 'nullable|string|location',
             'discount' => 'nullable',
-            'price' => 'required|numeric',
+            'price' => 'nullable|numeric',
         ]);
-
         if ($validator->fails()) {
             return [
                 'message' => 'Validation error',
@@ -50,7 +50,10 @@ class DiscountService
         $data['user_id'] = Auth::id();
         $discount = Discount::create($data);
         if (request()->hasFile('images_or_video')) {
+
             foreach (request()->file('images_or_video') as $key => $item) {
+            // dd($data['images_or_video'][$key]);
+
                 $image = $data['images_or_video'][$key];
                 $imageType = $image->getClientOriginalExtension();
                 $mimeType = $image->getMimeType();

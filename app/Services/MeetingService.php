@@ -24,8 +24,8 @@ class MeetingService
             'datetime' => 'nullable|date',
             'link' => 'nullable|string',
             'name' => 'nullable|string',
-            'start_time' => 'nullable|integer',
-            'end_time' => 'nullable|integer',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
             'description' => 'nullable|string',
             'type' => 'nullable|in:remotely,normal',
 

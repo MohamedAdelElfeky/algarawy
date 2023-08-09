@@ -47,14 +47,14 @@ class AuthController extends Controller
         $imagePathFront = "";
         if (request()->hasFile('national_card_image_front')) {
             $imageFront = request()->file('national_card_image_front');
-            $file_name_front = time() . rand(0, 9999999999999) . '_avatar.' . $imageFront->getClientOriginalExtension();
+            $file_name_front = time() . rand(0, 9999999999999) . '_front.' . $imageFront->getClientOriginalExtension();
             $imageFront->move(public_path('user/'), $file_name_front);
             $imagePathFront = "user/" . $file_name_front;
         }
         $imagePathBack = "";
         if (request()->hasFile('national_card_image_back')) {
             $imageBack = request()->file('national_card_image_back');
-            $file_name_back = time() . rand(0, 9999999999999) . '_avatar.' . $imageBack->getClientOriginalExtension();
+            $file_name_back = time() . rand(0, 9999999999999) . '_back.' . $imageBack->getClientOriginalExtension();
             $imageBack->move(public_path('user/'), $file_name_back);
             $imagePathBack = "user/" . $file_name_back;
         }
@@ -115,5 +115,57 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|unique:users,phone,' . $user->id,
+            'password' => 'nullable|string|min:6', // Password is optional for update
+            'birth_date' => 'nullable|date',
+            'national_id' => 'nullable|string|size:11|unique:users,national_id,' . $user->id,
+            'avatar' => 'nullable|string',
+            'card_images' => 'nullable|array',
+            'region_id' => 'nullable|exists:regions,id',
+            'city_id' => 'nullable|exists:cities,id',
+            'neighborhood_id' => 'nullable|exists:neighborhoods,id',
+            'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Update user profile data
+        $user->fill($request->except('password'));
+
+        // Handle password update if provided
+        if ($request->has('password')) {
+            $user->password = bcrypt($request->input('password'));
+        }
+
+        // Handle file uploads
+        if ($request->hasFile('national_card_image_front')) {
+            $file = $request->file('national_card_image_front');
+            $fileName = time() . '_front.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('uploads', $fileName, 'public');
+            $user->national_card_image_front = $filePath;
+        }
+
+        if ($request->hasFile('national_card_image_back')) {
+            $file = $request->file('national_card_image_back');
+            $fileName = time() . '_back.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('uploads', $fileName, 'public');
+            $user->national_card_image_back = $filePath;
+        }
+
+        $user->save();
+
+        return response()->json(['message' => 'Profile updated successfully']);
     }
 }

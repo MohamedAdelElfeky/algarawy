@@ -19,7 +19,7 @@ class CourseResource extends JsonResource
             'id' => $this->id,
             'description' => $this->description,
             'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
-            'files_pdf' => $this->files_pdf ? FilePdfResource::collection($this->pdfs) : null,
+            'files' => $this->files_pdf ? FilePdfResource::collection($this->pdfs) : null,
             'location' => $this->location,
             'discount' => $this->discount,
             'link' => $this->link,
