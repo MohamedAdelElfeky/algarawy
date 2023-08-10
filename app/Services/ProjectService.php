@@ -84,8 +84,8 @@ class ProjectService
                 $pdfType = $pdf->getClientOriginalExtension();
                 $mimeType = $pdf->getMimeType();
                 $file_name = time() . rand(0, 9999999999999) . '_project.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('project/pdf/'), $file_name);
-                $pdfPath = "project/pdf/" . $file_name;
+                $pdf->move(public_path('project/files/'), $file_name);
+                $pdfPath = "project/files/" . $file_name;
                 $pdfObject = new FilePdf([
                     'url' => $pdfPath,
                     'mime' => $mimeType,
@@ -170,8 +170,8 @@ class ProjectService
                 $pdfType = $pdf->getClientOriginalExtension();
                 $mimeType = $pdf->getMimeType();
                 $file_name = time() . rand(0, 9999999999999) . '_project.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('project/pdf/'), $file_name);
-                $pdfPath = "project/pdf/" . $file_name;
+                $pdf->move(public_path('project/files/'), $file_name);
+                $pdfPath = "project/files/" . $file_name;
                 $pdfObject = new FilePdf([
                     'url' => $pdfPath,
                     'mime' => $mimeType,

@@ -57,24 +57,7 @@ class CourseService
             }
         }
 
-        // Handle images/videos
-        if (request()->hasFile('files_pdf')) {
-            foreach (request()->file('files_pdf') as $key => $item) {
-                $pdf = $data['files_pdf'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_course.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('course/pdf/'), $file_name);
-                $pdfPath = "course/pdf/" . $file_name;
-                $pdfObject = new FilePdf([
-                    'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
-                ]);
-                $course->pdfs()->save($pdfObject);
-            }
-        }
-
+       
 
         return [
             'message' => 'تم إنشاء الدورة التدريبية بنجاح',

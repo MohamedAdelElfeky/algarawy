@@ -18,8 +18,7 @@ class JobApplicationResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'job_id' => $this->job_id,
-            'type_file' => $this->type_file,
-            'file' => $this->file,
+            'files' => $this->pdfs,
             'applied_date' => $this->created_at->toDateTimeString(),
         ];
     }

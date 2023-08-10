@@ -46,7 +46,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/courses', [UserController::class, 'getCourses']);
         Route::get('/data', [UserController::class, 'getUser']);
     });
-
+    // Fetch user's notifications
+    Route::get('/notifications', 'NotificationController@index');
+    // Mark notification as read
+    Route::put('/notifications/{notification}', 'NotificationController@update');
     Route::apiResources([
         'p-jobs' => JobController::class, // jobs Resource
         'p-courses' => CourseController::class, // courses Resource
@@ -80,5 +83,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/profile/{user}', [AuthController::class, 'updateProfile']);
     Route::get('/searchUser', [AuthController::class, 'searchUser']);
+
+    Route::get('/job-applications/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
+    Route::get('/job-applications/user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);
+
+    Route::post('/user/toggle-visibility', [UserController::class, 'toggleVisibility']);
 
 });

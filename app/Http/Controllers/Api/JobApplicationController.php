@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\JobApplicationResource;
+use App\Models\JobApplication;
 use App\Services\JobApplicationService;
 use Illuminate\Http\Request;
 
@@ -20,7 +20,7 @@ class JobApplicationController extends Controller
     public function store(Request $request)
     {
         $jobApplication = $this->jobApplicationService->createJobApplication($request->all());
-        return response()->json($jobApplication, 201);
+        return response()->json(['message' => $jobApplication], 201);
     }
 
     public function update(Request $request, $id)
@@ -56,5 +56,19 @@ class JobApplicationController extends Controller
     {
         $allJobApplications = $this->jobApplicationService->getAllJobsApplication();
         return response()->json($allJobApplications, 200);
+    }
+
+    public function getJobApplicationCount($jobId)
+    {
+        $count = $this->jobApplicationService->getJobApplicationCount($jobId);
+
+        return response()->json(['count' => $count], 200);
+    }
+
+    public function getJobApplicationsForUserAndJob($jobId)
+    {
+        $jobApplications = $this->jobApplicationService->getJobApplicationsForUserAndJob($jobId);
+
+        return response()->json($jobApplications, 200);
     }
 }

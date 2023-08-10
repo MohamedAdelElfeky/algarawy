@@ -33,4 +33,9 @@ class Meeting extends Model
     {
         return $this->morphMany(Like::class, 'likable');
     }
+
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
+    }
 }

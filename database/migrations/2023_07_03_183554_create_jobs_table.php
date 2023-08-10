@@ -18,6 +18,7 @@ return new class extends Migration
 
             $table->string('company_name')->nullable();
             $table->string('company_location')->nullable();
+            $table->string('company_description')->nullable();
             $table->string('company_type')->nullable();
             $table->string('company_link')->nullable();
             $table->string('company_logo')->nullable();
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->string('job_type')->nullable();
             $table->string('job_duration')->nullable();
             $table->decimal('price', 10, 2)->nullable();
+            
             $table->boolean('job_status')->default(false);        
             $table->boolean('is_training')->nullable();        
 

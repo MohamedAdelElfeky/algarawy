@@ -20,6 +20,8 @@ return new class extends Migration
             // Add foreign key constraints if required
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('job_id')->references('id')->on('jobs');
+            $table->unique(['user_id', 'job_id']);
+
         });
     }
 

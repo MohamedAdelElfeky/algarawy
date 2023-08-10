@@ -58,7 +58,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'card_images' => 'array',
     ];
     public function favorites()
     {
@@ -68,5 +67,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(Like::class, 'user_id');
     }
-    
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'city_id');
+    }
+
+    public function neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class, 'neighborhood_id');
+    }
 }

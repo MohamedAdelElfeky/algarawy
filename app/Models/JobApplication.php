@@ -16,6 +16,10 @@ class JobApplication extends Model
         'job_id',
 
     ];
+    public function job()
+    {
+        return $this->belongsTo(job::class, 'job_id');
+    }
     public function pdfs(): MorphMany
     {
         return $this->morphMany(FilePdf::class, 'pdfable');

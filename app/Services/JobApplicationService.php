@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\JobApplicationResource;
 use App\Models\FilePdf;
 use App\Models\JobApplication;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,13 @@ class JobApplicationService
 {
     public function createJobApplication(array $data)
     {
+        $existingJobApplication = JobApplication::where('user_id', Auth::id())
+            ->where('job_id', $data['job_id'])
+            ->first();
+
+        if ($existingJobApplication) {
+            return 'لقد تقدمت بالفعل لهذه الوظيفة.';
+        }
         $validator = Validator::make($data, [
             'job_id' => 'required',
             'files*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
@@ -32,8 +40,8 @@ class JobApplicationService
                 $pdfType = $pdf->getClientOriginalExtension();
                 $mimeType = $pdf->getMimeType();
                 $file_name = time() . rand(0, 9999999999999) . '_jobApplication.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('jobApplication/pdf/'), $file_name);
-                $pdfPath = "jobApplication/pdf/" . $file_name;
+                $pdf->move(public_path('jobApplication/files/'), $file_name);
+                $pdfPath = "jobApplication/files/" . $file_name;
                 $pdfObject = new FilePdf([
                     'url' => $pdfPath,
                     'mime' => $mimeType,
@@ -48,10 +56,7 @@ class JobApplicationService
     public function updateJobApplication($application_id, $data)
     {
         $validator = Validator::make($data, [
-            'user_id' => 'nullable',
             'job_id' => 'nullable',
-            'file' => 'nullable',
-            'type_file' => 'nullable',
         ]);
         if ($validator->fails()) {
             return [
@@ -71,19 +76,34 @@ class JobApplicationService
 
     public function deleteJobApplication($application_id)
     {
-        // Find and delete the job application with the given application_id
         return JobApplication::destroy($application_id);
     }
 
     public function getJobApplicationById($application_id)
     {
-        // Find and return the job application with the given application_id
         return JobApplication::find($application_id);
     }
 
     public function getAllJobsApplication()
     {
-        // Return all job applications
         return JobApplication::all();
+    }
+    public function getJobApplicationCount($jobId)
+    {
+        $count = JobApplication::where('job_id', $jobId)->count();
+        return $count;
+    }
+
+    public function getJobApplicationsForUserAndJob($jobId)
+    {
+        $userId = Auth::id();
+
+        $jobApplications = JobApplication::where('job_id', $jobId)
+            ->whereHas('job', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->get();
+
+        return JobApplicationResource::collection($jobApplications);
     }
 }

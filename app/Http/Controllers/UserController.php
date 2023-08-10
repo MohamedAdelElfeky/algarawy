@@ -52,4 +52,33 @@ class UserController extends Controller
             'user' => $user,
         ], 200);
     }
+
+    public function toggleVisibility(Request $request)
+    {
+        $user = auth()->user();
+
+        $fields = ['mobile_number', 'birthdate', 'email'];
+
+        $errors = [];
+
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                $visibility = $request->input($field);
+
+                if (!is_bool($visibility)) {
+                    $errors[] = "Invalid visibility value for {$field}.";
+                } else {
+                    $user->{$field . '_visibility'} = $visibility;
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            return response()->json(['errors' => $errors], 400);
+        }
+
+        $user->save();
+
+        return response()->json(['message' => 'تم تحديث إعدادات الرؤية.']);
+    }
 }

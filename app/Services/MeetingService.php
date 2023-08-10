@@ -4,6 +4,10 @@ namespace App\Services;
 
 use App\Http\Resources\MeetingResource;
 use App\Models\Meeting;
+use App\Models\Notification;
+// use Illuminate\Support\Facades\Notification;
+use App\Models\User;
+use App\Notifications\MeetingNotification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +44,18 @@ class MeetingService
         }
 
         $meeting = Meeting::create($data);
+        $users = User::all();
+        foreach ($users as $user) {
+            $notificationData = [
+                'user_id' => $user->id,
+                'notifiable_id' => $meeting->id,
+                'title' => 'دعوة',
+                'message'  => ' تمت دعوتك لحضور الاجتماع ' . $meeting->name . ' بتاريخ ' . $meeting->datetime,
+            ];
+            $meeting->notifications()->create($notificationData);
+        }
 
+        // Notification::notifiable($users);
         return [
             'message' => 'تم إنشاء الاجتماع بنجاح',
             'data' => new MeetingResource($meeting),

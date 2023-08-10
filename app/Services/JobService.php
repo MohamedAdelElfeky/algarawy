@@ -110,8 +110,8 @@ class JobService
                 $pdfType = $pdf->getClientOriginalExtension();
                 $mimeType = $pdf->getMimeType();
                 $file_name = time() . rand(0, 9999999999999) . '_job.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('job/pdf/'), $file_name);
-                $pdfPath = "job/pdf/" . $file_name;
+                $pdf->move(public_path('job/files/'), $file_name);
+                $pdfPath = "job/files/" . $file_name;
                 $pdfObject = new FilePdf([
                     'url' => $pdfPath,
                     'mime' => $mimeType,
@@ -212,8 +212,8 @@ class JobService
                 $pdfType = $pdf->getClientOriginalExtension();
                 $mimeType = $pdf->getMimeType();
                 $file_name = time() . rand(0, 9999999999999) . '_job.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('job/pdf/'), $file_name);
-                $pdfPath = "job/pdf/" . $file_name;
+                $pdf->move(public_path('job/files/'), $file_name);
+                $pdfPath = "job/files/" . $file_name;
                 $pdfObject = new FilePdf([
                     'url' => $pdfPath,
                     'mime' => $mimeType,
