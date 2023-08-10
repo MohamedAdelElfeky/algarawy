@@ -56,7 +56,22 @@ class CourseService
                 $course->images()->save($imageObject);
             }
         }
-
+        if (request()->hasFile('files')) {
+            foreach (request()->file('files') as $key => $item) {
+                $pdf = $data['files'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_course.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('course/files/'), $file_name);
+                $pdfPath = "course/files/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $course->pdfs()->save($pdfObject);
+            }
+        }
        
 
         return [

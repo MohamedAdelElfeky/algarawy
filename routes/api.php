@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/courses', [UserController::class, 'getCourses']);
         Route::get('/data', [UserController::class, 'getUser']);
         Route::post('/toggle-visibility', [UserController::class, 'toggleVisibility']);
-        Route::get('/getDataUser', [UserController::class, 'getDataUser']);
+        Route::get('/getDataUser/{user}', [UserController::class, 'getDataUser']);
         Route::put('/update/{user}', [UserController::class, 'updateProfile']);
         Route::get('/search', [UserController::class, 'searchUser']);
         Route::get('/notifications', [UserController::class, 'getNotificationsForUser']);

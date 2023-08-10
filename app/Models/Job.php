@@ -22,7 +22,7 @@ class Job extends Model
         'company_logo',
 
         'job_type',
-        'job_duraton',
+        'job_duration',
         'is_training',
         'price',
         'job_status',

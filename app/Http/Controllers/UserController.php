@@ -68,11 +68,11 @@ class UserController extends Controller
         return response()->json(['message' => 'تم تحديث إعدادات الرؤية.']);
     }
 
-    public function getDataUser()
+    public function getDataUser($userId)
     {
-        $courses = CourseResource::collection(Course::where('user_id', Auth::id())->get());
-        $projects = ProjectResource::collection(Project::where('user_id', Auth::id())->get());
-        $meetings =   MeetingResource::collection(Meeting::where('user_id', Auth::id())->get());
+        $courses = CourseResource::collection(Course::where('user_id', $userId)->get());
+        $projects = ProjectResource::collection(Project::where('user_id', $userId)->get());
+        $meetings =   MeetingResource::collection(Meeting::where('user_id', $userId)->get());
         $oneRowArray = [
             'Course' => $courses,
             'Project' => $projects,
