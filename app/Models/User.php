@@ -39,6 +39,10 @@ class User extends Authenticatable
         'registration_confirmed',
         'national_card_image_front',
         'national_card_image_back',
+        'mobile_number_visibility',
+        'birthdate_visibility',
+        'email_visibility',
+
     ];
 
     /**

@@ -106,4 +106,10 @@ class JobApplicationService
 
         return JobApplicationResource::collection($jobApplications);
     }
+
+    public function getJobApplicationsByUserId()
+    {
+        $jobApplications = JobApplication::where('user_id', Auth::id())->get();
+        return $jobApplications;
+    }
 }

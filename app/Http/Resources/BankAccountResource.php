@@ -21,7 +21,7 @@ class BankAccountResource extends JsonResource
             'bank_name' => $this->bank_name,
             'swift_number' => $this->swift_number,
             'type' => $this->type,
-            'user' => $this->user,
+            'user' => new UserResource($this->user),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];

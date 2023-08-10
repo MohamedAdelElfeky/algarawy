@@ -23,7 +23,7 @@ class MeetingResource extends JsonResource
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
             'description' => $this->description,
-            'user' => $this->user,
+            'user' => new UserResource($this->user),
             'type' => $this->type,
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,

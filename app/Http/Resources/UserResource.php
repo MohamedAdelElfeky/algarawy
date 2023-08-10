@@ -20,7 +20,10 @@ class UserResource extends JsonResource
             'avatar' => $this->avatar,
             'region' =>  new RegionResource($this->region),
             'city' =>  new CityResource($this->city),
-            'neighborhood' =>  new NeighborhoodResource($this->neighborhood),          
+            'neighborhood' =>  new NeighborhoodResource($this->neighborhood),
+            'mobile_number_visibility' =>  $this->mobile_number_visibility,
+            'birthdate_visibility' => $this->birthdate_visibility,
+            'email_visibility' => $this->email_visibility,
         ];
     }
 }

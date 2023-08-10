@@ -17,12 +17,11 @@ return new class extends Migration
             $table->string('title');
             $table->text('message');
             $table->boolean('read')->default(false);
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
             
-            // Add foreign key constraint to link the notification to a user
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            
-            // Morph fields
+
             $table->morphs('notifiable'); 
         });
     }

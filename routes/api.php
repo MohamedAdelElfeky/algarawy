@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\JobApplicationController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,11 +46,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/meetings', [UserController::class, 'getMeetings']);
         Route::get('/courses', [UserController::class, 'getCourses']);
         Route::get('/data', [UserController::class, 'getUser']);
+        Route::post('/toggle-visibility', [UserController::class, 'toggleVisibility']);
+        Route::get('/getDataUser', [UserController::class, 'getDataUser']);
+        Route::put('/update/{user}', [UserController::class, 'updateProfile']);
+        Route::get('/search', [UserController::class, 'searchUser']);
+        Route::get('/notifications', [UserController::class, 'getNotificationsForUser']);
+
     });
-    // Fetch user's notifications
-    Route::get('/notifications', 'NotificationController@index');
-    // Mark notification as read
-    Route::put('/notifications/{notification}', 'NotificationController@update');
+    Route::put('/notifications/AsRead/{notification}', [NotificationController::class, 'markNotificationAsRead']);
+    Route::get('/job-applications/user', [JobApplicationController::class, 'getJobApplicationsByUserId']);
+
     Route::apiResources([
         'p-jobs' => JobController::class, // jobs Resource
         'p-courses' => CourseController::class, // courses Resource
@@ -81,12 +87,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/getCharities', [BankAccountController::class, 'getCharities']);
     });
 
-    Route::put('/profile/{user}', [AuthController::class, 'updateProfile']);
-    Route::get('/searchUser', [AuthController::class, 'searchUser']);
+  
 
     Route::get('/job-applications/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
     Route::get('/job-applications/user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);
 
-    Route::post('/user/toggle-visibility', [UserController::class, 'toggleVisibility']);
 
 });

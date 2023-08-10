@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\JobApplication;
+use App\Http\Resources\JobApplicationResource;
 use App\Services\JobApplicationService;
 use Illuminate\Http\Request;
 
@@ -68,6 +68,13 @@ class JobApplicationController extends Controller
     public function getJobApplicationsForUserAndJob($jobId)
     {
         $jobApplications = $this->jobApplicationService->getJobApplicationsForUserAndJob($jobId);
+
+        return response()->json($jobApplications, 200);
+    }
+
+    public function getJobApplicationsByUserId()
+    {
+        $jobApplications =  JobApplicationResource::collection($this->jobApplicationService->getJobApplicationsByUserId());
 
         return response()->json($jobApplications, 200);
     }

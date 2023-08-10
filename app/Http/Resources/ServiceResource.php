@@ -20,7 +20,7 @@ class ServiceResource extends JsonResource
             'description' => $this->description,
             'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
             'location' => $this->location,
-            'user' => $this->user,
+            'user' => new UserResource($this->user),
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
