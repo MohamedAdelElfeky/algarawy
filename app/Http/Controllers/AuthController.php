@@ -168,4 +168,31 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Profile updated successfully']);
     }
+
+    public function searchUser(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $region_id = $request->input('region_id');
+        $city_id = $request->input('city_id');
+        $neighborhood_id = $request->input('neighborhood_id');
+
+        $users = User::where(function ($query) use ($searchTerm) {
+            $fields = ['first_name', 'last_name', 'name', 'phone'];
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $searchTerm . '%');
+            }
+        })
+            ->when($region_id, function ($query) use ($region_id) {
+                return $query->orWhere('region_id', $region_id);
+            })
+            ->when($city_id, function ($query) use ($city_id) {
+                return $query->orWhere('city_id', $city_id);
+            })
+            ->when($neighborhood_id, function ($query) use ($neighborhood_id) {
+                return $query->orWhere('neighborhood_id', $neighborhood_id);
+            })
+            ->get();
+
+        return response()->json($users);
+    }
 }

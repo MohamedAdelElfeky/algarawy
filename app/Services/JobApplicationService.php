@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\Http\Resources\JobApplicationResource;
-use App\Models\Job;
+use App\Models\FilePdf;
 use App\Models\JobApplication;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -14,8 +13,8 @@ class JobApplicationService
     {
         $validator = Validator::make($data, [
             'job_id' => 'required',
-            'file' => 'required',
-            // 'type_file' => 'required',
+            'files*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+
         ]);
         if ($validator->fails()) {
             return [
@@ -25,10 +24,24 @@ class JobApplicationService
             ];
         }
         $data['user_id'] = Auth::id();
-        $data['type_file'] = Auth::id();
-
         $jobApplication = JobApplication::create($data);
-
+        // Handle images/videos
+        if (request()->hasFile('files')) {
+            foreach (request()->file('files') as $key => $item) {
+                $pdf = $data['files'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_jobApplication.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('jobApplication/pdf/'), $file_name);
+                $pdfPath = "jobApplication/pdf/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $jobApplication->pdfs()->save($pdfObject);
+            }
+        }
         return $jobApplication;
     }
 
@@ -73,5 +86,4 @@ class JobApplicationService
         // Return all job applications
         return JobApplication::all();
     }
-    
 }

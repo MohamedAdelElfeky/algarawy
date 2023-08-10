@@ -18,7 +18,7 @@ class ProjectResource extends JsonResource
             'id' => $this->id,
             'description' => $this->description,
             'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
-            'files' => $this->files_pdf ? FilePdfResource::collection($this->pdfs) : null,
+            'files' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
             'location' => $this->location,
             'user' => $this->user,
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,

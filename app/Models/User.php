@@ -33,9 +33,9 @@ class User extends Authenticatable
         'national_id',
         'avatar',
         'card_images',
-        'governorate',
-        'city',
-        'area',
+        'neighborhood_id',
+        'region_id',
+        'city_id',
         'registration_confirmed',
         'national_card_image_front',
         'national_card_image_back',
@@ -68,4 +68,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Like::class, 'user_id');
     }
+    
 }

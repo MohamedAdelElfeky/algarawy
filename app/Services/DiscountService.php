@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\DiscountResource;
 use App\Models\FilePdf;
 use App\Models\Image;
+use Illuminate\Support\Facades\Storage;
 
 class DiscountService
 {
@@ -35,7 +36,6 @@ class DiscountService
             'description' => 'nullable',
             'images_or_video' => 'nullable',
             'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            // 'files_pdf.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
             'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'price' => 'nullable|numeric',
@@ -50,10 +50,7 @@ class DiscountService
         $data['user_id'] = Auth::id();
         $discount = Discount::create($data);
         if (request()->hasFile('images_or_video')) {
-
             foreach (request()->file('images_or_video') as $key => $item) {
-            // dd($data['images_or_video'][$key]);
-
                 $image = $data['images_or_video'][$key];
                 $imageType = $image->getClientOriginalExtension();
                 $mimeType = $image->getMimeType();
@@ -68,24 +65,6 @@ class DiscountService
                 $discount->images()->save($imageObject);
             }
         }
-
-        // Handle images/videos
-        // if (request()->hasFile('files_pdf')) {
-        //     foreach (request()->file('files_pdf') as $key => $item) {
-        //         $pdf = $data['files_pdf'][$key];
-        //         $pdfType = $pdf->getClientOriginalExtension();
-        //         $mimeType = $pdf->getMimeType();
-        //         $file_name = time() . rand(0, 9999999999999) . '_discount.' . $pdf->getClientOriginalExtension();
-        //         $pdf->move(public_path('discount/pdf/'), $file_name);
-        //         $pdfPath = "discount/pdf/" . $file_name;
-        //         $pdfObject = new FilePdf([
-        //             'url' => $pdfPath,
-        //             'mime' => $mimeType,
-        //             'type' => $pdfType,
-        //         ]);
-        //         $discount->pdfs()->save($pdfObject);
-        //     }
-        // }
         return [
             'success' => true,
             'message' => 'Discount created successfully',
@@ -96,14 +75,13 @@ class DiscountService
     public function updateDiscount(Discount $discount, array $data): array
     {
         $validator = Validator::make($data, [
-            'description' => 'sometimes|required',
-            'images' => 'nullable|array',
-            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            'files' => 'nullable|array',
-            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4|max:2048',
-            'location' => 'required|string|location',
+            'description' => 'nullable',
+            'images_or_video' => 'nullable',
+            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'location' => 'nullable|string|location',
             'discount' => 'nullable',
-            'price' => 'sometimes|required|numeric',
+            'price' => 'nullable|numeric',
+            'deleted_images_and_videos' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -113,7 +91,16 @@ class DiscountService
                 'errors' => $validator->errors(),
             ];
         }
-
+        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
+        foreach ($deletedImagesAndVideos as $imageId) {
+            $image = Image::find($imageId);
+            if ($image) {
+                // Delete from storage
+                Storage::delete($image->url);
+                // Delete from database
+                $image->delete();
+            }
+        }
         $data['user_id'] = Auth::id();
         $discount->update($data);
 

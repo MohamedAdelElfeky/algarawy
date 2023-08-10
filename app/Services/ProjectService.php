@@ -9,6 +9,7 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectService
 {
@@ -46,7 +47,7 @@ class ProjectService
         $validator = Validator::make($data, [
             'description' => 'nullable|string',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files*' => 'nullable|file',
+            'files*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
             'location' => 'nullable|string|location',
         ]);
         $data['user_id'] = Auth::id();
@@ -108,10 +109,12 @@ class ProjectService
             ], 200);
         }
         $validator = Validator::make($data, [
-            'description' => 'required|string',
-            'images_or_videos' => 'nullable|array',
-            'files_pdf' => 'nullable|array',
-            'location' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'location' => 'nullable|string|location',
+            'deleted_images_and_videos' => 'nullable',
+            'delete_files' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -120,9 +123,63 @@ class ProjectService
                 'errors' => $validator->errors(),
             ], 422);
         }
-
+        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
+        foreach ($deletedImagesAndVideos as $imageId) {
+            $image = Image::find($imageId);
+            if ($image) {
+                // Delete from storage
+                Storage::delete($image->url);
+                // Delete from database
+                $image->delete();
+            }
+        }
+        // Handle deleted files
+        $deletedFiles = $data['delete_files'] ?? [];
+        foreach ($deletedFiles as $fileId) {
+            $filePdf = FilePdf::find($fileId);
+            if ($filePdf) {
+                // Delete from storage
+                Storage::delete($filePdf->url);
+                // Delete from database
+                $filePdf->delete();
+            }
+        }
         $project->update($data);
+        // Handle images/videos
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_project.' . $image->getClientOriginalExtension();
+                $image->move(public_path('project/images/'), $file_name);
+                $imagePath = "project/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $project->images()->save($imageObject);
+            }
+        }
 
+        // Handle images/videos
+        if (request()->hasFile('files')) {
+            foreach (request()->file('files') as $key => $item) {
+                $pdf = $data['files'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_project.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('project/pdf/'), $file_name);
+                $pdfPath = "project/pdf/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $project->pdfs()->save($pdfObject);
+            }
+        }
         return [
             'message' => 'تم تحديث المشروع بنجاح',
             'data' => new ProjectResource($project),

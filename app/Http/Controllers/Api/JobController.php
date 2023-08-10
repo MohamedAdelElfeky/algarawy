@@ -37,7 +37,7 @@ class JobController extends Controller
         return response()->json($job, 201);
     }
     public function update(Request $request, $id)
-    {
+    {          
         $job = $this->jobService->getJobById($id);
         $updatedJob = $this->jobService->updateJob($job, $request->all());
         return response()->json($updatedJob);

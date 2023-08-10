@@ -40,6 +40,7 @@ class CourseController extends Controller
 
     public function update(Request $request, $id)
     {
+        dd($request->all());
         $course = $this->courseService->getCourseById($id);
         $result = $this->courseService->updateCourse($course, $request->all());
         return response()->json($result);

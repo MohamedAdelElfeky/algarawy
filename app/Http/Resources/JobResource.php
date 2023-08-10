@@ -34,7 +34,7 @@ class JobResource extends JsonResource
             'price' => $this->price,
             'job_status' => $this->job_status,
             'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
-            'files_pdf' => $this->files_pdf ? FilePdfResource::collection($this->pdfs) : null,
+            'files_pdf' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
             'user' => $this->user,
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,

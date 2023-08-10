@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ServiceResource;
 use App\Models\Image;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceService
 {
@@ -20,9 +21,10 @@ class ServiceService
     public function createService(array $data): array
     {
         $validator = Validator::make($data, [
-            'description' => 'required|string',
+            'description' => 'nullable|string',
+            'images_or_video' => 'nullable',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            'location' => 'string|location',
+            'location' => 'nullable|string|location',
         ]);
 
         if ($validator->fails()) {
@@ -66,10 +68,11 @@ class ServiceService
             ], 200);
         }
         $validator = Validator::make($data, [
-            'description' => 'sometimes|required|string',
-            'images' => 'nullable|array',
-            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
-            'location' => 'nullable|string',
+            'description' => 'sometimes|nullable|string',
+            'images_or_video' => 'nullable',
+            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'location' => 'nullable|string|location',
+            'deleted_images_and_videos' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -80,8 +83,35 @@ class ServiceService
             ];
         }
         $data['user_id'] = Auth::id();
-        $service->update($data);
+        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
+        foreach ($deletedImagesAndVideos as $imageId) {
+            $image = Image::find($imageId);
+            if ($image) {
+                // Delete from storage
+                Storage::delete($image->url);
+                // Delete from database
+                $image->delete();
+            }
+        }
 
+        $service->update($data);
+        // Handle images/videos
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_service.' . $image->getClientOriginalExtension();
+                $image->move(public_path('service/images/'), $file_name);
+                $imagePath = "service/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $service->images()->save($imageObject);
+            }
+        }
         return [
             'message' => 'تم تحديث الخدمة بنجاح',
             'data' => new ServiceResource($service),

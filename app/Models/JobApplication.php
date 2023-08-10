@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class JobApplication extends Model
 {
@@ -13,7 +14,10 @@ class JobApplication extends Model
     protected $fillable = [
         'user_id',
         'job_id',
-        'file',
-        'type_file',
+
     ];
+    public function pdfs(): MorphMany
+    {
+        return $this->morphMany(FilePdf::class, 'pdfable');
+    }
 }

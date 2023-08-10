@@ -79,5 +79,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::put('/profile/{user}', [AuthController::class, 'updateProfile']);
+    Route::get('/searchUser', [AuthController::class, 'searchUser']);
 
 });

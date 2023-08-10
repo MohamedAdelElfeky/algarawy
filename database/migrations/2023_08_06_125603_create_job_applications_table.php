@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('job_id');
-            $table->binary('file');
-            $table->string('type_file');
             $table->timestamps();
         
             // Add foreign key constraints if required

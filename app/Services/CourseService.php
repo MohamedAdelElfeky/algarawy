@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\FilePdf;
 use App\Models\Image;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class CourseService
@@ -90,13 +91,15 @@ class CourseService
         }
         $validator = Validator::make($data, [
             'description' => 'required',
-            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,mp4',
+            'files.*' => 'file|mimes:jpeg,png,jpg,gif,pdf,mp4',
             'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
-            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
+            'deleted_images_and_videos' => 'nullable',
+            'delete_files' => 'nullable',
         ]);
-       
+
         $data['user_id'] = Auth::id();
 
         if ($validator->fails()) {
@@ -104,6 +107,27 @@ class CourseService
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
             ];
+        }
+        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
+        foreach ($deletedImagesAndVideos as $imageId) {
+            $image = Image::find($imageId);
+            if ($image) {
+                // Delete from storage
+                Storage::delete($image->url);
+                // Delete from database
+                $image->delete();
+            }
+        }
+        // Handle deleted files
+        $deletedFiles = $data['delete_files'] ?? [];
+        foreach ($deletedFiles as $fileId) {
+            $filePdf = FilePdf::find($fileId);
+            if ($filePdf) {
+                // Delete from storage
+                Storage::delete($filePdf->url);
+                // Delete from database
+                $filePdf->delete();
+            }
         }
         $course->update($data);
 

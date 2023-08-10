@@ -49,7 +49,7 @@ class JobService
         $validator = Validator::make($data, [
             'description' => 'nullable',
             'title' => 'nullable',
-            'company_name' => 'nullable|string',            
+            'company_name' => 'nullable|string',
             'company_location' => 'nullable|string|location',
             'company_type' => 'nullable|string',
             'company_link' => 'nullable|url',
@@ -59,16 +59,17 @@ class JobService
             'price' => 'nullable|numeric',
             'job_status' => 'nullable|boolean',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files_pdf.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
             'region_id' => 'nullable|exists:regions,id',
             'city_id' => 'nullable|exists:cities,id',
             'neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'company_region_id' => 'nullable|exists:regions,id',
             'company_city_id' => 'nullable|exists:cities,id',
             'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
+            'is_training' => 'nullable',
         ]);
         $data['user_id'] = Auth::id();
-       
+
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation error',
@@ -103,9 +104,9 @@ class JobService
         }
 
         // Handle images/videos
-        if (request()->hasFile('files_pdf')) {
-            foreach (request()->file('files_pdf') as $key => $item) {
-                $pdf = $data['files_pdf'][$key];
+        if (request()->hasFile('files')) {
+            foreach (request()->file('files') as $key => $item) {
+                $pdf = $data['files'][$key];
                 $pdfType = $pdf->getClientOriginalExtension();
                 $mimeType = $pdf->getMimeType();
                 $file_name = time() . rand(0, 9999999999999) . '_job.' . $pdf->getClientOriginalExtension();
@@ -128,28 +129,33 @@ class JobService
 
     public function updateJob(Job $job, array $data)
     {
-        if (($job->user_id) != Auth::id()); {
+        if (($job->user_id) != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الوظيفية ليس من إنشائك',
             ], 200);
         }
         $validator = Validator::make($data, [
-            'name' => 'required',
-            'description' => 'sometimes|required',
-            'qualifications' => 'sometimes|required',
-            'location' => 'sometimes|required',
-            'contact_information' => 'sometimes|required',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'company_name' => 'sometimes|required|string',
-            'company_location' => 'sometimes|required|string',
-            'company_type' => 'sometimes|required|string',
+            'description' => 'nullable',
+            'title' => 'nullable',
+            'company_name' => 'nullable|string',
+            'company_location' => 'nullable|string|location',
+            'company_type' => 'nullable|string',
             'company_link' => 'nullable|url',
-            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'job_type' => 'sometimes|required|string',
-            'is_training' => 'sometimes|required|boolean',
-            'is_full_time' => 'sometimes|required|boolean',
-            'price' => 'sometimes|required|numeric',
-            'job_status' => 'sometimes|required|boolean',
+            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'job_type' => 'nullable|string',
+            'job_duration' => 'nullable',
+            'price' => 'nullable|numeric',
+            'job_status' => 'nullable|boolean',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'region_id' => 'nullable|exists:regions,id',
+            'city_id' => 'nullable|exists:cities,id',
+            'neighborhood_id' => 'nullable|exists:neighborhoods,id',
+            'company_region_id' => 'nullable|exists:regions,id',
+            'company_city_id' => 'nullable|exists:cities,id',
+            'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
+            'deleted_images_and_videos' => 'nullable',
+            'delete_files' => 'nullable',
 
         ]);
         if ($validator->fails()) {
@@ -158,7 +164,64 @@ class JobService
                 'errors' => $validator->errors(),
             ], 422);
         }
+        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
+        foreach ($deletedImagesAndVideos as $imageId) {
+            $image = Image::find($imageId);
+            if ($image) {
+                // Delete from storage
+                Storage::delete($image->url);
+                // Delete from database
+                $image->delete();
+            }
+        }
+        // Handle deleted files
+        $deletedFiles = $data['delete_files'] ?? [];
+        foreach ($deletedFiles as $fileId) {
+            $filePdf = FilePdf::find($fileId);
+            if ($filePdf) {
+                // Delete from storage
+                Storage::delete($filePdf->url);
+                // Delete from database
+                $filePdf->delete();
+            }
+        }
         $job->update($data);
+
+        // Handle deleted images and videos        
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_job.' . $image->getClientOriginalExtension();
+                $image->move(public_path('job/images/'), $file_name);
+                $imagePath = "job/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $job->images()->save($imageObject);
+            }
+        }
+
+        // Handle images/videos
+        if (request()->hasFile('files')) {
+            foreach (request()->file('files') as $key => $item) {
+                $pdf = $data['files'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_job.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('job/pdf/'), $file_name);
+                $pdfPath = "job/pdf/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $job->pdfs()->save($pdfObject);
+            }
+        }
         return response()->json([
             'message' => 'تم تحديث الوظيفة بنجاح',
             'data' => new JobResource($job),
