@@ -102,8 +102,8 @@ class ProjectService
     }
 
     public function updateProject(Project $project, array $data)
-    {
-        if (($project->user_id) != Auth::id()); {
+    {  
+        if ($project->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا المشروع ليس من إنشائك',
             ], 200);

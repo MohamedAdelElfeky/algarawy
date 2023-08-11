@@ -129,7 +129,7 @@ class JobService
 
     public function updateJob(Job $job, array $data)
     {
-        if (($job->user_id) != Auth::id()) {
+        if ($job->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الوظيفية ليس من إنشائك',
             ], 200);

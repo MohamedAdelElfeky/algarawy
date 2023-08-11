@@ -82,7 +82,7 @@ class CourseService
 
     public function updateCourse(Course $course, array $data)
     {
-        if (($course->user_id) != Auth::id()); {
+        if ($course->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الدورة ليس من إنشائك',
             ], 200);

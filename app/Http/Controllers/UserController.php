@@ -171,17 +171,18 @@ class UserController extends Controller
     }
 
 
-    public function changePassword(Request $request, User $user)
+    public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'old_password' => 'required',
             'password' => 'required|confirmed|min:6',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
+            $user = Auth::user();
+    
         if (!Hash::check($request->input('old_password'), $user->password)) {
             return response()->json(['error' => 'كلمة المرور القديمة غير متطابقة'], 422);
         }
@@ -189,7 +190,7 @@ class UserController extends Controller
         $user->update([
             'password' => Hash::make($request->input('password')),
         ]);
-
+    
         return response()->json(['message' => 'تم تحديث كلمة السر بنجاح']);
     }
 }

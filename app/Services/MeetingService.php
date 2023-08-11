@@ -28,8 +28,8 @@ class MeetingService
             'datetime' => 'nullable|date',
             'link' => 'nullable|string',
             'name' => 'nullable|string',
-            'start_time' => 'nullable|date_format:H:i:s',
-            'end_time' => 'nullable|date_format:H:i:s',
+            'start_time' => 'nullable|iso8601',
+            'end_time' => 'nullable|iso8601',
             'description' => 'nullable|string',
             'type' => 'nullable|in:remotely,normal',
 
@@ -65,7 +65,7 @@ class MeetingService
 
     public function updateMeeting(Meeting $meeting, array $data)
     {
-        if (($meeting->user_id) != Auth::id()); {
+        if ($meeting->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الاجتماع ليس من إنشائك',
             ], 200);
@@ -74,8 +74,8 @@ class MeetingService
             'datetime' => 'nullable|date',
             'link' => 'nullable|string',
             'name' => 'nullable|string',
-            'start_time' => 'nullable|date_format:H:i:s',
-            'end_time' => 'nullable|date_format:H:i:s',
+            'start_time' => 'nullable|iso8601',
+            'end_time' => 'nullable|iso8601',
             'description' => 'nullable|string',
             'type' => 'nullable|in:remotely,normal',
 

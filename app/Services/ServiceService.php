@@ -62,7 +62,7 @@ class ServiceService
 
     public function updateService(Service $service, array $data): array
     {
-        if (($service->user_id) != Auth::id()); {
+        if ($service->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الخدمة ليس من إنشائك',
             ], 200);

@@ -74,6 +74,11 @@ class DiscountService
 
     public function updateDiscount(Discount $discount, array $data): array
     {
+        if ($discount->user_id != Auth::id()) {
+            return response()->json([
+                'message' => 'هذا الخصم ليس من إنشائك',
+            ], 200);
+        }
         $validator = Validator::make($data, [
             'description' => 'nullable',
             'images_or_video' => 'nullable',

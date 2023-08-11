@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('link')->nullable();
             $table->string('description')->nullable();
             $table->unsignedBigInteger('user_id');
-            $table->time('start_time')->nullable();
-            $table->time('end_time')->nullable();
+            $table->string('start_time')->nullable();
+            $table->string('end_time')->nullable();
             $table->string('type')->nullable();
             $table->timestamps();
 
