@@ -43,14 +43,8 @@ class ServiceController extends Controller
             return response()->json(['message' => 'Service not found'], 404);
         }
         $result = $this->serviceService->updateService($service, $request->all());
-        if ($result['success']) {
             return new ServiceResource($result['data']);
-        } else {
-            return response()->json([
-                'message' => 'فشل تحديث الخدمة',
-                'errors' => $result['errors'],
-            ], 422);
-        }
+        
     }
 
     public function destroy($id)

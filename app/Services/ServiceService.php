@@ -62,6 +62,7 @@ class ServiceService
 
     public function updateService(Service $service, array $data): array
     {
+
         if ($service->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الخدمة ليس من إنشائك',
@@ -134,7 +135,7 @@ class ServiceService
     {
         $service = Service::find($id);
         if (!$service) {
-            abort(404, 'الخدمة غير موجودة');
+            return response()->json(['message' => 'Service not found'], 404);
         }
         return $service;
     }

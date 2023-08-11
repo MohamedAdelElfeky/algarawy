@@ -34,14 +34,7 @@ class DiscountController extends Controller
     public function store(Request $request)
     {
         $result = $this->discountService->createDiscount($request->all());
-        if ($result['success']) {
-            return new DiscountResource($result['data']);
-        } else {
-            return response()->json([
-                'message' => 'فشل إنشاء الخصم',
-                'errors' => $result['errors'],
-            ], 422);
-        }
+        return new DiscountResource($result['data']);
     }
 
     public function update(Request $request, $id)
@@ -54,14 +47,8 @@ class DiscountController extends Controller
 
         $result = $this->discountService->updateDiscount($discount, $request->all());
 
-        if ($result['success']) {
             return new DiscountResource($result['data']);
-        } else {
-            return response()->json([
-                'message' => 'فشل تحديث الخصم',
-                'errors' => $result['errors'],
-            ], 422);
-        }
+       
     }
 
     public function destroy($id)

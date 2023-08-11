@@ -39,7 +39,7 @@ class JobService
     {
         $job = Job::find($id);
         if (!$job) {
-            abort(404, 'لم يتم العثور على الوظيفة');
+            return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
         }
         return $job;
     }

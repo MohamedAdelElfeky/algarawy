@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Meeting;
 use App\Services\MeetingService;
 use Illuminate\Http\Request;
 
@@ -24,8 +25,10 @@ class MeetingController extends Controller
 
     public function update(Request $request, $id)
     {
-        $meeting = $this->meetingService->getMeeting($id);
-
+        $meeting = Meeting::findOrFail($id);
+        if (!$meeting) {
+            return response()->json(['message' => 'الاجتماع غير موجودة'], 404);
+        }
         $updatedMeeting = $this->meetingService->updateMeeting($meeting, $request->all());
 
         return response()->json($updatedMeeting);
