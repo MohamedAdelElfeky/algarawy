@@ -130,7 +130,11 @@ class DiscountService
     public function deleteDiscount(string $id)
     {
         $discount = Discount::findOrFail($id);
-
+        if ($discount->user_id != Auth::id()) {
+            return response()->json([
+                'message' => 'هذا الخصم ليس من إنشائك',
+            ], 200);
+        }
         if (!$discount) {
             return response()->json(['message' => 'الخصم غير موجود'], 404);
         }

@@ -98,7 +98,7 @@ class MeetingService
 
     public function deleteMeeting(Meeting $meeting)
     {
-        if (($meeting->user_id) != Auth::id()); {
+        if ($meeting->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الاجتماع ليس من إنشائك',
             ], 200);

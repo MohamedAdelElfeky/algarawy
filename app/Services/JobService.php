@@ -230,7 +230,7 @@ class JobService
 
     public function deleteJob(Job $job)
     {
-        if (($job->user_id) != Auth::id()); {
+        if ($job->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الوظيفية ليس من إنشائك',
             ], 200);

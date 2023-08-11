@@ -140,13 +140,9 @@ class ServiceService
         return $service;
     }
 
-    public function deleteService(string $id)
+    public function deleteService(Service $service)
     {
-        $service = Service::findOrFail($id);
-        if (!$service) {
-            return response()->json(['message' => 'Service not found'], 404);
-        }
-        if (($service->user_id) != Auth::id()); {
+        if ($service->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الخدمة ليس من إنشائك',
             ], 200);

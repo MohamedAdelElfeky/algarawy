@@ -191,7 +191,7 @@ class ProjectService
     {
         $project = $this->getProjectById($id);
 
-        if (($project->user_id) != Auth::id()); {
+        if ($project->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا المشروع ليس من إنشائك',
             ], 200);

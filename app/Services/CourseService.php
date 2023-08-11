@@ -163,7 +163,7 @@ class CourseService
         if (!$course) {
             return ['message' => 'الدورة غير موجودة'];
         }
-        if (($course->user_id) != Auth::id()); {
+        if ($course->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الدورة ليس من إنشائك',
             ], 200);
