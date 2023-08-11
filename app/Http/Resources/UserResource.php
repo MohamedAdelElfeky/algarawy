@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'last_name' => $this->last_name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'birth_date' => $this->birth_date,
+            'birth_date' => $this->birth_date ? date('Y-m-d', strtotime($this->birth_date)) : null,
             'region' =>  new RegionResource($this->region),
             'city' =>  new CityResource($this->city),
             'neighborhood' =>  new NeighborhoodResource($this->neighborhood),

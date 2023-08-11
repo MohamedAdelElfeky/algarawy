@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/update/{user}', [UserController::class, 'updateProfile']);
         Route::get('/search', [UserController::class, 'searchUser']);
         Route::get('/notifications', [UserController::class, 'getNotificationsForUser']);
+        Route::put('/changePassword', [UserController::class, 'changePassword']);
 
     });
     Route::put('/notifications/AsRead/{notification}', [NotificationController::class, 'markNotificationAsRead']);
@@ -87,7 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/getCharities', [BankAccountController::class, 'getCharities']);
     });
 
-  
+    Route::get('/getCharityAndSavingBankAccounts', [BankAccountController::class, 'getCharityAndSavingBankAccounts']);
+
 
     Route::get('/job-applications/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
     Route::get('/job-applications/user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);

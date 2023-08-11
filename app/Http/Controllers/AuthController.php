@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\City;
 use App\Models\Neighborhood;
 use App\Models\Region;
@@ -67,7 +68,6 @@ class AuthController extends Controller
         $user = User::create([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
-            'name' => $request->input('first_name') . ' ' . $request->input('last_name'),
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
             'password' => Hash::make($request->input('password')),
@@ -89,23 +89,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Validate the incoming request data
         $credentials = $request->validate([
             'national_id' => 'required|string',
             'password' => 'required|string',
         ]);
-        // Fetch the user by 'national_id'
         $user = User::where('national_id', $credentials['national_id'])->first();
-        // Check if the user exists and the provided password is correct
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'بيانات الاعتماد غير صالحة'], 401);
         }
-        // Generate a new API token for the user
         $token = $user->createToken('authToken')->plainTextToken;
-
-        // Return the user and token information
         return response()->json([
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $token,
         ], 200);
     }
@@ -116,7 +110,4 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
     }
-
-  
-   
 }

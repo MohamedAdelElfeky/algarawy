@@ -101,4 +101,7 @@ class BankAccountService
         $bankAccounts = BankAccount::where('type', 'charity')->paginate(5);
         return BankAccountResource::collection($bankAccounts);
     }
+
+
+   
 }

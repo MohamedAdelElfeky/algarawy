@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CourseResource;
+use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\UserResource;
 use App\Models\Course;
 use App\Models\Meeting;
 use App\Models\Project;
@@ -12,6 +14,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -35,7 +38,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
         return response()->json([
-            'user' => $user,
+            'user' =>  new JobResource($user),
         ], 200);
     }
 
@@ -94,61 +97,43 @@ class UserController extends Controller
 
     public function updateProfile(Request $request, User $user)
     {
-        // dd($request->all());
-
-        // Validate the incoming request data
         $validator = Validator::make($request->all(), [
             'first_name' => 'nullable|string',
             'last_name' => 'nullable|string',
             'email' => 'nullable|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|unique:users,phone,' . $user->id,
-            'password' => 'nullable|string|min:6', // Password is optional for update
-            'birth_date' => 'nullable|date',
-            'national_id' => 'nullable|string|size:11|unique:users,national_id,' . $user->id,
-            'avatar' => 'nullable|file',
-            'card_images' => 'nullable|array',
-            'region_id' => 'nullable|exists:regions,id',
-            'city_id' => 'nullable|exists:cities,id',
-            'neighborhood_id' => 'nullable|exists:neighborhoods,id',
-            'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_avatar_deleted' => 'nullable|boolean', // New field to handle avatar deletion
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        // Update user profile data
-        $user->fill($request->except('password'));
 
-        // Handle password update if provided
-        if ($request->has('password')) {
-            $user->password = bcrypt($request->input('password'));
-        }
-        if (request()->hasFile('avatar')) {
-            $imageAvatar = request()->file('avatar');
-            $file_name_avatar = time() . rand(0, 9999999999999) . '_avatar.' . $imageAvatar->getClientOriginalExtension();
+        if ($request->hasFile('avatar')) {
+            $imageAvatar = $request->file('avatar');
+            $file_name_avatar = time() . '_' . $imageAvatar->getClientOriginalName();
             $imageAvatar->move(public_path('user/'), $file_name_avatar);
             $imagePathAvatar = "user/" . $file_name_avatar;
             $user->avatar = $imagePathAvatar;
         }
-        // Handle file uploads
-        if ($request->hasFile('national_card_image_front')) {
-            $file = $request->file('national_card_image_front');
-            $fileName = time() . '_front.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs('uploads', $fileName, 'public');
-            $user->national_card_image_front = $filePath;
+        if ($request->input('is_avatar_deleted')) {
+            if ($user->avatar) {
+                $oldAvatarPath = public_path($user->avatar);
+                if (file_exists($oldAvatarPath)) {
+                    unlink($oldAvatarPath);
+                }
+                $user->avatar = null;
+            }
         }
+        $user->update([
+            'first_name' => $request->input('first_name', $user->first_name),
+            'last_name' => $request->input('last_name', $user->last_name),
+            'email' => $request->input('email', $user->email),
+            'phone' => $request->input('phone', $user->phone),
+        ]);
 
-        if ($request->hasFile('national_card_image_back')) {
-            $file = $request->file('national_card_image_back');
-            $fileName = time() . '_back.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs('uploads', $fileName, 'public');
-            $user->national_card_image_back = $filePath;
-        }
-
-        $user->save();
-
-        return response()->json(['message' => 'Profile updated successfully']);
+        return response()->json(['message' => 'تم تحديث الملف الشخصي بنجاح']);
     }
 
     public function searchUser(Request $request)
@@ -183,5 +168,28 @@ class UserController extends Controller
         $user = Auth::user();
         $notifications = $user->notifications;
         return response()->json($notifications);
+    }
+
+
+    public function changePassword(Request $request, User $user)
+    {
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'password' => 'required|confirmed|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if (!Hash::check($request->input('old_password'), $user->password)) {
+            return response()->json(['error' => 'كلمة المرور القديمة غير متطابقة'], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->input('password')),
+        ]);
+
+        return response()->json(['message' => 'تم تحديث كلمة السر بنجاح']);
     }
 }

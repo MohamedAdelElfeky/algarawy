@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BankAccountResource;
+use App\Models\BankAccount;
 use App\Services\BankAccountService;
 use Illuminate\Http\Request;
 
@@ -19,7 +21,7 @@ class BankAccountController extends Controller
     {
         $bankAccounts = $this->bankAccountService->getAllBankAccounts();
 
-        return response()->json($bankAccounts,200);
+        return response()->json($bankAccounts, 200);
     }
 
     public function store(Request $request)
@@ -40,7 +42,7 @@ class BankAccountController extends Controller
     {
         $bankAccount = $this->bankAccountService->updateBankAccount($id, $request->all());
 
-        return response()->json($bankAccount,200);
+        return response()->json($bankAccount, 200);
     }
 
     public function destroy($id)
@@ -49,18 +51,29 @@ class BankAccountController extends Controller
 
         return response()->json(['message' => 'Bank account deleted successfully']);
     }
-    
+
     public function getSavings()
     {
         $bankAccounts = $this->bankAccountService->getSavingBankAccounts();
 
-        return response()->json( $bankAccounts,200);
+        return response()->json($bankAccounts, 200);
     }
 
     public function getCharities()
     {
         $bankAccounts = $this->bankAccountService->getCharityBankAccounts();
 
-        return response()->json($bankAccounts,200);
+        return response()->json($bankAccounts, 200);
+    }
+    public function getCharityAndSavingBankAccounts()
+    {
+        $bankAccountCharity = BankAccount::where('type', 'charity')->first();
+        $bankAccountSaving = BankAccount::where('type', 'saving')->first();
+
+        // Return the bank account resources
+        return [
+            'charity_account' => new BankAccountResource($bankAccountCharity),
+            'saving_account' => new BankAccountResource($bankAccountSaving),
+        ];
     }
 }
