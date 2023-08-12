@@ -27,13 +27,13 @@ class LikeController extends Controller
             ->first();
         if ($existingLike) {
             $existingLike->delete();
-            return response()->json(['message' => 'تم إزالة الإعجاب'], 200);
+            return response()->json(['message' => 'تم إزالة الإعجاب', 'liked' => false], 200);
         }
         $like = new Like();
         $like->likable_id = $id;
         $like->likable_type = $modelClass;
         $user->likes()->save($like);
-        return response()->json(['message' => 'تم الإعجاب'], 201);
+        return response()->json(['message' => 'تم الإعجاب', 'liked' => true], 200);
     }
     /**
      * Display a listing of the resource.

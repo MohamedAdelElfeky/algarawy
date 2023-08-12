@@ -32,12 +32,13 @@ class FavoriteController extends Controller
             ->first();
         if ($existingFavorite) {
             $existingFavorite->delete();
-            return response()->json(['message' => 'تم إزالة من المفضلة'], 200);        }
+            return response()->json(['message' => 'تم إزالة من المفضلة', 'favorited' => false], 200);
+        }
         $favorite = new Favorite();
         $favorite->favoritable_id = $id;
         $favorite->favoritable_type = $modelClass;
         $user->favorites()->save($favorite);
-        return response()->json(['message' => 'تمت إضافة النموذج إلى المفضلة'], 201);
+        return response()->json(['message' => 'تمت إضافة النموذج إلى المفضلة', 'favorited' => true], 200);
     }
 
     public function getUserFavorites()
