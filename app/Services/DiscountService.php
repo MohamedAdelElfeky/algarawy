@@ -21,7 +21,8 @@ class DiscountService
 
     public function getAllDiscounts($perPage = 10, $page = 1)
     {
-        $discounts = Discount::paginate($perPage, ['*'], 'page', $page);
+        $discountQuery = Discount::orderBy('created_at', 'desc');
+        $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
         $discountResource = DiscountResource::collection($discounts);
         $paginationData = $this->paginationService->getPaginationData($discounts);
         return [
@@ -108,7 +109,22 @@ class DiscountService
         }
         $data['user_id'] = Auth::id();
         $discount->update($data);
-
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_discount.' . $image->getClientOriginalExtension();
+                $image->move(public_path('discount/images'), $file_name);
+                $imagePath = "discount/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $discount->images()->save($imageObject);
+            }
+        }
         return [
             'success' => true,
             'message' => 'تم تحديث الخصم بنجاح',

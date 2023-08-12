@@ -23,7 +23,8 @@ class ProjectService
 
     public function getAllProjects($perPage = 10, $page = 1)
     {
-        $projects = Project::paginate($perPage, ['*'], 'page', $page);
+        $projectQuery = Project::orderBy('created_at', 'desc');
+        $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
         $projectResource = ProjectResource::collection($projects);
         $paginationData = $this->paginationService->getPaginationData($projects);
 
@@ -47,7 +48,7 @@ class ProjectService
         $validator = Validator::make($data, [
             'description' => 'nullable|string',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files*' => 'nullable|file',
             'location' => 'nullable|string|location',
         ]);
         $data['user_id'] = Auth::id();
@@ -102,7 +103,7 @@ class ProjectService
     }
 
     public function updateProject(Project $project, array $data)
-    {  
+    {
         if ($project->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا المشروع ليس من إنشائك',
@@ -111,10 +112,10 @@ class ProjectService
         $validator = Validator::make($data, [
             'description' => 'nullable|string',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files*' => 'nullable|file',
             'location' => 'nullable|string|location',
             'deleted_images_and_videos' => 'nullable',
-            'delete_files' => 'nullable',
+            'deleted_files' => 'nullable',
         ]);
 
         if ($validator->fails()) {

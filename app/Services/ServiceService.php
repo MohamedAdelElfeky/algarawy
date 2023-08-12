@@ -121,7 +121,8 @@ class ServiceService
 
     public function getAllServices($perPage = 10, $page = 1)
     {
-        $services = Service::paginate($perPage, ['*'], 'page', $page);
+        $servicesQuery = Service::orderBy('created_at', 'desc');
+        $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
         $serviceResource = ServiceResource::collection($services);
         $paginationData = $this->paginationService->getPaginationData($services);
 

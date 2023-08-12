@@ -23,7 +23,7 @@ class CourseService
     {
         $validator = Validator::make($data, [
             'description' => 'required',
-            'files.*' => 'file|mimes:jpeg,png,jpg,gif,pdf,mp4',
+            'files.*' => 'nullable|file',
             'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
@@ -72,7 +72,7 @@ class CourseService
                 $course->pdfs()->save($pdfObject);
             }
         }
-       
+
 
         return [
             'message' => 'تم إنشاء الدورة التدريبية بنجاح',
@@ -89,13 +89,13 @@ class CourseService
         }
         $validator = Validator::make($data, [
             'description' => 'required',
-            'files.*' => 'file|mimes:jpeg,png,jpg,gif,pdf,mp4',
+            'files.*' => 'nullable|file',
             'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'link' => 'nullable|url',
-            'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
+            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
             'deleted_images_and_videos' => 'nullable',
-            'delete_files' => 'nullable',
+            'deleted_files' => 'nullable',
         ]);
 
         $data['user_id'] = Auth::id();
@@ -117,7 +117,7 @@ class CourseService
             }
         }
         // Handle deleted files
-        $deletedFiles = $data['delete_files'] ?? [];
+        $deletedFiles = $data['deleted_files'] ?? [];
         foreach ($deletedFiles as $fileId) {
             $filePdf = FilePdf::find($fileId);
             if ($filePdf) {
@@ -128,7 +128,39 @@ class CourseService
             }
         }
         $course->update($data);
-
+        // Handle images/videos
+        if (request()->hasFile('images_or_video')) {
+            foreach (request()->file('images_or_video') as $key => $item) {
+                $image = $data['images_or_video'][$key];
+                $imageType = $image->getClientOriginalExtension();
+                $mimeType = $image->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_course.' . $image->getClientOriginalExtension();
+                $image->move(public_path('course/images/'), $file_name);
+                $imagePath = "course/images/" . $file_name;
+                $imageObject = new Image([
+                    'url' => $imagePath,
+                    'mime' => $mimeType,
+                    'image_type' => $imageType,
+                ]);
+                $course->images()->save($imageObject);
+            }
+        }
+        if (request()->hasFile('files')) {
+            foreach (request()->file('files') as $key => $item) {
+                $pdf = $data['files'][$key];
+                $pdfType = $pdf->getClientOriginalExtension();
+                $mimeType = $pdf->getMimeType();
+                $file_name = time() . rand(0, 9999999999999) . '_course.' . $pdf->getClientOriginalExtension();
+                $pdf->move(public_path('course/files/'), $file_name);
+                $pdfPath = "course/files/" . $file_name;
+                $pdfObject = new FilePdf([
+                    'url' => $pdfPath,
+                    'mime' => $mimeType,
+                    'type' => $pdfType,
+                ]);
+                $course->pdfs()->save($pdfObject);
+            }
+        }
         return [
             'data' => new CourseResource($course),
         ];
@@ -136,7 +168,8 @@ class CourseService
 
     public function getAllCourses($perPage = 10, $page = 1)
     {
-        $courses = Course::paginate($perPage, ['*'], 'page', $page);
+        $courseQuery = Course::orderBy('created_at', 'desc');
+        $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
         $courseResource = CourseResource::collection($courses);
         $paginationData = $this->paginationService->getPaginationData($courses);
 

@@ -114,7 +114,8 @@ class MeetingService
 
     public function getAllMeetings($perPage = 10, $page = 1)
     {
-        $meetings = Meeting::paginate($perPage, ['*'], 'page', $page);
+        $meetingQuery = Meeting::orderBy('created_at', 'desc');
+        $meetings = $meetingQuery->paginate($perPage, ['*'], 'page', $page);
         $meetingResource =  MeetingResource::collection($meetings);
         $paginationData = $this->paginationService->getPaginationData($meetings);
 

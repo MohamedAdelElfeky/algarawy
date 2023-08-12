@@ -22,7 +22,8 @@ class JobService
 
     public function getAllJobs($perPage = 10, $page = 1)
     {
-        $jobs = Job::paginate($perPage, ['*'], 'page', $page);
+        $jobQuery  = Job::orderBy('created_at', 'desc');
+        $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
         $jobCollection = JobResource::collection($jobs);
 
         $paginationData = $this->paginationService->getPaginationData($jobs);
@@ -59,7 +60,7 @@ class JobService
             'price' => 'nullable|numeric',
             'job_status' => 'nullable|boolean',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files.*' => 'nullable|file',
             'region_id' => 'nullable|exists:regions,id',
             'city_id' => 'nullable|exists:cities,id',
             'neighborhood_id' => 'nullable|exists:neighborhoods,id',
@@ -147,7 +148,7 @@ class JobService
             'price' => 'nullable|numeric',
             'job_status' => 'nullable|boolean',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
+            'files.*' => 'nullable|file',
             'region_id' => 'nullable|exists:regions,id',
             'city_id' => 'nullable|exists:cities,id',
             'neighborhood_id' => 'nullable|exists:neighborhoods,id',
@@ -155,7 +156,7 @@ class JobService
             'company_city_id' => 'nullable|exists:cities,id',
             'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'deleted_images_and_videos' => 'nullable',
-            'delete_files' => 'nullable',
+            'deleted_files' => 'nullable',
 
         ]);
         if ($validator->fails()) {
@@ -175,7 +176,7 @@ class JobService
             }
         }
         // Handle deleted files
-        $deletedFiles = $data['delete_files'] ?? [];
+        $deletedFiles = $data['deleted_files'] ?? [];
         foreach ($deletedFiles as $fileId) {
             $filePdf = FilePdf::find($fileId);
             if ($filePdf) {
