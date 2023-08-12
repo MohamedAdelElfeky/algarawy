@@ -55,7 +55,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
     Route::put('/notifications/AsRead/{notification}', [NotificationController::class, 'markNotificationAsRead']);
-    Route::get('/job-applications/user', [JobApplicationController::class, 'getJobApplicationsByUserId']);
 
     Route::apiResources([
         'p-jobs' => JobController::class, // jobs Resource
@@ -92,7 +91,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::get('/job-applications/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
-    Route::get('/job-applications/user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);
+    Route::get('/job-applications/for-user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);
+    Route::get('/job-applications/by-user', [JobApplicationController::class, 'getJobApplicationsByUserId']);
 
 
 });

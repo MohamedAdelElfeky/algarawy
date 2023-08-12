@@ -38,7 +38,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
         return response()->json([
-            'user' =>  new JobResource($user),
+            'user' =>  new UserResource($user),
         ], 200);
     }
 

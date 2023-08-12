@@ -25,11 +25,11 @@ class MeetingService
     {
 
         $validator = Validator::make($data, [
-            'datetime' => 'nullable|date',
+            'datetime' => 'nullable|date_format:Y-m-d\TH:i:s.v',
             'link' => 'nullable|string',
             'name' => 'nullable|string',
-            'start_time' => 'nullable|iso8601',
-            'end_time' => 'nullable|iso8601',
+            'start_time' => 'nullable|date_format:Y-m-d\TH:i:s.v',
+            'end_time' => 'nullable|date_format:Y-m-d\TH:i:s.v',
             'description' => 'nullable|string',
             'type' => 'nullable|in:remotely,normal',
 
@@ -42,7 +42,9 @@ class MeetingService
                 'errors' => $validator->errors(),
             ], 422);
         }
-
+        // $data['startTime'] = date('Y-m-d H:i:s', strtotime($data['start_time']));
+        // $data['endTime'] = date('Y-m-d H:i:s', strtotime($data['end_time']));
+        // $data['datetime'] = date('Y-m-d H:i:s', strtotime($data['end_time']));
         $meeting = Meeting::create($data);
         $users = User::all();
         foreach ($users as $user) {

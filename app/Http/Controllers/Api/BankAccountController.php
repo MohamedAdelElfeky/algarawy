@@ -69,21 +69,26 @@ class BankAccountController extends Controller
     {
         $bankAccountCharity = BankAccount::where('type', 'charity')->first();
         $bankAccountSaving = BankAccount::where('type', 'saving')->first();
-    
+        $bankAccountInvestment = BankAccount::where('type', 'investment')->first();
+
         $data = [];
-    
+
         if ($bankAccountCharity) {
             $data['charity_account'] = new BankAccountResource($bankAccountCharity);
         } else {
-            $data['charity_account'] = null; // You can set it to null or an empty array, depending on your use case.
+            $data['charity_account'] = null;
         }
-    
+
         if ($bankAccountSaving) {
             $data['saving_account'] = new BankAccountResource($bankAccountSaving);
         } else {
-            $data['saving_account'] = null; // You can set it to null or an empty array, depending on your use case.
+            $data['saving_account'] = null;
         }
-    
+        if ($bankAccountInvestment) {
+            $data['investment_account'] = new BankAccountResource($bankAccountInvestment);
+        } else {
+            $data['investment_account'] = null;
+        }
         return $data;
     }
 }
