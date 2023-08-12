@@ -38,7 +38,6 @@ class ServiceController extends Controller
 
     public function update(Request $request, $id)
     {
-        dd(request()->all() );
         $service = $this->serviceService->getServiceById($id);
         if (!$service) {
             return response()->json(['message' => 'Service not found'], 404);

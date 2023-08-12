@@ -36,7 +36,7 @@ class JobResource extends JsonResource
             'company_neighborhood' =>  new NeighborhoodResource($this->companyNeighborhood),
 
             'job_type' => $this->job_type,
-            'job_duration' => $this->job_duraton,
+            'job_duration' => $this->job_duration,
             'is_training' => $this->is_training,
             'price' => $this->price,
             'job_status' => $this->job_status,

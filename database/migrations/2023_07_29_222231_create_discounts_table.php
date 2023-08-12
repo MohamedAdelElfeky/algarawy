@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('description')->nullable();          
             $table->unsignedBigInteger('user_id');
             $table->string('location')->nullable();
+            $table->string('link')->nullable();
             $table->integer('discount')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->timestamps();

@@ -40,6 +40,7 @@ class DiscountService
             'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'price' => 'nullable|numeric',
+            'link' => 'nullable|string',
         ]);
         if ($validator->fails()) {
             return [
@@ -88,6 +89,7 @@ class DiscountService
             'discount' => 'nullable',
             'price' => 'nullable|numeric',
             'deleted_images_and_videos' => 'nullable',
+            'link' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -143,20 +145,14 @@ class DiscountService
         return $discount;
     }
 
-    public function deleteDiscount(string $id)
+    public function deleteDiscount(Discount $discount)
     {
-        $discount = Discount::findOrFail($id);
         if ($discount->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الخصم ليس من إنشائك',
             ], 200);
         }
-        if (!$discount) {
-            return response()->json(['message' => 'الخصم غير موجود'], 404);
-        }
-
         $discount->delete();
-
         return response()->json(['message' => 'تم حذف الخصم بنجاح']);
     }
     public function searchDiscount($searchTerm)
