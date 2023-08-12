@@ -193,4 +193,8 @@ class UserController extends Controller
     
         return response()->json(['message' => 'تم تحديث كلمة السر بنجاح']);
     }
+
+    public function numberSupport(){
+        return response()->json(['number' => '+96614584684']);
+    }
 }

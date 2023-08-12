@@ -39,6 +39,7 @@ Route::get('/cities', [CityController::class, 'index']);
 Route::get('/neighborhoods', [NeighborhoodController::class, 'index']);
 Route::get('/regions/{region}/cities', [CityController::class, 'getCitiesByRegion']);
 Route::get('/cities/{city}/neighborhoods', [NeighborhoodController::class, 'getNeighborhoodsByCity']);
+Route::get('/number-support', [UserController::class, 'numberSupport']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // User related routes
