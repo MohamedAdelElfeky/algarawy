@@ -22,9 +22,9 @@ class AuthController extends Controller
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users',
             'phone' => 'required|string|unique:users',
+            'national_id' => 'required|string|size:11|unique:users',
             'password' => 'required|string|min:6',
             'birth_date' => 'required|date',
-            'national_id' => 'required|string|size:11|unique:users',
             'avatar' => 'nullable|string',
             'card_images' => 'nullable|array',
             'region_id' => 'nullable|exists:regions,id',
@@ -32,6 +32,17 @@ class AuthController extends Controller
             'neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ] ,[
+            'email.required' => trans('validation.email.required'),
+            'email.email' => trans('validation.email.email'),
+            'email.unique' => trans('validation.email.unique'),
+            'phone.required' => trans('validation.phone.required'),
+            'phone.string' => trans('validation.phone.string'),
+            'phone.unique' => trans('validation.phone.unique'),
+            'national_id.required' => trans('validation.national_id.required'),
+            'national_id.string' => trans('validation.national_id.string'),
+            'national_id.size' => trans('validation.national_id.size'),
+            'national_id.unique' => trans('validation.national_id.unique'),
         ]);
 
         // Check if validation fails
