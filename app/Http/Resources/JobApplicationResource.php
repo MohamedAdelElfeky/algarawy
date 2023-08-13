@@ -17,7 +17,7 @@ class JobApplicationResource extends JsonResource
         return [
             'id' => $this->id,
             'user' => new UserResource($this->user),
-            'job' => new JobResource($this->job),
+            // 'job' => new JobResource($this->job),
             'files' => $this->pdfs,
             'applied_date' => $this->created_at->toDateTimeString(),
         ];

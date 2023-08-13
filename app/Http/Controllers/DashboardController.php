@@ -19,10 +19,23 @@ class DashboardController extends Controller
     public function index()
     {
         addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']);
-        $jobs = Job::all();
+        $jobs = Job::with([
+            'user',
+            'region',
+            'city',
+            'neighborhood',
+            'companyRegion',
+            'companyCity',
+            'companyNeighborhood',
+            'images',
+            'pdfs',
+            'favorites',
+            'likes',
+        ])->get();
         $allProject = Project::all();
         $jobData = JobResource::collection($jobs);
         $projects = ProjectResource::collection($allProject);
+        dd($jobData);
         return view('pages.dashboards.index', \compact('jobData', 'projects'));
     }
 
