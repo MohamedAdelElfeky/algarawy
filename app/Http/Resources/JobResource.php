@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,8 @@ class JobResource extends JsonResource
 
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,
+
+            'count_apply_job' => JobApplication::where('job_id',$this->id)->count(),
 
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
