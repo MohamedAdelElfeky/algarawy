@@ -110,13 +110,7 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if ($request->hasFile('avatar')) {
-            $imageAvatar = $request->file('avatar');
-            $file_name_avatar = time() . '_' . $imageAvatar->getClientOriginalName();
-            $imageAvatar->move(public_path('user/'), $file_name_avatar);
-            $imagePathAvatar = "user/" . $file_name_avatar;
-            $user->avatar = $imagePathAvatar;
-        }
+
         if ($request->input('is_avatar_deleted')) {
             if ($user->avatar) {
                 $oldAvatarPath = public_path($user->avatar);
@@ -125,6 +119,13 @@ class UserController extends Controller
                 }
                 $user->avatar = null;
             }
+        }
+        if ($request->hasFile('avatar')) {
+            $imageAvatar = $request->file('avatar');
+            $file_name_avatar = time() . '_' . $imageAvatar->getClientOriginalName();
+            $imageAvatar->move(public_path('user/'), $file_name_avatar);
+            $imagePathAvatar = "user/" . $file_name_avatar;
+            $user->avatar = $imagePathAvatar;
         }
         $user->update([
             'first_name' => $request->input('first_name', $user->first_name),
@@ -177,12 +178,12 @@ class UserController extends Controller
             'old_password' => 'required',
             'password' => 'required|confirmed|min:6',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-            $user = Auth::user();
-    
+        $user = Auth::user();
+
         if (!Hash::check($request->input('old_password'), $user->password)) {
             return response()->json(['error' => 'كلمة المرور القديمة غير متطابقة'], 422);
         }
@@ -190,11 +191,12 @@ class UserController extends Controller
         $user->update([
             'password' => Hash::make($request->input('password')),
         ]);
-    
+
         return response()->json(['message' => 'تم تحديث كلمة السر بنجاح']);
     }
 
-    public function numberSupport(){
+    public function numberSupport()
+    {
         return response()->json(['number' => '+96614584684']);
     }
 }

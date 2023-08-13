@@ -81,8 +81,8 @@ class JobService
         if (request()->hasFile('company_logo')) {
             $imageCompanyLogo = request()->file('company_logo');
             $file_name_company_logo = time() . rand(0, 9999999999999) . '_company_logo.' . $imageCompanyLogo->getClientOriginalExtension();
-            $imageCompanyLogo->move(public_path('job/img'), $file_name_company_logo);
-            $imagePathCompanyLogo = "job/img" . $file_name_company_logo;
+            $imageCompanyLogo->move(public_path('job/img/'), $file_name_company_logo);
+            $imagePathCompanyLogo = "job/img/" . $file_name_company_logo;
         }
         $data['company_logo'] =  $imagePathCompanyLogo;
         // Create a new job
@@ -157,6 +157,7 @@ class JobService
             'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'deleted_images_and_videos' => 'nullable',
             'deleted_files' => 'nullable',
+            'deleted_company_logo' => 'nullable',
 
         ]);
         if ($validator->fails()) {
@@ -186,6 +187,25 @@ class JobService
                 $filePdf->delete();
             }
         }
+        if (!empty($data['is_logo_deleted'])) {
+            if ($job->company_logo) {
+                $oldLogoPath = public_path($job->company_logo);
+                if (file_exists($oldLogoPath)) {
+                    unlink($oldLogoPath);
+                }
+                $job->logo = null;
+            }
+        }
+        if (request()->hasFile('company_logo')) {
+            $imageLogo = $data['company_logo'];
+            $file_name_logo = time() . '_' . $imageLogo->getClientOriginalName();
+            $imageLogo->move(public_path('job/img/'), $file_name_logo);
+            $imagePathLogo = "job/img/" . $file_name_logo;
+            $job->company_logo = $imagePathLogo; // Assuming you have a company object named $company
+        }
+
+
+
         $job->update($data);
 
         // Handle deleted images and videos        
