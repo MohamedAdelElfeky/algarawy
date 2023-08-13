@@ -12,14 +12,8 @@ class JobApplicationResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray(Request $request)
     {
-        return [
-            'id' => $this->id,
-            'user' => new UserResource($this->user),
-            'job' => new JobResource($this->job),
-            'files' => $this->pdfs,
-            'applied_date' => $this->created_at->toDateTimeString(),
-        ];
+        return new JobResource($this->job);
     }
 }
