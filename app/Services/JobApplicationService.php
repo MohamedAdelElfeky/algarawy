@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\JobApplication2Resource;
 use App\Http\Resources\JobApplicationResource;
 use App\Models\FilePdf;
 use App\Models\JobApplication;
@@ -104,7 +105,7 @@ class JobApplicationService
             })
             ->get();
 
-        return JobApplicationResource::collection($jobApplications);
+        return JobApplication2Resource::collection($jobApplications);
     }
 
     public function getJobApplicationsByUserId()
