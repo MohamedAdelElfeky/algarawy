@@ -196,14 +196,15 @@ class JobService
                 $job->logo = null;
             }
         }
+       
+        $imagePathCompanyLogo = "";
         if (request()->hasFile('company_logo')) {
-            $imageLogo = $data['company_logo'];
-            $file_name_logo = time() . '_' . $imageLogo->getClientOriginalName();
-            $imageLogo->move(public_path('job/img/'), $file_name_logo);
-            $imagePathLogo = "job/img/" . $file_name_logo;
-            $job->company_logo = $imagePathLogo; // Assuming you have a company object named $company
+            $imageCompanyLogo = request()->file('company_logo');
+            $file_name_company_logo = time() . rand(0, 9999999999999) . '_company_logo.' . $imageCompanyLogo->getClientOriginalExtension();
+            $imageCompanyLogo->move(public_path('job/img/'), $file_name_company_logo);
+            $imagePathCompanyLogo = "job/img/" . $file_name_company_logo;
         }
-
+        $data['company_logo'] =  $imagePathCompanyLogo;
 
 
         $job->update($data);
