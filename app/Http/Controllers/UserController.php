@@ -11,6 +11,7 @@ use App\Models\Course;
 use App\Models\Meeting;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\PaginationService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,13 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    protected $paginationService;
+
+    public function __construct(PaginationService $paginationService)
+    {
+        $this->paginationService = $paginationService;
+    }
+
     public function getMeetings()
     {
         $meetings = Meeting::where('user_id', Auth::id())->get();
@@ -134,7 +142,7 @@ class UserController extends Controller
             'phone' => $request->input('phone', $user->phone),
         ]);
 
-        return response()->json(['message' => 'تم تحديث الملف الشخصي بنجاح']);
+        return response()->json(new UserResource($user));
     }
 
     public function searchUser(Request $request)
@@ -170,9 +178,16 @@ class UserController extends Controller
         $page = $request->header('page');
         $user = Auth::user();
         $notifications = $user->notifications()
-        ->orderBy('created_at', 'desc') // You can adjust the sorting order as needed
-        ->paginate($perPage, ['*'], 'page', $page);
-        return response()->json($notifications);
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+        $notificationsRe = $user->notifications()
+            ->orderBy('created_at', 'desc')->get();
+        $paginationData = $this->paginationService->getPaginationData($notifications);
+
+        return [
+            'data' => $notificationsRe,
+            'metadata' => $paginationData,
+        ];
     }
 
 

@@ -33,7 +33,6 @@ class NotificationController extends Controller
 
     public function markAllNotificationsAsRead()
     {
-        dd('d');
         $user = Auth::user();
         Notification::where('user_id', $user->id)
             ->update(['read_at' => now(), 'read' => true]);
