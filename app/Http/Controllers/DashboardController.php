@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $allProject = Project::all();
         $jobData = JobResource::collection($jobs);
         $projects = ProjectResource::collection($allProject);
-        dd($jobData);
+        // dd($jobData);
         return view('pages.dashboards.index', \compact('jobData', 'projects'));
     }
 

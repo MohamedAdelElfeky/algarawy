@@ -50,7 +50,7 @@ class JobResource extends JsonResource
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,
 
-            'count_apply_job' => JobApplication::where('job_id',$this->id)->count(),
+            'count_apply_job' =>$this->count_of_applications, // JobApplication::where('job_id',$this->id)->count(),
 
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),

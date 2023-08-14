@@ -88,5 +88,12 @@ class Job extends Model
     {
         return $this->belongsTo(Neighborhood::class, 'company_neighborhood_id');
     }
-
+    public function jobApplications()
+    {
+        return $this->hasMany(JobApplication::class, 'job_id');
+    }
+    public function getCountOfApplicationsAttribute()
+    {
+        return $this->jobApplications()->count();
+    }
 }

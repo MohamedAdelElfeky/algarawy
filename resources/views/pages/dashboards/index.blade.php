@@ -3056,7 +3056,7 @@
             <!--end::Tables widget 16-->
         </div>
     </div>
-    @section('script')
+    {{-- @section('script')
         <script>
             function generateTenDays() {
                 const today = new Date();
@@ -3153,5 +3153,5 @@
                 fetchMeetings();
             });
         </script>
-    @endsection
+    @endsection --}}
 </x-default-layout>
