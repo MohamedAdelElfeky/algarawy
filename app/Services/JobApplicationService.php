@@ -100,10 +100,7 @@ class JobApplicationService
     {
         $userId = Auth::id();
 
-        $jobApplications = JobApplication::where('job_id', $jobId)
-            ->whereHas('job', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
-            })
+        $jobApplications = JobApplication::where('job_id', $jobId)->where('user_id', $userId)    
             ->get();
 
         return JobApplication2Resource::collection($jobApplications);

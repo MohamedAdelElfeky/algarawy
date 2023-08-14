@@ -55,12 +55,24 @@ class JobApplicationController extends Controller
     public function index()
     {
         $allJobApplications = $this->jobApplicationService->getAllJobsApplication();
+    
+        if ($allJobApplications === null) {
+            $errorMessage = "No job applications found.";
+            return response()->json(['error' => $errorMessage], 404);
+        }
+    
         return response()->json($allJobApplications, 200);
     }
+    
 
     public function getJobApplicationCount($jobId)
     {
         $count = $this->jobApplicationService->getJobApplicationCount($jobId);
+
+        if ($count === null) {
+            $errorMessage = "No job applications found for the specified job.";
+            return response()->json(['error' => $errorMessage], 404);
+        }
 
         return response()->json(['count' => $count], 200);
     }
@@ -68,14 +80,21 @@ class JobApplicationController extends Controller
     public function getJobApplicationsForUserAndJob($jobId)
     {
         $jobApplications = $this->jobApplicationService->getJobApplicationsForUserAndJob($jobId);
-
+        if ($jobApplications === null) {
+            $errorMessage = "No job applications found for the specified job.";
+            return response()->json(['error' => $errorMessage], 404);
+        }
+    
         return response()->json($jobApplications, 200);
     }
 
     public function getJobApplicationsByUserId()
     {
         $jobApplications =  JobApplicationResource::collection($this->jobApplicationService->getJobApplicationsByUserId());
-
+        if ($jobApplications === null) {
+            $errorMessage = "No job applications found for the specified job.";
+            return response()->json(['error' => $errorMessage], 404);
+        }
         return response()->json($jobApplications, 200);
     }
 }

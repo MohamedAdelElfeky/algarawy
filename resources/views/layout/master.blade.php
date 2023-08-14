@@ -14,7 +14,10 @@
     <meta property="og:type" content="article"/>
     <meta property="og:title" content=""/>
     <link rel="canonical" href=""/>
-
+    {{-- <link href="{{ asset('assets/plugins/global/plugins.bundle.rtl.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/style.bundle.rtl.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/plugins/custom/datatables/datatables.bundle.rtl.css') }}" rel="stylesheet"
+     --}}
     {!! includeFavicon() !!}
 
     <!--begin::Fonts-->
