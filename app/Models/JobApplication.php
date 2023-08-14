@@ -23,7 +23,7 @@ class JobApplication extends Model
     }
     public function job()
     {
-        return $this->belongsTo(job::class);
+        return $this->belongsTo(job::class, 'job_id');
     }
     public function pdfs(): MorphMany
     {
