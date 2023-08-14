@@ -145,7 +145,7 @@ class UserController extends Controller
         $neighborhood_id = $request->input('neighborhood_id');
 
         $users = User::where(function ($query) use ($searchTerm) {
-            $fields = ['first_name', 'last_name', 'name', 'phone'];
+            $fields = ['first_name', 'last_name', 'phone'];
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
