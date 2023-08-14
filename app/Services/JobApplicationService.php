@@ -6,6 +6,7 @@ use App\Http\Resources\JobApplication2Resource;
 use App\Http\Resources\JobApplicationResource;
 use App\Http\Resources\JobResource;
 use App\Models\FilePdf;
+use App\Models\Job;
 use App\Models\JobApplication;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -52,7 +53,7 @@ class JobApplicationService
                 $jobApplication->pdfs()->save($pdfObject);
             }
         }
-        return  new JobResource($jobApplication->job);
+        return  new JobResource(Job::find($jobApplication->job));
     }
 
     public function updateJobApplication($application_id, $data)
