@@ -53,7 +53,7 @@ class JobApplicationService
                 $jobApplication->pdfs()->save($pdfObject);
             }
         }
-        return  new JobResource(Job::find($jobApplication->job));
+        return  new JobResource(Job::find($data['job_id']));
     }
 
     public function updateJobApplication($application_id, $data)
