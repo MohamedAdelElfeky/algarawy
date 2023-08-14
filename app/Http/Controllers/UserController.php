@@ -164,10 +164,14 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function getNotificationsForUser()
+    public function getNotificationsForUser(Request $request)
     {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
         $user = Auth::user();
-        $notifications = $user->notifications;
+        $notifications = $user->notifications()
+        ->orderBy('created_at', 'desc') // You can adjust the sorting order as needed
+        ->paginate($perPage, ['*'], 'page', $page);
         return response()->json($notifications);
     }
 

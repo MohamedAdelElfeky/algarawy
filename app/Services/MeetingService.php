@@ -48,13 +48,15 @@ class MeetingService
         $meeting = Meeting::create($data);
         $users = User::all();
         foreach ($users as $user) {
-            $notificationData = [
-                'user_id' => $user->id,
-                'notifiable_id' => $meeting->id,
-                'title' => 'دعوة',
-                'message'  => ' تمت دعوتك لحضور الاجتماع ' . $meeting->name . ' بتاريخ ' . $meeting->datetime,
-            ];
-            $meeting->notifications()->create($notificationData);
+            if ($user->id !== Auth::id()) {
+                $notificationData = [
+                    'user_id' => $user->id,
+                    'notifiable_id' => $meeting->id,
+                    'title' => 'دعوة',
+                    'message'  => ' تمت دعوتك لحضور الاجتماع ' . $meeting->name . ' بتاريخ ' . $meeting->datetime,
+                ];
+                $meeting->notifications()->create($notificationData);
+            }
         }
 
         // Notification::notifiable($users);
@@ -92,6 +94,18 @@ class MeetingService
         }
 
         $meeting->update($data);
+        $users = User::all();
+        foreach ($users as $user) {
+            if ($user->id !== Auth::id()) {
+                $notificationData = [
+                    'user_id' => $user->id,
+                    'notifiable_id' => $meeting->id,
+                    'title' => 'دعوة',
+                    'message'  => ' تمت تحديث الدعوة لحضور الاجتماع ' . $meeting->name . ' بتاريخ ' . $meeting->datetime,
+                ];
+                $meeting->notifications()->create($notificationData);
+            }
+        }
         return [
             'message' => 'تم تحديث الاجتماع بنجاح',
             'data' => new MeetingResource($meeting),
