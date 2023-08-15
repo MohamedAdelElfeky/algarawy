@@ -6,6 +6,7 @@ use App\Http\Resources\JobResource;
 use App\Models\FilePdf;
 use App\Models\Image;
 use App\Models\Job;
+use Faker\Core\Number;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -133,7 +134,7 @@ class JobService
         if ($job->user_id != Auth::id()) {
             return response()->json([
                 'message' => 'هذا الوظيفية ليس من إنشائك',
-            ], 200);
+            ], 403);
         }
         $validator = Validator::make($data, [
             'description' => 'nullable',
@@ -187,24 +188,23 @@ class JobService
                 $filePdf->delete();
             }
         }
-        if (!empty($data['is_logo_deleted'])) {
-            if ($job->company_logo) {
-                $oldLogoPath = public_path($job->company_logo);
-                if (file_exists($oldLogoPath)) {
-                    unlink($oldLogoPath);
-                }
-                $job->logo = null;
+        // dd($data);
+        if (!empty($data['deleted_company_logo'])) {
+            $oldLogoPath = public_path($job->company_logo);
+            if (file_exists($oldLogoPath)) {
+                unlink($oldLogoPath);
             }
+            $data['company_logo'] = null;
         }
-       
-        $imagePathCompanyLogo = "";
+
         if (request()->hasFile('company_logo')) {
             $imageCompanyLogo = request()->file('company_logo');
             $file_name_company_logo = time() . rand(0, 9999999999999) . '_company_logo.' . $imageCompanyLogo->getClientOriginalExtension();
             $imageCompanyLogo->move(public_path('job/img/'), $file_name_company_logo);
             $imagePathCompanyLogo = "job/img/" . $file_name_company_logo;
+            $data['company_logo'] =  $imagePathCompanyLogo;
         }
-        $data['company_logo'] =  $imagePathCompanyLogo;
+
 
 
         $job->update($data);

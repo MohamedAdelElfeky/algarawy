@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\JobResource;
+use App\Models\Job;
+use App\Models\JobApplication;
 use App\Services\JobService;
 use Illuminate\Http\Request;
 
@@ -39,13 +41,20 @@ class JobController extends Controller
     }
     public function update(Request $request, $id)
     {
-        $job = $this->jobService->getJobById($id);
+        $job = Job::find($id);
+        if (!$job) {
+            return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
+        }
         $updatedJob = $this->jobService->updateJob($job, $request->all());
         return response()->json($updatedJob);
     }
     public function destroy($id)
     {
-        $job = $this->jobService->getJobById($id);
+        $job = Job::find($id);
+        if (!$job) {
+            return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
+        }
+        JobApplication::destroy('job_id', $id);
         $this->jobService->deleteJob($job);
         return response()->json(['message' => 'تم حذف الوظيفة بنجاح'], 200);
     }

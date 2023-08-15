@@ -23,7 +23,7 @@ class BankAccountService
             'iban' => 'required',
             'bank_name' => 'required',
             'swift_number' => 'required',
-            'type' => 'required|in:saving,charity',
+            'type' => 'required|in:saving,charity,investment',
         ]);
         $data['user_id'] = Auth::id();
 
@@ -55,7 +55,7 @@ class BankAccountService
             'iban' => 'required',
             'bank_name' => 'required',
             'swift_number' => 'required',
-            'type' => 'required|in:saving,charity',
+            'type' => 'required|in:saving,charity,investment',
         ]);
         $data['user_id'] = Auth::id();
 

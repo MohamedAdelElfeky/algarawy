@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\JobApplicationResource;
+use App\Models\Job;
+use App\Models\JobApplication;
 use App\Services\JobApplicationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobApplicationController extends Controller
 {
@@ -19,6 +22,17 @@ class JobApplicationController extends Controller
 
     public function store(Request $request)
     {
+        $existingJob = Job::find($request->job_id);
+        if (!$existingJob) {
+            return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 403);
+        }
+        $existingJobApplication = JobApplication::where('user_id', Auth::id())
+            ->where('job_id', $request->job_id)
+            ->first();
+
+        if ($existingJobApplication) {
+            return response()->json(['message' => 'لقد تقدمت بالفعل لهذه الوظيفة.'], 403);
+        }        
         $jobApplication = $this->jobApplicationService->createJobApplication($request->all());
         return response()->json(['message' => $jobApplication], 201);
     }
@@ -55,15 +69,15 @@ class JobApplicationController extends Controller
     public function index()
     {
         $allJobApplications = $this->jobApplicationService->getAllJobsApplication();
-    
+
         if ($allJobApplications === null) {
             $errorMessage = "No job applications found.";
             return response()->json(['error' => $errorMessage], 403);
         }
-    
+
         return response()->json($allJobApplications, 200);
     }
-    
+
 
     public function getJobApplicationCount($jobId)
     {
@@ -84,7 +98,7 @@ class JobApplicationController extends Controller
             $errorMessage = "No job applications found for the specified job.";
             return response()->json(['error' => $errorMessage], 404);
         }
-    
+
         return response()->json($jobApplications, 200);
     }
 

@@ -14,26 +14,8 @@ use Illuminate\Support\Facades\Validator;
 class JobApplicationService
 {
     public function createJobApplication(array $data)
-    {
-        $existingJobApplication = JobApplication::where('user_id', Auth::id())
-            ->where('job_id', $data['job_id'])
-            ->first();
-
-        if ($existingJobApplication) {
-            return response()->json(['message' => 'لقد تقدمت بالفعل لهذه الوظيفة.'], 403);
-        }
-        $validator = Validator::make($data, [
-            'job_id' => 'required',
-            'files*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-
-        ]);
-        if ($validator->fails()) {
-            return [
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ];
-        }
+    {      
+        
         $data['user_id'] = Auth::id();
         $jobApplication = JobApplication::create($data);
         // Handle images/videos
