@@ -57,6 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::put('/notifications/AsRead/{notification}', [NotificationController::class, 'markNotificationAsRead']);
     Route::put('/markAllNotificationsAsRead', [NotificationController::class, 'markAllNotificationsAsRead']);
+    Route::get('/getNewNotifications', [NotificationController::class, 'getNewNotifications']);
+    Route::put('/ChangeStatus', [JobController::class, 'ChangeStatus']);
 
     Route::apiResources([
         'p-jobs' => JobController::class, // jobs Resource

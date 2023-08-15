@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Services\JobService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class JobController extends Controller
 {
@@ -64,5 +65,26 @@ class JobController extends Controller
         $searchTerm = $request->input('search');
         $results = $this->jobService->searchJob($searchTerm);
         return response()->json(['data' => $results]);
+    }
+
+    public function ChangeStatus(Request $request)
+    {
+        $job = Job::find($request->id);
+        if (!$job) {
+            return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
+        }
+        $validator = Validator::make($request->all(), [
+            'job_status' => 'nullable|boolean',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $status = $request->input('job_status');
+        $data['job_status'] = $status;
+        $job->update($data);
+        return response()->json(['message' => 'تم تحديث حاله الوظيفية'], 201);
     }
 }
