@@ -6,6 +6,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +19,11 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::middleware('auth')->group(function () {
+    Route::get('/users', [UserController::class, 'getAllUsers'])->name('users.index');
+    Route::post('/toggle-user/{id}', [UserController::class, 'toggleUser']);
 
+});
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
 Route::post('/save-family', [ProjectController::class, 'store'])->name('save.family');
 Route::view('/projecta', 'admin.project.index')->name('projects');
@@ -38,8 +43,3 @@ Route::resource('jobs', JobController::class);
 Route::resource('courses', CourseController::class);
 Route::resource('meetings', MeetingController::class);
 Route::resource('bank-accounts', BankAccountController::class);
-// Route::resource('projects', ProjectController::class);
-Route::view('/family', 'admin.family.index')->name('families');
-Route::view('/discount', 'admin.discount.index')->name('discounts');
-// Route::view('/course', 'admin.course.index')->name('courses');
-Route::view('/type_of_relationships', 'admin.type_of_relationships.index')->name('type.of.relationships');

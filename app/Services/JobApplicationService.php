@@ -20,7 +20,7 @@ class JobApplicationService
             ->first();
 
         if ($existingJobApplication) {
-            return 'لقد تقدمت بالفعل لهذه الوظيفة.';
+            return response()->json(['message' => 'لقد تقدمت بالفعل لهذه الوظيفة.'], 403);
         }
         $validator = Validator::make($data, [
             'job_id' => 'required',
@@ -101,7 +101,7 @@ class JobApplicationService
     {
         $userId = Auth::id();
 
-        $jobApplications = JobApplication::where('job_id', $jobId)->where('user_id', $userId)    
+        $jobApplications = JobApplication::where('job_id', $jobId)->where('user_id', $userId)
             ->get();
 
         return JobApplication2Resource::collection($jobApplications);

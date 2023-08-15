@@ -58,7 +58,7 @@ class JobApplicationController extends Controller
     
         if ($allJobApplications === null) {
             $errorMessage = "No job applications found.";
-            return response()->json(['error' => $errorMessage], 404);
+            return response()->json(['error' => $errorMessage], 403);
         }
     
         return response()->json($allJobApplications, 200);

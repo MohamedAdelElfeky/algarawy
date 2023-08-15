@@ -169,7 +169,7 @@ class UserController extends Controller
             })
             ->get();
 
-        return response()->json($users);
+        return response()->json(UserResource::collection($users));
     }
 
     public function getNotificationsForUser(Request $request)
@@ -199,12 +199,12 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json(['errors' => $validator->errors()], 403);
         }
         $user = Auth::user();
 
         if (!Hash::check($request->input('old_password'), $user->password)) {
-            return response()->json(['error' => 'كلمة المرور القديمة غير متطابقة'], 422);
+            return response()->json(['error' => 'كلمة المرور القديمة غير متطابقة'], 403);
         }
 
         $user->update([
@@ -217,5 +217,18 @@ class UserController extends Controller
     public function numberSupport()
     {
         return response()->json(['number' => '+96614584684']);
+    }
+
+    public function getAllUsers()
+    {
+        $users = User::all();
+        return view('pages.dashboards.users.index', compact('users'));
+    }
+    public function toggleUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['registration_confirmed' => !$user->active]);
+
+        return response()->json(['success' => true]);
     }
 }
