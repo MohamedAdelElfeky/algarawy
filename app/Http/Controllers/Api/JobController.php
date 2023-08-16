@@ -85,6 +85,9 @@ class JobController extends Controller
         $status = $request->input('job_status');
         $data['job_status'] = $status;
         $job->update($data);
-        return response()->json(['message' => 'تم تحديث حاله الوظيفية'], 201);
+        return response()->json([
+            'message' => 'تم تحديث حاله الوظيفية',
+            'data' => new JobResource($job),
+        ], 201);
     }
 }
