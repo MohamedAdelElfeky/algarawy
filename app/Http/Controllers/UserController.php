@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CourseResource;
 use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\UserResource;
 use App\Models\Course;
@@ -180,12 +181,12 @@ class UserController extends Controller
         $notifications = $user->notifications()
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
-        $notificationsRe = $user->notifications()
-            ->orderBy('created_at', 'desc')->get();
+
+        $notificationsResource = NotificationResource::collection($notifications);
         $paginationData = $this->paginationService->getPaginationData($notifications);
 
         return [
-            'data' => $notificationsRe,
+            'data' => $notificationsResource,
             'metadata' => $paginationData,
         ];
     }

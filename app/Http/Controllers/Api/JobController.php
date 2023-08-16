@@ -55,7 +55,10 @@ class JobController extends Controller
         if (!$job) {
             return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
         }
-        JobApplication::destroy('job_id', $id);
+        $jobApplicationsToDelete = JobApplication::where('job_id', $id)->get();
+        foreach ($jobApplicationsToDelete as $application) {
+            $application->delete();
+        }
         $this->jobService->deleteJob($job);
         return response()->json(['message' => 'تم حذف الوظيفة بنجاح'], 200);
     }
