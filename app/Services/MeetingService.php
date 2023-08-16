@@ -8,6 +8,7 @@ use App\Models\Notification;
 // use Illuminate\Support\Facades\Notification;
 use App\Models\User;
 use App\Notifications\MeetingNotification;
+use DateTime;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -47,13 +48,14 @@ class MeetingService
         // $data['datetime'] = date('Y-m-d H:i:s', strtotime($data['end_time']));
         $meeting = Meeting::create($data);
         $users = User::all();
+        $meetingDateTime = new DateTime($meeting->datetime);
         foreach ($users as $user) {
             if ($user->id !== Auth::id()) {
                 $notificationData = [
                     'user_id' => $user->id,
                     'notifiable_id' => $meeting->id,
                     'title' => 'دعوة',
-                    'message'  => ' تمت دعوتك لحضور الاجتماع ' . $meeting->name . ' بتاريخ ' . $meeting->datetime,
+                    'message'  => ' تمت دعوتك لحضور الاجتماع ' . $meeting->name . ' بتاريخ ' . $meetingDateTime->format('Y-m-d'),
                 ];
                 $meeting->notifications()->create($notificationData);
             }
