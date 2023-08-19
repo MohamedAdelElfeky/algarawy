@@ -228,8 +228,84 @@ class UserController extends Controller
     public function toggleUser($id)
     {
         $user = User::findOrFail($id);
-        $user->update(['registration_confirmed' => !$user->active]);
+        $user->update(['registration_confirmed' => !$user->registration_confirmed]);
 
         return response()->json(['success' => true]);
+    }
+
+
+    public function userActive()
+    {
+        $users = User::where('registration_confirmed', 1)->where('admin', 0)->get();
+        return view('pages.dashboards.users.user_active', compact('users'));
+    }
+    public function userNotActive()
+    {
+        $users =  User::where('registration_confirmed', 0)->where('admin', 0)->get();
+        return view('pages.dashboards.users.user_not_active', compact('users'));
+    }
+
+    public function admin()
+    {
+        $users =  User::where('admin', 1)->get();
+        return view('pages.dashboards.admin.index', compact('users'));
+    }
+
+    public function addUser(Request $request)
+    {
+        // Validate the incoming data
+        $validatedData = $request->validate([
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|unique:users',
+            'phone' => 'required',
+            'password' => 'required|confirmed',
+            'birth_date' => 'required|date',
+            'national_id' => 'required|unique:users',
+            'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'avatar' => 'nullable|string',
+
+        ]);
+        $imagePathAvatar = "";
+        if (request()->hasFile('avatar')) {
+            $imageAvatar = request()->file('avatar');
+            $file_name_avatar = time() . rand(0, 9999999999999) . '_avatar.' . $imageAvatar->getClientOriginalExtension();
+            $imageAvatar->move(public_path('user/'), $file_name_avatar);
+            $imagePathAvatar = "user/" . $file_name_avatar;
+        }
+        $imagePathFront = "";
+        if (request()->hasFile('national_card_image_front')) {
+            $imageFront = request()->file('national_card_image_front');
+            $file_name_front = time() . rand(0, 9999999999999) . '_front.' . $imageFront->getClientOriginalExtension();
+            $imageFront->move(public_path('user/'), $file_name_front);
+            $imagePathFront = "user/" . $file_name_front;
+        }
+        $imagePathBack = "";
+        if (request()->hasFile('national_card_image_back')) {
+            $imageBack = request()->file('national_card_image_back');
+            $file_name_back = time() . rand(0, 9999999999999) . '_back.' . $imageBack->getClientOriginalExtension();
+            $imageBack->move(public_path('user/'), $file_name_back);
+            $imagePathBack = "user/" . $file_name_back;
+        }
+        // Create the user
+        $user = new User([
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
+            'email' => $validatedData['email'],
+            'phone' => $validatedData['phone'],
+            'password' => bcrypt($validatedData['password']),
+            'birth_date' => $validatedData['birth_date'],
+            'national_id' => $validatedData['national_id'],
+            'avatar' => $imagePathAvatar,
+            'national_card_image_front' => $imagePathFront,
+            'national_card_image_back' => $imagePathBack,
+            'admin' => 1,
+            'registration_confirmed' => 1,
+
+        ]);
+        $user->save();
+
+        return response()->json(['message' => 'تمت إضافة المستخدم بنجاح']);
     }
 }

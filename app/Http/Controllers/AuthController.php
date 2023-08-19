@@ -32,7 +32,7 @@ class AuthController extends Controller
             'neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ] ,[
+        ], [
             'email.required' => trans('validation.email.required'),
             'email.email' => trans('validation.email.email'),
             'email.unique' => trans('validation.email.unique'),

@@ -22,13 +22,24 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth')->group(function () {
     Route::get('/users', [UserController::class, 'getAllUsers'])->name('users.index');
     Route::post('/toggle-user/{id}', [UserController::class, 'toggleUser']);
-
+    Route::get('/admin', [UserController::class, 'admin'])->name('admin');
+    Route::post('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
+    Route::get('/userActive', [UserController::class, 'userActive'])->name('userActive');
+    Route::get('/userNotActive', [UserController::class, 'userNotActive'])->name('userNotActive');
+    Route::get('/accountCharitySaving', [BankAccountController::class, 'accountCharitySaving'])->name('accountCharitySaving');
+    Route::get('/accountInvestment', [BankAccountController::class, 'accountInvestment'])->name('accountInvestment');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+    Route::post('/banks/activate/{id}', [BankAccountController::class, 'activate'])->name('banks.activate');
+    Route::post('/banks/deactivate/{id}', [BankAccountController::class, 'deactivate'])->name('banks.deactivate');
+    Route::resource('jobs', JobController::class);
+    Route::resource('courses', CourseController::class);
+    Route::resource('meetings', MeetingController::class);
+    Route::resource('bank-accounts', BankAccountController::class);
 });
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
 Route::post('/save-family', [ProjectController::class, 'store'])->name('save.family');
 Route::view('/projecta', 'admin.project.index')->name('projects');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/getMeeting', [DashboardController::class, 'meeting'])->name('meet');
 
 Route::get('/error', function () {
@@ -38,8 +49,3 @@ Route::get('/error', function () {
 Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
 
 require __DIR__ . '/auth.php';
-
-Route::resource('jobs', JobController::class);
-Route::resource('courses', CourseController::class);
-Route::resource('meetings', MeetingController::class);
-Route::resource('bank-accounts', BankAccountController::class);

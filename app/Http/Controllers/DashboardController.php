@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
 use App\Http\Resources\ProjectResource;
+use App\Models\BankAccount;
 use App\Models\Job;
 use App\Models\Project;
+use App\Models\User;
 use App\Services\MeetingService;
 
 class DashboardController extends Controller
@@ -18,30 +20,16 @@ class DashboardController extends Controller
     }
     public function index()
     {
-        addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']);
-        $jobs = Job::with([
-            'user',
-            'region',
-            'city',
-            'neighborhood',
-            'companyRegion',
-            'companyCity',
-            'companyNeighborhood',
-            'images',
-            'pdfs',
-            'favorites',
-            'likes',
-        ])->get();
-        $allProject = Project::all();
-        $jobData = JobResource::collection($jobs);
-        $projects = ProjectResource::collection($allProject);
-        // dd($jobData);
-        return view('pages.dashboards.index', \compact('jobData', 'projects'));
-    }
+        // addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']);
+        $userActive = User::where('registration_confirmed', 1)->where('admin', 0)->count();
+        $userNotActive = User::where('registration_confirmed', 0)->where('admin', 0)->count();
+        $accountCharitySaving = BankAccount::whereIn('type', ['charity', 'saving'])->count();
+        $accountInvestment = BankAccount::where('type', 'investment')->count();
+        $job = Job::count();
 
-    public function meeting()
-    {
-        $meetings = $this->meetingService->getAllMeetings();
-        return response()->json(['data' => $meetings]);
+        return view(
+            'pages.dashboards.index',
+            compact('userActive', 'userNotActive', 'accountCharitySaving', 'accountInvestment', 'job')
+        );
     }
 }

@@ -16,6 +16,7 @@ class BankAccount extends Model
         'swift_number',
         'type',
         'user_id',
+        'status',
     ];
 
     public function user()

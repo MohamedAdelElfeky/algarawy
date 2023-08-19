@@ -21,14 +21,15 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('national_id')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('location');
-            $table->date('birth_date');
+            $table->string('password')->nullable();
+            $table->string('location')->nullable();
+            $table->date('birth_date')->nullable();
             $table->string('national_card_image_front')->nullable();
             $table->string('national_card_image_back')->nullable();
             $table->json('card_images')->nullable();
             $table->boolean('registration_confirmed')->default(false);
             $table->string('avatar')->nullable();
+            $table->boolean('admin')->default(false);
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

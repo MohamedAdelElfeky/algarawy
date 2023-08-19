@@ -5,68 +5,58 @@
         data-kt-scroll-activate="true" data-kt-scroll-height="auto"
         data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
         data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
-        <!--begin::Menu-->
         <div class="menu menu-column menu-rounded menu-sub-indention px-3" id="#kt_app_sidebar_menu" data-kt-menu="true"
             data-kt-menu-expand="false">
-            <!--begin:Menu item-->
             <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
-                <!--begin:Menu link-->
+
                 <div class="menu-item">
-                    {{-- {{ csrf_field() }}        --}}
-                    <a class="menu-link" href="{{ url('family') }}">
+                    <a class="menu-link" href="{{ url('admin') }}">
                         <span class="menu-bullet">
                             <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
                         </span>
-                        <span class="menu-title">Family</span>
+                        <span class="menu-title"> مديرين الموقع </span>
+                    </a>
+                </div>
+
+                <div class="menu-item">
+                    <a class="menu-link" href="{{ url('userActive') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title">المستخدمين </span>
                     </a>
                 </div>
 
                 <div class="menu-item">
 
-                    <a class="menu-link" href="{{ url('job') }}">
+                    <a class="menu-link" href="{{ url('userNotActive') }}">
                         <span class="menu-bullet">
                             <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
                         </span>
-                        <span class="menu-title">Job</span>
+                        <span class="menu-title">المستخدمين الجدد</span>
                     </a>
                 </div>
                 <div class="menu-item">
 
-                    <a class="menu-link" href="{{ url('project') }}">
+                    <a class="menu-link" href="{{ url('accountCharitySaving') }}">
                         <span class="menu-bullet">
                             <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
                         </span>
-                        <span class="menu-title">Project</span>
+                        <span class="menu-title">حساب الصدقة والزكاة</span>
                     </a>
                 </div>
+
 
                 <div class="menu-item">
 
-                    <a class="menu-link" href="{{ url('discount') }}">
+                    <a class="menu-link" href="{{ url('accountInvestment') }}">
                         <span class="menu-bullet">
                             <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
                         </span>
-                        <span class="menu-title">Discount</span>
+                        <span class="menu-title">صندوق الادخار والاستثمار</span>
                     </a>
                 </div>
-                <div class="menu-item">
 
-                    <a class="menu-link" href="{{ url('course') }}">
-                        <span class="menu-bullet">
-                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
-                        </span>
-                        <span class="menu-title">Course</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-
-                    <a class="menu-link" href="{{ url('type_of_relationships') }}">
-                        <span class="menu-bullet">
-                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
-                        </span>
-                        <span class="menu-title">Type Of Relationships</span>
-                    </a>
-                </div>
             </div>
         </div>
         <!--end::Menu-->

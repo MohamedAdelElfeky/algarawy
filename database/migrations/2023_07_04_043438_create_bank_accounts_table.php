@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('bank_name')->nullable();
             $table->string('swift_number')->nullable();
             $table->string('type')->nullable();
+            $table->string('status')->default('inactive');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
 
