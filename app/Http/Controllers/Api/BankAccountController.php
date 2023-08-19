@@ -67,9 +67,9 @@ class BankAccountController extends Controller
     }
     public function getCharityAndSavingBankAccounts()
     {
-        $bankAccountCharity = BankAccount::where('type', 'charity')->first();
-        $bankAccountSaving = BankAccount::where('type', 'saving')->first();
-        $bankAccountInvestment = BankAccount::where('type', 'investment')->first();
+        $bankAccountCharity = BankAccount::where('type', 'charity')->where('status', 'active')->first();
+        $bankAccountSaving = BankAccount::where('type', 'saving')->where('status', 'active')->first();
+        $bankAccountInvestment = BankAccount::where('type', 'investment')->where('status', 'active')->first();
 
         $data = [];
 

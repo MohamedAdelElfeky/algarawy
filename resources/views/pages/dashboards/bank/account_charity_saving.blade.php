@@ -104,6 +104,41 @@
                     });
                 });
             });
+            
+            $(document).ready(function() {
+                $('#bankAccountForm').submit(function(e) {
+                    e.preventDefault();
+                    var formData = $(this).serialize();
+                    $.ajax({
+                        type: 'POST',
+                        url: 'bank-accounts',
+                        data: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'نجاح!',
+                                text: 'تمت إضافة الحساب المصرفي بنجاح.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(function() {
+                                location.reload();
+                            });
+                        },
+                        error: function(error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ!',
+                                text: 'فشل إضافة حساب مصرفي.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    });
+                });
+            });
         </script>
     @endsection
 </x-default-layout>

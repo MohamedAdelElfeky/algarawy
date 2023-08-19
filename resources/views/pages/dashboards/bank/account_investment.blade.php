@@ -70,38 +70,77 @@
 
                 $('.activate-btn').click(function() {
                     let accountId = $(this).data('id');
-                    $.post(`banks/activate/${accountId}`, function(data) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم التفعيل',
-                            text: data.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(function() {
-                            location.reload();
-                        });
+                    $.ajax({
+                        type: 'POST',
+                        url: `banks/activate/${accountId}`,
+                        success: function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'تم التفعيل',
+                                text: data.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(function() {
+                                location.reload();
+                            });
+                        }
                     });
                 });
 
                 $('.deactivate-btn').click(function() {
                     let accountId = $(this).data('id');
-                    $.post(`banks/deactivate/${accountId}`, function(data) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم إلغاء التفعيل',
-                            text: data.message,
-                            confirmButtonText: 'حسناً'
-                        }).then(function() {
-                            location.reload();
-                        });
+                    $.ajax({
+                        type: 'POST',
+                        url: `banks/deactivate/${accountId}`,
+                        success: function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'تم إلغاء التفعيل',
+                                text: data.message,
+                                confirmButtonText: 'حسناً'
+                            }).then(function() {
+                                location.reload();
+                            });
+                        }
                     });
                 });
-                // function refreshTable() {
-                //     $.get('/banks', function(data) {
-                //         $('.table tbody').html(data);
-                //     });
-                // }
+            });
+
+            $(document).ready(function() {
+                $('#bankAccountForm').submit(function(e) {
+                    e.preventDefault();
+                    var formData = $(this).serialize();
+                    $.ajax({
+                        type: 'POST',
+                        url: 'bank-accounts',
+                        data: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'نجاح!',
+                                text: 'تمت إضافة الحساب المصرفي بنجاح.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(function() {
+                                location.reload();
+                            });
+                        },
+                        error: function(error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ!',
+                                text: 'فشل إضافة حساب مصرفي.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    });
+                });
             });
         </script>
     @endsection
+
 </x-default-layout>

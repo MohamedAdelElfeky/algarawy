@@ -11,6 +11,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Course;
 use App\Models\Meeting;
 use App\Models\Project;
+use App\Models\support;
 use App\Models\User;
 use App\Services\PaginationService;
 use Illuminate\Support\Facades\Validator;
@@ -217,7 +218,9 @@ class UserController extends Controller
 
     public function numberSupport()
     {
-        return response()->json(['number' => '+96614584684']);
+        $supportRecord = support::first();
+        $number = $supportRecord ? $supportRecord->number : null;
+        return response()->json(['number' =>  $number]);
     }
 
     public function getAllUsers()

@@ -100,11 +100,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         $credentials = $request->validate([
             'national_id' => 'required|string',
             'password' => 'required|string',
         ]);
         $user = User::where('national_id', $credentials['national_id'])->first();
+
+        if ($user->registration_confirmed == 1) {
+            return response()->json(['message' => 'لم يتم موافقة حتي الان '], 401);
+        }
+
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'بيانات الاعتماد غير صالحة'], 401);
         }
@@ -112,7 +118,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => new UserResource($user),
             'token' => $token,
-        ], 200);
+        ], 201);
     }
 
     public function logout(Request $request)

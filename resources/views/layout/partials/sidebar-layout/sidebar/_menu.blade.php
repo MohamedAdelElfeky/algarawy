@@ -57,6 +57,15 @@
                     </a>
                 </div>
 
+                <div class="menu-item">
+
+                    <a class="menu-link" href="{{ url('support') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title"> الدعم الفني </span>
+                    </a>
+                </div>
             </div>
         </div>
         <!--end::Menu-->
