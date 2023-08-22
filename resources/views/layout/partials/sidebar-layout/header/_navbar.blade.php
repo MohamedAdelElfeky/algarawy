@@ -42,13 +42,26 @@
 	</div>
 	<!--end::Theme mode-->
 	<!--begin::User menu-->
-	<div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
+	{{-- <div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
 		<!--begin::Menu wrapper-->
 		<div class="cursor-pointer symbol symbol-30px symbol-md-40px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
 			<img src="{{ image('avatars/300-1.jpg') }}" alt="user" />
 		</div>
 		@include('partials/menus/_user-account-menu')
 		<!--end::Menu wrapper-->
+	</div> --}}
+	<div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
+
+		<a class="menu-link px-5" href="{{ route('logout') }}"
+			onclick="event.preventDefault();
+			 document.getElementById('logout-form').submit();">
+			<span data-bs-toggle="tooltip" data-bs-placement="top" title="Power Off">
+				<i class="bi bi-power fs-2"></i>
+			</span>
+		</a>
+		<form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+			@csrf
+		</form>
 	</div>
 	<!--end::User menu-->
 	<!--begin::Header menu toggle-->

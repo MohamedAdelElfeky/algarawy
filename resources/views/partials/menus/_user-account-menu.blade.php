@@ -1,7 +1,7 @@
 <!--begin::User account menu-->
-<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
-	<!--begin::Menu item-->
-	<div class="menu-item px-3">
+{{-- <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true"> --}}
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-3">
 		<div class="menu-content d-flex align-items-center px-3">
 			<!--begin::Avatar-->
 			<div class="symbol symbol-50px me-5">
@@ -16,18 +16,18 @@
 			</div>
 			<!--end::Username-->
 		</div>
-	</div>
-	<!--end::Menu item-->
-	<!--begin::Menu separator-->
-	{{-- <div class="separator my-2"></div> --}}
-	<!--end::Menu separator-->
-	<!--begin::Menu item-->
-	{{-- <div class="menu-item px-5">
+	</div> --}}
+<!--end::Menu item-->
+<!--begin::Menu separator-->
+{{-- <div class="separator my-2"></div> --}}
+<!--end::Menu separator-->
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-5">
 		<a href="#" class="menu-link px-5">My Profile</a>
 	</div> --}}
-	<!--end::Menu item-->
-	<!--begin::Menu item-->
-	{{-- <div class="menu-item px-5">
+<!--end::Menu item-->
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-5">
 		<a href="#" class="menu-link px-5">
 			<span class="menu-text">My Projects</span>
 			<span class="menu-badge">
@@ -35,9 +35,9 @@
 			</span>
 		</a>
 	</div> --}}
-	<!--end::Menu item-->
-	<!--begin::Menu item-->
-	{{-- <div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start" data-kt-menu-offset="-15px, 0">
+<!--end::Menu item-->
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start" data-kt-menu-offset="-15px, 0">
 		<a href="#" class="menu-link px-5">
 			<span class="menu-title">My Subscription</span>
 			<span class="menu-arrow"></span>
@@ -81,17 +81,17 @@
 		</div>
 		<!--end::Menu sub-->
 	</div> --}}
-	<!--end::Menu item-->
-	<!--begin::Menu item-->
-	{{-- <div class="menu-item px-5">
+<!--end::Menu item-->
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-5">
 		<a href="#" class="menu-link px-5">My Statements</a>
 	</div> --}}
-	<!--end::Menu item-->
-	<!--begin::Menu separator-->
-	{{-- <div class="separator my-2"></div> --}}
-	<!--end::Menu separator-->
-	<!--begin::Menu item-->
-	{{-- <div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start" data-kt-menu-offset="-15px, 0">
+<!--end::Menu item-->
+<!--begin::Menu separator-->
+{{-- <div class="separator my-2"></div> --}}
+<!--end::Menu separator-->
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start" data-kt-menu-offset="-15px, 0">
 		<a href="#" class="menu-link px-5">
 			<span class="menu-title position-relative">Language
 			<span class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0">English
@@ -142,18 +142,31 @@
 		</div>
 		<!--end::Menu sub-->
 	</div> --}}
-	<!--end::Menu item-->
-	<!--begin::Menu item-->
-	{{-- <div class="menu-item px-5 my-1">
+<!--end::Menu item-->
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-5 my-1">
 		<a href="#" class="menu-link px-5">Account Settings</a>
 	</div> --}}
-	<!--end::Menu item-->
-	<!--begin::Menu item-->
-	<div class="menu-item px-5">
+<!--end::Menu item-->
+<!--begin::Menu item-->
+{{-- <div class="menu-item px-5">
         <a class="button-ajax menu-link px-5" href="#" data-action="{{ route('logout') }}" data-method="post" data-csrf="{{ csrf_token() }}" data-reload="true">
             Sign Out
         </a>
-	</div>
-	<!--end::Menu item-->
-</div>
+	</div> --}}
+<!--end::Menu item-->
+{{-- </div> --}}
 <!--end::User account menu-->
+<div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
+
+    <a class="menu-link px-5" href="{{ route('logout') }}"
+        onclick="event.preventDefault();
+		 document.getElementById('logout-form').submit();">
+        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Power Off">
+            <i class="bi bi-power fs-2"></i>
+        </span>
+    </a>
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+        @csrf
+    </form>
+</div>

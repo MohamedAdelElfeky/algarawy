@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\JobController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupportController;
@@ -34,15 +36,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/banks/activate/{id}', [BankAccountController::class, 'activate'])->name('banks.activate');
     Route::post('/banks/deactivate/{id}', [BankAccountController::class, 'deactivate'])->name('banks.deactivate');
     Route::resource('jobs', JobController::class);
+    Route::resource('projects', ProjectController::class);
     Route::resource('courses', CourseController::class);
+    Route::resource('discounts', DiscountController::class);
     Route::resource('meetings', MeetingController::class);
     Route::resource('bank-accounts', BankAccountController::class);
     Route::get('/support', [SupportController::class, 'index'])->name('support');
     Route::post('/support/add-or-update-number', [SupportController::class, 'addOrUpdateNumber'])->name('addOrUpdateSupport');
+    
+    // Route::delete('/delete-job/{id}', [JobController::class, 'destroy'])->name('jobs.delete');
 });
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
-Route::post('/save-family', [ProjectController::class, 'store'])->name('save.family');
-Route::view('/projecta', 'admin.project.index')->name('projects');
 
 Route::get('/getMeeting', [DashboardController::class, 'meeting'])->name('meet');
 

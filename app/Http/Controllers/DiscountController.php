@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Discount;
 use App\Services\DiscountService;
 use Illuminate\Http\Request;
 
@@ -16,8 +17,10 @@ class DiscountController extends Controller
 
     public function index()
     {
-        $discounts = $this->discountService->getAllDiscounts();
-        return view('discounts.index', compact('discounts'));
+        $discounts = Discount::with([
+            'user', 'images', 'pdfs', 'likes', 'favorites',
+        ])->orderBy('created_at', 'desc')->get();
+        return view('pages.dashboards.discount.index', compact('discounts'));
     }
 
     public function show($id)

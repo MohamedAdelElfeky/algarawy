@@ -19,11 +19,11 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $courses = Course::all();
-        return response()->json([
-            'message' => 'Courses retrieved successfully',
-            'data' => $courses,
-        ]);
+        $courses = Course::with([
+            'user', 'images', 'pdfs', 'likes', 'favorites',
+        ])->orderBy('created_at', 'desc')->get();
+        return view('pages.dashboards.course.index', compact('courses'));
+
     }
 
     /**

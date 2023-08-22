@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -17,8 +18,9 @@ class ProjectController extends Controller
 
     public function index()
     {
-        $projects = $this->projectService->getAllProjects();
-        return response()->json($projects, 200);
+        $projects = Project::with(['images', 'pdfs', 'favorites', 'likes'])
+            ->get();
+        return view('pages.dashboards.project.index', compact('projects'));
     }
 
 

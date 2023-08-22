@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\JobResource;
 use App\Models\Job;
 use App\Services\JobService;
 use Illuminate\Http\Request;
@@ -16,12 +17,14 @@ class JobController extends Controller
     }
     public function index()
     {
-        // Retrieve all jobs
-        $jobs = $this->jobService->getAllJobs();
-        return response()->json([
-            'message' => 'Jobs retrieved successfully',
-            'data' => $jobs,
-        ]);
+        // $jobQuery = Job::orderBy('created_at', 'desc')->get();
+        $jobQuery = Job::with([
+            'region', 'city', 'neighborhood',
+            'companyRegion', 'companyCity', 'companyNeighborhood',
+            'user', 'images', 'pdfs', 'likes', 'favorites',
+        ])->orderBy('created_at', 'desc')->get();
+        $jobs = JobResource::collection($jobQuery);
+        return view('pages.dashboards.job.index', compact('jobs'));
     }
 
     public function show($id)

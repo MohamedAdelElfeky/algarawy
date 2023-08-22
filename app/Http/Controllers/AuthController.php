@@ -94,7 +94,7 @@ class AuthController extends Controller
             'national_card_image_back' => $imagePathBack,
         ]);
 
-        return response()->json(['message' => 'تم التسجيل بنجاح'], 200);
+        return response()->json(['message' => 'تم التسجيل بنجاح'], 201);
     }
 
 
@@ -107,13 +107,14 @@ class AuthController extends Controller
         ]);
         $user = User::where('national_id', $credentials['national_id'])->first();
 
-        if ($user->registration_confirmed == 1) {
-            return response()->json(['message' => 'لم يتم موافقة حتي الان '], 401);
-        }
-
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'بيانات الاعتماد غير صالحة'], 401);
         }
+
+        if ($user->registration_confirmed != 1) {
+            return response()->json(['message' => 'لم يتم موافقة حتي الان '], 401);
+        }
+
         $token = $user->createToken('authToken')->plainTextToken;
         return response()->json([
             'user' => new UserResource($user),

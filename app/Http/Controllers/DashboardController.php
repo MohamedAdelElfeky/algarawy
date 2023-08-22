@@ -6,6 +6,8 @@ use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
 use App\Http\Resources\ProjectResource;
 use App\Models\BankAccount;
+use App\Models\Course;
+use App\Models\Discount;
 use App\Models\Job;
 use App\Models\Project;
 use App\Models\User;
@@ -26,10 +28,21 @@ class DashboardController extends Controller
         $accountCharitySaving = BankAccount::whereIn('type', ['charity', 'saving'])->count();
         $accountInvestment = BankAccount::where('type', 'investment')->count();
         $job = Job::count();
-
+        $project = Project::count();
+        $course = Course::count();
+        $discount = Discount::count();
         return view(
             'pages.dashboards.index',
-            compact('userActive', 'userNotActive', 'accountCharitySaving', 'accountInvestment', 'job')
+            compact(
+                'userActive',
+                'userNotActive',
+                'accountCharitySaving',
+                'accountInvestment',
+                'job',
+                'project',
+                'course',
+                'discount'
+            )
         );
     }
 }
