@@ -66,6 +66,43 @@
                         <span class="menu-title"> الدعم الفني </span>
                     </a>
                 </div>
+                <div class="menu-item">
+
+                    <a class="menu-link" href="{{ route('jobs.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title"> الوظيفة </span>
+                    </a>
+                </div>
+                <div class="menu-item">
+
+                    <a class="menu-link" href="{{ route('projects.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title"> المشاريع </span>
+                    </a>
+                </div>
+                <div class="menu-item">
+
+                    <a class="menu-link" href="{{ route('courses.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title"> الدورات الاستشارية </span>
+                    </a>
+                </div>
+                <div class="menu-item">
+
+                    <a class="menu-link" href="{{ route('discounts.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title"> الخصومات والعروض </span>
+                    </a>
+                </div>
+
             </div>
         </div>
         <!--end::Menu-->
