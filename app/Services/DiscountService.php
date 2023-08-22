@@ -36,11 +36,11 @@ class DiscountService
         $validator = Validator::make($data, [
             'description' => 'nullable',
             'images_or_video' => 'nullable',
-            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
             'location' => 'nullable|string|location',
             'discount' => 'nullable',
             'price' => 'nullable|numeric',
-            'link' => 'nullable|string',
+            'link' => 'nullable|url',
         ]);
         if ($validator->fails()) {
             return [
@@ -89,7 +89,7 @@ class DiscountService
             'discount' => 'nullable',
             'price' => 'nullable|numeric',
             'deleted_images_and_videos' => 'nullable',
-            'link' => 'nullable|string',
+            'link' => 'nullable|url',
         ]);
 
         if ($validator->fails()) {

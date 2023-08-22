@@ -28,12 +28,12 @@
                                     <td>{{ $job->user->first_name . ' ' . $job->user->last_name }}</td>
                                     <td>{{ $job->description }}</td>
                                     <td>
-                                        {{ $job->region->name . ' ' . $job->city->name . ' ' . $job->neighborhood->name }}
+                                        {{ ($job->region ? $job->region->name : '') . ' ' . ($job->city ? $job->city->name : '') . ' ' . ($job->neighborhood ? $job->neighborhood->name : '') }}
                                     </td>
                                     <td>{{ $job->company_name }}</td>
                                     <td>{{ $job->company_description }}</td>
                                     <td>
-                                        {{ $job->companyRegion->name . ' ' . $job->companyCity->name . ' ' . $job->companyNeighborhood->name }}
+                                        {{ ($job->companyRegion ? $job->companyRegion->name : '') . ' ' . ($job->companyCity ? $job->companyCity->name : '') . ' ' . ($job->companyNeighborhood ? $job->companyNeighborhood->name : '') }}
                                     </td>
                                     <td>
                                         {{ $job->likes()->count() }}
@@ -73,7 +73,7 @@
                         confirmButtonColor: '#3085d6',
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'نعم، احذفه',
-                        cancelButtonText:  'إلغاء'
+                        cancelButtonText: 'إلغاء'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({

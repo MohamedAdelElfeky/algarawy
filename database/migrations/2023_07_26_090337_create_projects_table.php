@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->string('description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('location')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->timestamps();

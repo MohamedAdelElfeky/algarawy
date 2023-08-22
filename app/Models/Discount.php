@@ -14,6 +14,7 @@ class Discount extends Model
         'location',
         'discount',
         'price',
+        'link',
         'user_id',
     ];
 
