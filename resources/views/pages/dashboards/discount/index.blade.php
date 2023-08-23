@@ -23,7 +23,37 @@
                             @foreach ($discounts as $discount)
                                 <tr>
                                     <td>{{ $discount->user->first_name . ' ' . $discount->user->last_name }}</td>
-                                    <td>{{ $discount->description }}</td>
+                                    <td>
+                                        {{ substr($discount->description, 0, 100) }}
+                                        @if (strlen($discount->description) > 100)
+                                            <a href="#" data-bs-toggle="modal"
+                                                data-bs-target="#projectModal{{ $discount->id }}">....</a>
+                                        @endif
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="projectModal{{ $discount->id }}" tabindex="-1"
+                                            role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="projectModalLabel">
+                                                            عرض الوصف </h5>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-icon btn-active-color-primary"
+                                                            data-bs-dismiss="modal">
+                                                            X
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ $discount->description }}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">الغاء</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>{{ $discount->discount }}</td>
                                     <td>{{ $discount->price }}</td>
                                     <td>

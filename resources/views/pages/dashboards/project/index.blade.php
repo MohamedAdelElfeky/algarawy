@@ -20,8 +20,39 @@
                         <tbody>
                             @foreach ($projects as $project)
                                 <tr>
-                                    <td>{{ $project->user->first_name . ' ' . $project->user->last_name }}</td>
-                                    <td>{{ $project->description }}</td>
+                                    <td>{{ $project->user->first_name . ' ' . $project->user->last_name }} </td>
+
+                                    <td>
+                                        {{ substr($project->description, 0, 100) }}
+                                        @if (strlen($project->description) > 100)
+                                            <a href="#" data-bs-toggle="modal"
+                                                data-bs-target="#projectModal{{ $project->id }}">....</a>
+                                        @endif
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="projectModal{{ $project->id }}" tabindex="-1"
+                                            role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="projectModalLabel">
+                                                           عرض الوصف </h5>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-icon btn-active-color-primary"
+                                                            data-bs-dismiss="modal">
+                                                            X
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ $project->description }}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">الغاء</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         {{ $project->likes()->count() }}
                                     </td>

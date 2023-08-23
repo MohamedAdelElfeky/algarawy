@@ -21,8 +21,37 @@
                             @foreach ($courses as $course)
                                 <tr>
                                     <td>{{ $course->user->first_name . ' ' . $course->user->last_name }}</td>
-                                    <td>{{ $course->description }}</td>
-
+                                    <td>
+                                        {{ substr($course->description, 0, 100) }}
+                                        @if (strlen($course->description) > 100)
+                                            <a href="#" data-bs-toggle="modal"
+                                                data-bs-target="#projectModal{{ $course->id }}">....</a>
+                                        @endif
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="projectModal{{ $course->id }}" tabindex="-1"
+                                            role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="projectModalLabel">
+                                                            عرض الوصف </h5>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-icon btn-active-color-primary"
+                                                            data-bs-dismiss="modal">
+                                                            X
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ $course->description }}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">الغاء</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         {{ $course->likes()->count() }}
                                     </td>

@@ -26,7 +26,37 @@
                             @foreach ($jobs as $job)
                                 <tr>
                                     <td>{{ $job->user->first_name . ' ' . $job->user->last_name }}</td>
-                                    <td>{{ $job->description }}</td>
+                                    <td>
+                                        {{ substr($job->description, 0, 100) }}
+                                        @if (strlen($job->description) > 100)
+                                            <a href="#" data-bs-toggle="modal"
+                                                data-bs-target="#projectModal{{ $job->id }}">....</a>
+                                        @endif
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="projectModal{{ $job->id }}" tabindex="-1"
+                                            role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="projectModalLabel">
+                                                            عرض الوصف </h5>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-icon btn-active-color-primary"
+                                                            data-bs-dismiss="modal">
+                                                            X
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ $job->description }}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">الغاء</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         {{ ($job->region ? $job->region->name : '') . ' ' . ($job->city ? $job->city->name : '') . ' ' . ($job->neighborhood ? $job->neighborhood->name : '') }}
                                     </td>
