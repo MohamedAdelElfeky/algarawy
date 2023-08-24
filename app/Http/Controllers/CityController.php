@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CityResource;
 use App\Models\City;
+use App\Models\Region;
 use Illuminate\Http\Request;
 
 class CityController extends Controller
@@ -13,8 +13,9 @@ class CityController extends Controller
      */
     public function index()
     {
-        $cities = City::with('region')->get();
-        return CityResource::collection($cities);
+        $regions = Region::all();
+        $cities = City::all();
+        return view('pages.dashboards.cities.index', compact('cities', 'regions'));
     }
 
     /**
@@ -30,7 +31,11 @@ class CityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $name = $request->input('name');
+        $region_id = $request->input('region_id');
+        City::updateOrCreate(
+            ['name' => $name, 'region_id' => $region_id]
+        );
     }
 
     /**
@@ -62,6 +67,8 @@ class CityController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $city = City::findOrFail($id);
+        $city->neighborhoods()->delete();
+        $city->delete();
     }
 }

@@ -91,9 +91,9 @@
         <div class="text-gray-500 text-center fw-semibold fs-6">
             لست عضوا حتى الآن ؟ 
 
-            <a href="/register" class="link-primary">
+            {{-- <a href="/register" class="link-primary">
                 اشتراك
-            </a>
+            </a> --}}
         </div>
         <!--end::Sign up-->
     </form>

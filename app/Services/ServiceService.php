@@ -23,7 +23,7 @@ class ServiceService
         $validator = Validator::make($data, [
             'description' => 'nullable|string',
             'images_or_video' => 'nullable',
-            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
             'location' => 'nullable|string|location',
         ]);
 
@@ -71,7 +71,7 @@ class ServiceService
         $validator = Validator::make($data, [
             'description' => 'sometimes|nullable|string',
             'images_or_video' => 'nullable',
-            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4|max:2048',
+            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
             'location' => 'nullable|string|location',
             'deleted_images_and_videos' => 'nullable',
         ]);

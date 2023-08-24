@@ -61,7 +61,7 @@
                                     </td>
 
                                     <td>
-                                        <button class="delete-project-btn btn btn-danger btn-active-color-dark  me-1"
+                                        <button class="delete-project-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"
                                             data-project-id="{{ $project->id }}">
                                             <i class="ki-duotone ki-tablet-delete">
                                                 <i class="path1"></i>

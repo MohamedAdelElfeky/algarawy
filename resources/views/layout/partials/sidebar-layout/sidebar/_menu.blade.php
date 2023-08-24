@@ -94,7 +94,6 @@
                     </a>
                 </div>
                 <div class="menu-item">
-
                     <a class="menu-link" href="{{ route('discounts.index') }}">
                         <span class="menu-bullet">
                             <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
@@ -102,7 +101,30 @@
                         <span class="menu-title"> الخصومات والعروض </span>
                     </a>
                 </div>
-
+                <div class="menu-item">
+                    <a class="menu-link" href="{{ route('regions.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title">  المنطقه </span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link" href="{{ route('cities.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title">  المدينة </span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link" href="{{ route('neighborhoods.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title">  الحى </span>
+                    </a>
+                </div>
             </div>
         </div>
         <!--end::Menu-->

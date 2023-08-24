@@ -14,15 +14,7 @@ class RegionController extends Controller
     public function index()
     {
         $regions = Region::all();
-        return RegionResource::collection($regions);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('pages.dashboards.regions.index', compact('regions'));
     }
 
     /**
@@ -30,15 +22,12 @@ class RegionController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $name = $request->input('name');
+        Region::updateOrCreate(
+            ['name' => $name]
+        );
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return response()->json(['message' => 'تم إضافة / تحديث الرقم بنجاح']);
     }
 
     /**
@@ -46,7 +35,6 @@ class RegionController extends Controller
      */
     public function edit(string $id)
     {
-        //
     }
 
     /**
@@ -54,7 +42,10 @@ class RegionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $name = $request->input('name');
+        Region::updateOrCreate(
+            ['name' => $name]
+        );
     }
 
     /**
@@ -62,6 +53,11 @@ class RegionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $region = Region::findOrFail($id);
+        foreach ($region->cities as $city) {
+            $city->neighborhoods()->delete();
+            $city->delete();
+        }
+        $region->delete();
     }
 }

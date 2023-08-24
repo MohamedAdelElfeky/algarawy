@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\NeighborhoodResource;
+use App\Models\City;
 use App\Models\Neighborhood;
+use App\Models\Region;
 use Illuminate\Http\Request;
 
 class NeighborhoodController extends Controller
@@ -13,8 +15,10 @@ class NeighborhoodController extends Controller
      */
     public function index()
     {
-        $neighborhoods = Neighborhood::with('city')->get();
-        return NeighborhoodResource::collection($neighborhoods);
+        $regions = Region::all();
+        $cities = City::all();
+        $neighborhoods = Neighborhood::all();
+        return view('pages.dashboards.neighborhoods.index', compact('cities', 'regions', 'neighborhoods'));
     }
 
     /**
@@ -28,9 +32,13 @@ class NeighborhoodController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function addNeighborhood(Request $request)
     {
-        //
+        $name = $request->input('name');
+        $city_id = $request->input('city_id');
+        Neighborhood::updateOrCreate(
+            ['name' => $name, 'city_id' => $city_id]
+        );
     }
 
     /**
@@ -62,6 +70,7 @@ class NeighborhoodController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $neighborhood = Neighborhood::findOrFail($id);
+        $neighborhood->delete();
     }
 }

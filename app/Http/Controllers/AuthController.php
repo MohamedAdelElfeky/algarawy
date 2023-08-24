@@ -8,9 +8,11 @@ use App\Models\Neighborhood;
 use App\Models\Region;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\NewPasswordEmail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -30,8 +32,8 @@ class AuthController extends Controller
             'region_id' => 'nullable|exists:regions,id',
             'city_id' => 'nullable|exists:cities,id',
             'neighborhood_id' => 'nullable|exists:neighborhoods,id',
-            'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ], [
             'email.required' => trans('validation.email.required'),
             'email.email' => trans('validation.email.email'),
@@ -127,5 +129,34 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
+    }
+
+    public function PasswordReset(Request $request)
+    {
+        dd($request);
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        $newPassword = Str::random(10); // Generate a random password
+
+        $user->update([
+            'password' => Hash::make($newPassword), // Update the user's password
+        ]);
+
+        // Send the new password to the user's email
+        Mail::to($user->email)->send(new NewPasswordEmail($newPassword));
+
+        return response()->json([
+            'message' => 'Password reset successful. Check your email for the new password.',
+        ], 200);
     }
 }

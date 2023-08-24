@@ -112,7 +112,7 @@ class UserController extends Controller
             'last_name' => 'nullable|string',
             'email' => 'nullable|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|unique:users,phone,' . $user->id,
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'is_avatar_deleted' => 'nullable|boolean', // New field to handle avatar deletion
         ]);
 

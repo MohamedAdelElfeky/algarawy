@@ -109,10 +109,10 @@ var KTAccountSettingsSigninMethods = function () {
                     });
                 } else {
                     swal.fire({
-                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        text: "معذرة ، يبدو أنه تم اكتشاف بعض الأخطاء ، يرجى المحاولة مرة أخرى.",
                         icon: "error",
                         buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
+                        confirmButtonText: "حسنًا ، موافق.",
                         customClass: {
                             confirmButton: "btn font-weight-bold btn-light-primary"
                         }
@@ -186,7 +186,7 @@ var KTAccountSettingsSigninMethods = function () {
                         text: "Sent password reset. Please check your email",
                         icon: "success",
                         buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
+                        confirmButtonText: "حسنًا ، موافق.",
                         customClass: {
                             confirmButton: "btn font-weight-bold btn-light-primary"
                         }
@@ -197,10 +197,10 @@ var KTAccountSettingsSigninMethods = function () {
                     });
                 } else {
                     swal.fire({
-                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        text: "معذرة ، يبدو أنه تم اكتشاف بعض الأخطاء ، يرجى المحاولة مرة أخرى.",
                         icon: "error",
                         buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
+                        confirmButtonText: "حسنًا ، موافق.",
                         customClass: {
                             confirmButton: "btn font-weight-bold btn-light-primary"
                         }

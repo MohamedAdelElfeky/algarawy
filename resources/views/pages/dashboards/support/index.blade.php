@@ -9,12 +9,21 @@
             <div class="card-body py-3">
                 <form method="post" action="{{ route('addOrUpdateSupport') }}">
                     @csrf
-                    <div class="mb-3">
-                        <label for="number" class="form-label">رقم الدعم الفني:</label>
-                        <input type="text" class="form-control" id="number" name="number"
-                            value="{{ $number ?? '' }}" required>
+                    <div class="row">
+                        <div class="mb-4">
+                            <label for="number" class="form-label">رقم الدعم الفني:</label>
+                            <input type="text" class="form-control" id="number" name="number"
+                                value="{{ $number ?? '' }}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="number" class="form-label">
+                                بريد الالكتروني لدعم كلمة السر
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                value="{{ $email ?? '' }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">أضافة / تعديل </button>
                     </div>
-                    <button type="submit" class="btn btn-primary">أضافة / تعديل </button>
                 </form>
             </div>
         </div>
