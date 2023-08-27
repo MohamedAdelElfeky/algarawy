@@ -73,7 +73,7 @@ var KTSigninGeneral = function () {
                         } else {
                             // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
                             Swal.fire({
-                                text: "معذرة ، يبدو أنه تم اكتشاف بعض الأخطاء ، يرجى المحاولة مرة أخرى.",
+                                text: "رقم الهويه او كلمه السر غير صحيحة",
                                 icon: "error",
                                 buttonsStyling: false,
                                 confirmButtonText: "حسنًا ، موافق.",
@@ -84,7 +84,7 @@ var KTSigninGeneral = function () {
                         }
                     }).catch(function (error) {
                         Swal.fire({
-                            text: "معذرة ، يبدو أنه تم اكتشاف بعض الأخطاء ، يرجى المحاولة مرة أخرى.",
+                            text: "رقم الهويه او كلمه السر غير صحيحة",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "حسنًا ، موافق.",
@@ -102,7 +102,7 @@ var KTSigninGeneral = function () {
                 } else {
                     // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
                     Swal.fire({
-                        text: "معذرة ، يبدو أنه تم اكتشاف بعض الأخطاء ، يرجى المحاولة مرة أخرى.",
+                        text: "رقم الهويه او كلمه السر غير صحيحة",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "حسنًا ، موافق.",

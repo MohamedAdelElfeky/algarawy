@@ -72,7 +72,7 @@
             <div></div>
 
             <!--begin::Link-->
-            <a href="/forgot-password" class="link-primary">
+            <a href="{{ route('password.request') }}" class="link-primary">
                 هل نسيت كلمة السر ؟
             </a>
             <!--end::Link-->
