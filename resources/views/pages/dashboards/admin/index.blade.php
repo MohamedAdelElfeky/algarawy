@@ -25,7 +25,7 @@
                             <th>صورة البطاقة الخلفية</th>
                             <th>تاريخ الميلاد</th>
                             <th>الهوية الوطنية</th>
-                            <th> تغير كلمه المرور </th>
+                            {{-- <th> تغير كلمه المرور </th> --}}
 
                         </thead>
                         <tbody>
@@ -75,13 +75,13 @@
                                     </td>
                                     <td>{{ $user->birth_date }}</td>
                                     <td>{{ $user->national_id }}</td>
-                                    <td>
+                                    {{-- <td>
                                         <button class="btn btn-sm btn-primary change-password-btn"
                                             data-user-id="{{ $user->id }}" data-toggle="modal"
                                             data-target="#kt_modal_admin">
                                             Change Password
                                         </button>
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @endforeach
                         </tbody>
