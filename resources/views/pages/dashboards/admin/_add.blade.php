@@ -93,7 +93,7 @@
         </div>
     </div>
 </div>
-
+{{-- 
 @section('script')
     <script>
         $(document).ready(function() {
@@ -130,5 +130,48 @@
                 });
             });
         });
+
+        $(document).ready(function() {
+            $('.change-password-btn').click(function() {
+                const userId = $(this).data('user-id');
+                // Set user ID in a hidden input field within the form
+                $('#user-id').val(userId);
+            });
+
+            $('#adminForm').submit(function(e) {
+                e.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: 'admin/change-password',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Password has been changed successfully.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(function() {
+                            // Close the modal
+                            $('#kt_modal_admin').modal('hide');
+                            location.reload();
+                        });
+                    },
+                    error: function(error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Failed to change password.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            });
+        });
     </script>
-@endsection
+@endsection --}}

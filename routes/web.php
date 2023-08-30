@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CityController;
@@ -29,7 +30,9 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/auth.php';
 
-Route::get('/', [AuthenticatedSessionController::class, 'create']);
+// Route::get('/', [AuthenticatedSessionController::class, 'create'])->middleware('auth');
+Route::get('/', [AuthenticatedSessionController::class, 'create'])
+    ->middleware('auth');
 Route::middleware('auth')->group(function () {
 
     Route::get('/users', [UserController::class, 'getAllUsers'])->name('users.index');
@@ -60,9 +63,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('cities', CityController::class);
 
-    Route::resource('neighborhoods', NeighborhoodController::class); 
-    Route::put('addNeighborhoods', [NeighborhoodController::class,'addNeighborhood'])->name('addNeighborhood'); 
-
+    Route::resource('neighborhoods', NeighborhoodController::class);
+    Route::put('addNeighborhoods', [NeighborhoodController::class, 'addNeighborhood'])->name('addNeighborhood');
 });
 
 Route::get('/error', function () {

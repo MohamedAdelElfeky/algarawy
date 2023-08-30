@@ -25,7 +25,7 @@
                             <th>صورة البطاقة الخلفية</th>
                             <th>تاريخ الميلاد</th>
                             <th>الهوية الوطنية</th>
-                            {{-- <th> تفعيل المستخدم</th> --}}
+                            <th> تغير كلمه المرور </th>
 
                         </thead>
                         <tbody>
@@ -75,16 +75,13 @@
                                     </td>
                                     <td>{{ $user->birth_date }}</td>
                                     <td>{{ $user->national_id }}</td>
-                                    {{-- <td>
-                                        <button
-                                            class="toggle-user-btn btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
-                                            data-user-id="{{ $user->id }}" data-user-active="{{ $user->active }}">
-                                            <i class="ki-duotone ki-toggle-on-circle fs-2">
-                                                <i class="path1"></i>
-                                                <i class="path2"></i>
-                                            </i>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary change-password-btn"
+                                            data-user-id="{{ $user->id }}" data-toggle="modal"
+                                            data-target="#kt_modal_admin">
+                                            Change Password
                                         </button>
-                                    </td> --}}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -97,31 +94,78 @@
     @section('script')
         <script>
             $(document).ready(function() {
-                $('.toggle-user-btn').click(function(event) {
-                    event.preventDefault();
-
-                    const button = $(this);
-                    const userId = button.attr('data-user-id');
-                    const isActive = button.attr('data-user-active') === '1';
-                    const url = `toggle-user/${userId}`;
-
-                    // Send an AJAX request to the server
+                $('#adminForm').submit(function(e) {
+                    e.preventDefault();
+                    var formData = $(this).serialize();
                     $.ajax({
-                        url: url,
                         type: 'POST',
-                        dataType: 'json',
+                        url: 'admin/add-user',
+                        data: formData,
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }, // Include the CSRF token in the headers
-                        success: function(data) {
-                            if (data.success) {
-                                // Toggle the active status in the button data attribute
-                                button.attr('data-user-active', isActive ? '0' : '1');
-                                // Update button appearance if needed
-                            }
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'نجاح!',
+                                text: 'تمت إضافة المستخدم بنجاح.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(function() {
+                                location.reload();
+                            });
                         },
                         error: function(error) {
-                            console.error('An error occurred:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ!',
+                                text: 'فشل إضافة المستخدم.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    });
+                });
+            });
+
+            $(document).ready(function() {
+                $('.change-password-btn').click(function() {
+                    const userId = $(this).data('user-id');
+                    // Set user ID in a hidden input field within the form
+                    $('#user-id').val(userId);
+                });
+
+                $('#adminForm').submit(function(e) {
+                    e.preventDefault();
+                    var formData = $(this).serialize();
+                    $.ajax({
+                        type: 'POST',
+                        url: 'admin/change-password',
+                        data: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Password has been changed successfully.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(function() {
+                                // Close the modal
+                                $('#kt_modal_admin').modal('hide');
+                                location.reload();
+                            });
+                        },
+                        error: function(error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Failed to change password.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
                         }
                     });
                 });
