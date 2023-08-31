@@ -83,7 +83,7 @@ class AuthController extends Controller
             'last_name' => $request->input('last_name'),
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
-            'password' => Hash::make($request->input('password')),
+            'password' => bcrypt($request->input('password')),
             'location' => $request->input('location'),
             'birth_date' => $request->input('birth_date'),
             'national_id' => $request->input('national_id'),
