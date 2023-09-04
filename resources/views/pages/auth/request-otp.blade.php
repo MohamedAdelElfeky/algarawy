@@ -6,12 +6,11 @@
             </a>
         </x-slot>
 
-        <form method="POST" action="{{ route('password.update') }}">
+        <form method="POST" action="{{ route('password.send_otp') }}">
             @csrf
 
             <!-- Password Reset Token -->
             <input type="hidden" name="token" value="{{ $request->input('token') }}">
-            <input type="hidden" name="email" value="{{ $email }}">
 
             <!-- Email Address -->
             <div>

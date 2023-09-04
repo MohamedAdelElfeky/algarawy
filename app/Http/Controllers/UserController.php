@@ -311,4 +311,23 @@ class UserController extends Controller
 
         return response()->json(['message' => 'تمت إضافة المستخدم بنجاح']);
     }
+
+    public function changePasswordByAdmin(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json(['message' => 'تم تغيير الرقم السري بنجاح']);
+    }
 }

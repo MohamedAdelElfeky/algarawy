@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\JobApplicationController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +36,10 @@ Route::POST('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/p-password/reset',  [AuthController::class, 'PasswordReset']);
+
+Route::post('p-forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
+Route::post('pt-forgot-password', [PasswordResetLinkController::class, 'store']);
+
 
 Route::get('/regions', [RegionController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
@@ -54,7 +60,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/search', [UserController::class, 'searchUser']);
         Route::get('/notifications', [UserController::class, 'getNotificationsForUser']);
         Route::put('/changePassword', [UserController::class, 'changePassword']);
-
     });
     Route::put('/notifications/AsRead/{notification}', [NotificationController::class, 'markNotificationAsRead']);
     Route::put('/markAllNotificationsAsRead', [NotificationController::class, 'markAllNotificationsAsRead']);
@@ -98,6 +103,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/job-applications/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
     Route::get('/job-applications/for-user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);
     Route::get('/job-applications/by-user', [JobApplicationController::class, 'getJobApplicationsByUserId']);
-
-
 });

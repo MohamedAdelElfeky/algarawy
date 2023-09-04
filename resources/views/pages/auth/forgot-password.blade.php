@@ -1,7 +1,8 @@
 <x-auth-layout>
 
     <!--begin::Form-->
-    <form class="form w-100" novalidate="novalidate" id="kt_password_reset_form" data-kt-redirect-url="{{ route('password.email') }}" action="#">
+    <form class="form w-100" novalidate="novalidate" id="kt_password_reset_form"
+        data-kt-redirect-url="{{ route('password.send_otp') }}">
         @csrf
         <!--begin::Heading-->
         <div class="text-center mb-10">
@@ -22,7 +23,8 @@
         <!--begin::Input group--->
         <div class="fv-row mb-8">
             <!--begin::Email-->
-            <input type="text" placeholder="البريد الالكتروني" name="email" autocomplete="off" class="form-control bg-transparent"/>
+            <input type="text" placeholder="البريد الالكتروني" name="email" autocomplete="off"
+                class="form-control bg-transparent" />
             <!--end::Email-->
         </div>
 
@@ -32,7 +34,7 @@
                 @include('partials/general/_button-indicator', ['label' => 'ارسال'])
             </button>
 
-            <a href="/login" class="btn btn-light">الغاء</a>
+            <a href="{{ route('login') }}" class="btn btn-light">الغاء</a>
         </div>
         <!--end::Actions-->
     </form>

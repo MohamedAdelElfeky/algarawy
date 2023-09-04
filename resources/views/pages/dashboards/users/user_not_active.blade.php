@@ -21,7 +21,7 @@
                             <th>تاريخ الميلاد</th>
                             <th>الهوية الوطنية</th>
                             <th> تفعيل المستخدم</th>
-                            {{-- <th> تغير كلمه المرور </th> --}}
+                            <th> تغير كلمه المرور </th>
 
                         </thead>
                         <tbody>
@@ -77,6 +77,14 @@
                                             </i>
                                         </button>
                                     </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary change-password-btn"
+                                            data-user-id="{{ $user->id }}" data-bs-toggle="modal"
+                                            data-bs-target="#kt_modal_admin">
+                                            تغيير كلمة المرور
+                                        </button>
+                                        @include('pages/dashboards/admin/_edit_password')
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -117,6 +125,49 @@
                         },
                         error: function(error) {
                             console.error('An error occurred:', error);
+                        }
+                    });
+                });
+            });
+
+            $(document).ready(function() {
+                $('#change-password-form').on('submit', function(e) {
+                    e.preventDefault();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: 'changePasswordByAdmin',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            $('#kt_modal_admin').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'تم تغيير كلمة المرور بنجاح',
+                                showConfirmButton: false,
+                                timer: 1500 // Close the alert after 1.5 seconds
+                            });
+                        },
+                        error: function(xhr) {
+                            $('#kt_modal_admin').modal('hide');
+                            if (xhr.status === 404) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: 'المستخدم غير موجود'
+                                });
+                            } else if (xhr.status === 400) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: 'كلمة المرور القديمة غير صحيحة'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: 'حدث خطأ ما'
+                                });
+                            }
                         }
                     });
                 });

@@ -25,7 +25,7 @@
                             <th>صورة البطاقة الخلفية</th>
                             <th>تاريخ الميلاد</th>
                             <th>الهوية الوطنية</th>
-                            {{-- <th> تغير كلمه المرور </th> --}}
+                            <th> تغير كلمه المرور </th>
 
                         </thead>
                         <tbody>
@@ -75,13 +75,16 @@
                                     </td>
                                     <td>{{ $user->birth_date }}</td>
                                     <td>{{ $user->national_id }}</td>
-                                    {{-- <td>
+                                    <td>
+
                                         <button class="btn btn-sm btn-primary change-password-btn"
-                                            data-user-id="{{ $user->id }}" data-toggle="modal"
-                                            data-target="#kt_modal_admin">
-                                            Change Password
+                                            data-user-id="{{ $user->id }}" data-bs-toggle="modal"
+                                            data-bs-target="#kt_modal_admin">
+                                            تغيير كلمة المرور
                                         </button>
-                                    </td> --}}
+                                        @include('pages/dashboards/admin/_edit_password')
+
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -128,44 +131,87 @@
                 });
             });
 
-            $(document).ready(function() {
-                $('.change-password-btn').click(function() {
-                    const userId = $(this).data('user-id');
-                    // Set user ID in a hidden input field within the form
-                    $('#user-id').val(userId);
-                });
+            // $(document).ready(function() {
+            //     $('.change-password-btn').click(function() {
+            //         const userId = $(this).data('user-id');
+            //         // Set user ID in a hidden input field within the form
+            //         $('#user-id').val(userId);
+            //     });
 
-                $('#adminForm').submit(function(e) {
+            //     $('#adminForm').submit(function(e) {
+            //         e.preventDefault();
+            //         var formData = $(this).serialize();
+            //         $.ajax({
+            //             type: 'POST',
+            //             url: 'admin/change-password',
+            //             data: formData,
+            //             headers: {
+            //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //             },
+            //             success: function(response) {
+            //                 Swal.fire({
+            //                     icon: 'success',
+            //                     title: 'Success!',
+            //                     text: 'Password has been changed successfully.',
+            //                     showConfirmButton: false,
+            //                     timer: 1500
+            //                 }).then(function() {
+            //                     // Close the modal
+            //                     $('#kt_modal_admin').modal('hide');
+            //                     location.reload();
+            //                 });
+            //             },
+            //             error: function(error) {
+            //                 Swal.fire({
+            //                     icon: 'error',
+            //                     title: 'Error!',
+            //                     text: 'Failed to change password.',
+            //                     showConfirmButton: false,
+            //                     timer: 1500
+            //                 });
+            //             }
+            //         });
+            //     });
+            // });
+
+            $(document).ready(function() {
+                $('#change-password-form').on('submit', function(e) {
                     e.preventDefault();
-                    var formData = $(this).serialize();
+
                     $.ajax({
                         type: 'POST',
-                        url: 'admin/change-password',
-                        data: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
+                        url: 'changePasswordByAdmin',
+                        data: $(this).serialize(),
                         success: function(response) {
+                            $('#kt_modal_admin').modal('hide');
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Success!',
-                                text: 'Password has been changed successfully.',
+                                title: 'تم تغيير كلمة المرور بنجاح',
                                 showConfirmButton: false,
-                                timer: 1500
-                            }).then(function() {
-                                // Close the modal
-                                $('#kt_modal_admin').modal('hide');
-                                location.reload();
+                                timer: 1500 // Close the alert after 1.5 seconds
                             });
                         },
-                        error: function(error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: 'Failed to change password.',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
+                        error: function(xhr) {
+                            $('#kt_modal_admin').modal('hide');
+                            if (xhr.status === 404) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: 'المستخدم غير موجود'
+                                });
+                            } else if (xhr.status === 400) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: 'كلمة المرور القديمة غير صحيحة'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: 'حدث خطأ ما'
+                                });
+                            }
                         }
                     });
                 });

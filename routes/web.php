@@ -10,6 +10,7 @@ use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\NeighborhoodController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\SupportController;
@@ -28,9 +29,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+Route::get('/request-otp', [PasswordResetController::class, 'requestOtpForm'])->name('password.request_otp');
+Route::post('/request-otp', [PasswordResetController::class, 'sendOtp'])->name('password.send_otp');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
+Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp'])->name('password.verify_otp');
+
 require __DIR__ . '/auth.php';
 
-// Route::get('/', [AuthenticatedSessionController::class, 'create'])->middleware('auth');
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
     ->middleware('auth');
 Route::middleware('auth')->group(function () {
@@ -41,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
     Route::get('/userActive', [UserController::class, 'userActive'])->name('userActive');
     Route::get('/userNotActive', [UserController::class, 'userNotActive'])->name('userNotActive');
+    Route::post('/changePasswordByAdmin', [UserController::class, 'changePasswordByAdmin'])->name('password.update.admin');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
