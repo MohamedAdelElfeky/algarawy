@@ -1,5 +1,12 @@
-<x-default-layout>
-    <p>Your OTP code for verification is:</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>التحقق من OTP</title>
+</head>
+<body>
+    <p>رمز OTP الخاص بك للتحقق هو:</p>
     <h1>{{ $otp }}</h1>
-    <p>Please use this code to verify your account.</p>
-</x-default-layout>
+    <p>الرجاء استخدام هذا الرمز للتحقق من حسابك.</p>
+</body>
+</html>
