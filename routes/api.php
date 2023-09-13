@@ -43,7 +43,8 @@ Route::post('pt-forgot-password', [PasswordResetLinkController::class, 'store'])
 Route::post('forgot-password/send-otp', [ForgotPasswordController::class, 'sendOtp']);
 Route::post('forgot-password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
 Route::post('forgot-password/reset-password', [ForgotPasswordController::class, 'resetPassword']);
-
+Route::post('p-send-otp', [AuthController::class, 'sendOTP']);
+Route::post('p-reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/regions', [RegionController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
