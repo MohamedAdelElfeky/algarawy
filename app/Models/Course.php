@@ -40,4 +40,8 @@ class Course extends Model
     {
         return $this->morphMany(Like::class, 'likable');
     }
+    public function complaints()
+    {
+        return $this->morphMany(Complaint::class, 'complaintable');
+    }
 }

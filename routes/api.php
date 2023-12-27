@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BankAccountController;
+use App\Http\Controllers\Api\BlockedUserController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\MeetingController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\JobApplicationController;
@@ -53,7 +55,7 @@ Route::get('/regions/{region}/cities', [CityController::class, 'getCitiesByRegio
 Route::get('/cities/{city}/neighborhoods', [NeighborhoodController::class, 'getNeighborhoodsByCity']);
 Route::get('/number-support', [UserController::class, 'numberSupport']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
     // User related routes
     Route::prefix('user')->group(function () {
         Route::get('/meetings', [UserController::class, 'getMeetings']);
@@ -82,8 +84,13 @@ Route::middleware('auth:sanctum')->group(function () {
         'p-job-application' => JobApplicationController::class,
     ]);
 
+    Route::post('/block-user', [BlockedUserController::class, 'blockUser']);
+    Route::post('/unblock-user', [BlockedUserController::class, 'unblockUser']);
+
     Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'toggleFavorite']);
     Route::post('/p-add-like/{type}/{id}', [LikeController::class, 'toggleLike']);
+    Route::post('/p-add-complaint/{type}/{id}', [ComplaintController::class, 'toggleComplaint']);
+    Route::get('/p-show-complaint/{type}/{id}', [ComplaintController::class, 'showComplaints']);
 
     Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
     Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);

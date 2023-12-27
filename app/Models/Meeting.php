@@ -38,4 +38,8 @@ class Meeting extends Model
     {
         return $this->morphMany(Notification::class, 'notifiable');
     }
+    public function complaints()
+    {
+        return $this->morphMany(Complaint::class, 'complaintable');
+    }
 }

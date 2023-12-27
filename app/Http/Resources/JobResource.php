@@ -17,7 +17,7 @@ class JobResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->id,  
             'description' => $this->description,
             'title' => $this->title,
 
@@ -48,7 +48,13 @@ class JobResource extends JsonResource
             'user' => new UserResource($this->user),
 
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
+            'count_favorite' => $this->favorites->where('favoritable_id', $this->id)->count() > 0,
+
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,
+            'count_like' => $this->likes->where('likable_id', $this->id)->count(),
+
+            'complaint' => $this->complaints->where('user_id', Auth::id())->where('complaintable_id', $this->id)->count() > 0,
+            'count_complaint' => $this->complaints->where('complaintable_id', $this->id)->count(),
 
             'count_apply_job' =>$this->count_of_applications, // JobApplication::where('job_id',$this->id)->count(),
 

@@ -96,4 +96,9 @@ class Job extends Model
     {
         return $this->jobApplications()->count();
     }
+    public function complaints()
+    {
+        return $this->morphMany(Complaint::class, 'complaintable');
+    }
+   
 }
