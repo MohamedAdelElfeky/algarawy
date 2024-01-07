@@ -84,8 +84,7 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
         'p-job-application' => JobApplicationController::class,
     ]);
 
-    Route::post('/block-user', [BlockedUserController::class, 'blockUser']);
-    Route::post('/unblock-user', [BlockedUserController::class, 'unblockUser']);
+    Route::post('/toggle-block', [BlockedUserController::class, 'toggleBlock']);
 
     Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'toggleFavorite']);
     Route::post('/p-add-like/{type}/{id}', [LikeController::class, 'toggleLike']);
