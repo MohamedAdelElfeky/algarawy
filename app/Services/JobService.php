@@ -23,11 +23,17 @@ class JobService
 
     public function getAllJobs($perPage = 10, $page = 1)
     {
-        $jobQuery  = Job::orderBy('created_at', 'desc');
-        $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
-        $jobCollection = JobResource::collection($jobs);
-
-        $paginationData = $this->paginationService->getPaginationData($jobs);
+        $user = Auth::user();
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+        $jobQuery = Job::orderBy('created_at', 'desc');
+        if ($showNoComplaintedPosts) {
+            $jobsWithComplaints = $jobQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
+            $jobCollection = JobResource::collection($jobsWithComplaints);
+        } else {
+            $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
+            $jobCollection = JobResource::collection($jobs);
+        }
+        $paginationData = $this->paginationService->getPaginationData($jobCollection);
 
         return [
             'data' => $jobCollection,

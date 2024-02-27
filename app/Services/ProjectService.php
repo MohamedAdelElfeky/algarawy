@@ -23,8 +23,14 @@ class ProjectService
 
     public function getAllProjects($perPage = 10, $page = 1)
     {
+        $user = Auth::user();
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
         $projectQuery = Project::orderBy('created_at', 'desc');
-        $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
+        if ($showNoComplaintedPosts) {
+            $projects = $projectQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
+        } else {
+            $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
+        }
         $projectResource = ProjectResource::collection($projects);
         $paginationData = $this->paginationService->getPaginationData($projects);
 

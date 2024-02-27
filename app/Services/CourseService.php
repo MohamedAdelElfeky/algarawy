@@ -168,8 +168,14 @@ class CourseService
 
     public function getAllCourses($perPage = 10, $page = 1)
     {
+        $user = Auth::user();
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
         $courseQuery = Course::orderBy('created_at', 'desc');
-        $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
+        if ($showNoComplaintedPosts) {
+            $courses = $courseQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
+        } else {
+            $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
+        }
         $courseResource = CourseResource::collection($courses);
         $paginationData = $this->paginationService->getPaginationData($courses);
 

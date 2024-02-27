@@ -85,6 +85,8 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
     ]);
 
     Route::post('/toggle-block', [BlockedUserController::class, 'toggleBlock']);
+    Route::get('/blocked-user', [BlockedUserController::class, 'getBlockedUsers']);
+    Route::post('/toggle-show-complainted', [AuthController::class, 'toggleShowNoComplaintedPosts']);
 
     Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'toggleFavorite']);
     Route::post('/p-add-like/{type}/{id}', [LikeController::class, 'toggleLike']);

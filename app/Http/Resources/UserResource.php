@@ -28,6 +28,7 @@ class UserResource extends JsonResource
             'mobile_number_visibility' =>  $this->mobile_number_visibility,
             'birthdate_visibility' => $this->birthdate_visibility,
             'email_visibility' => $this->email_visibility,
+            'show_no_complainted_posts' => $this->show_no_complainted_posts,
         ];
     }
 }

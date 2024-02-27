@@ -15,6 +15,7 @@ use App\Mail\ResetPasswordMail;
 use App\Models\Otp;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -221,5 +222,18 @@ class AuthController extends Controller
         $reset->update(['used' => true]);
 
         return response()->json(['message' => 'تم تغيير الرقم السري بنجاح.'], 201);
+    }
+
+    public function toggleShowNoComplaintedPosts()
+    {
+        $user = Auth::user();
+
+        $user->update([
+            'show_no_complainted_posts' => $user->show_no_complainted_posts == 1 ? 0 : 1,
+        ]);
+        return response()->json([
+            'message' => 'show No Complainted Posts Toggled Successfully.',
+            'user' => $user,
+        ]);
     }
 }

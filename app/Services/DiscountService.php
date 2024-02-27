@@ -21,8 +21,14 @@ class DiscountService
 
     public function getAllDiscounts($perPage = 10, $page = 1)
     {
+        $user = Auth::user();
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
         $discountQuery = Discount::orderBy('created_at', 'desc');
-        $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
+        if ($showNoComplaintedPosts) {
+            $discounts = $discountQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
+        } else {
+            $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
+        }
         $discountResource = DiscountResource::collection($discounts);
         $paginationData = $this->paginationService->getPaginationData($discounts);
         return [

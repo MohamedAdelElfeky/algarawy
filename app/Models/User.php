@@ -41,6 +41,7 @@ class User extends Authenticatable
         'mobile_number_visibility',
         'birthdate_visibility',
         'email_visibility',
+        'show_no_complainted_posts',
 
     ];
 

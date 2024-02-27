@@ -38,4 +38,14 @@ class BlockedUserController extends Controller
 
         return response()->json(['message' => $message], $statusCode);
     }
+
+    public function getBlockedUsers()
+    {
+        $user = Auth::user();
+
+        $blockedUsers = BlockedUser::where('user_id', $user->id)            
+            ->get();
+
+        return response()->json(['blockedUsers' => $blockedUsers]);
+    }
 }
