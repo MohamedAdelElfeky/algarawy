@@ -16,6 +16,7 @@ class Discount extends Model
         'price',
         'link',
         'user_id',
+        'status',
     ];
 
     public function user()

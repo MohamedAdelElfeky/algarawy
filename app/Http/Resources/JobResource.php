@@ -57,7 +57,7 @@ class JobResource extends JsonResource
             'count_complaint' => $this->complaints->where('complaintable_id', $this->id)->count(),
 
             'count_apply_job' =>$this->count_of_applications, // JobApplication::where('job_id',$this->id)->count(),
-
+            'status' => $this->status,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];

@@ -93,4 +93,12 @@ class JobController extends Controller
             'data' => new JobResource($job),
         ], 201);
     }
+
+    public function getJobs(Request $request)
+    {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
+        $jobs = $this->jobService->getAllJobsPublic($perPage, $page);
+        return response()->json($jobs, 200);
+    }
 }

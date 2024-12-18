@@ -25,6 +25,8 @@ class ServiceService
             'images_or_video' => 'nullable',
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
             'location' => 'nullable|string|location',
+            'status' => 'nullable',
+
         ]);
 
         if ($validator->fails()) {
@@ -74,6 +76,8 @@ class ServiceService
             'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
             'location' => 'nullable|string|location',
             'deleted_images_and_videos' => 'nullable',
+            'status' => 'nullable',
+
         ]);
 
         if ($validator->fails()) {
@@ -122,6 +126,19 @@ class ServiceService
     public function getAllServices($perPage = 10, $page = 1)
     {
         $servicesQuery = Service::orderBy('created_at', 'desc');
+        $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
+        $serviceResource = ServiceResource::collection($services);
+        $paginationData = $this->paginationService->getPaginationData($services);
+
+        return [
+            'data' => $serviceResource,
+            'metadata' => $paginationData,
+        ];
+    }
+
+    public function getAllServicesPublic($perPage = 10, $page = 1)
+    {
+        $servicesQuery = Service::where('status', 'public')->orderBy('created_at', 'desc');
         $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
         $serviceResource = ServiceResource::collection($services);
         $paginationData = $this->paginationService->getPaginationData($services);

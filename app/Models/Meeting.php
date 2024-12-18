@@ -18,6 +18,7 @@ class Meeting extends Model
         'description',
         'type',
         'user_id',
+        'status',
     ];
 
     public function user()

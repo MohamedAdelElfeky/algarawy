@@ -24,6 +24,14 @@ class ServiceController extends Controller
         return response()->json($services, 200);
     }
 
+    public function getServices(Request $request)
+    {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
+        $services = $this->serviceService->getAllServicesPublic($perPage, $page);
+        return response()->json($services, 200);
+    }
+
     public function show($id)
     {
         $service = $this->serviceService->getServiceById($id);

@@ -25,6 +25,14 @@ class DiscountController extends Controller
         return response()->json($discounts, 200);
     }
 
+    public function getDiscounts(Request $request)
+    {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
+        $discounts = $this->discountService->getAllDiscountsPublic($perPage, $page);
+        return response()->json($discounts, 200);
+    }
+    
     public function show($id)
     {
         $discount = $this->discountService->getDiscountById($id);
@@ -47,8 +55,7 @@ class DiscountController extends Controller
 
         $result = $this->discountService->updateDiscount($discount, $request->all());
 
-            return new DiscountResource($result['data']);
-       
+        return new DiscountResource($result['data']);
     }
 
     public function destroy($id)

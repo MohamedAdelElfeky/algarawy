@@ -67,4 +67,12 @@ class MeetingController extends Controller
         $results = $this->meetingService->searchMeeting($searchTerm);
         return response()->json(['data' => $results]);
     }
+
+    public function getMeetings(Request $request)
+    {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
+        $meetings = $this->meetingService->getAllMeetingsPublic($perPage, $page);
+        return response()->json($meetings, 200);
+    }
 }

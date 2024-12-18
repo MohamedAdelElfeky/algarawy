@@ -34,6 +34,7 @@ class Job extends Model
         'company_region_id',
         'company_city_id',
         'company_neighborhood_id',
+        'status',
     ];
 
     public function user()

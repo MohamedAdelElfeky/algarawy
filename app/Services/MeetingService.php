@@ -33,6 +33,7 @@ class MeetingService
             'end_time' => 'nullable|date_format:Y-m-d\TH:i:s.v',
             'description' => 'nullable|string',
             'type' => 'nullable|in:remotely,normal',
+            'status' => 'nullable',
 
         ]);
         $data['user_id'] = Auth::id();
@@ -84,6 +85,7 @@ class MeetingService
             'end_time' => 'nullable|date_format:Y-m-d\TH:i:s.v',
             'description' => 'nullable|string',
             'type' => 'nullable|in:remotely,normal',
+            'status' => 'nullable',
 
         ]);
         $data['user_id'] = Auth::id();
@@ -140,8 +142,22 @@ class MeetingService
         return  [
             'data' => $meetingResource,
             'metadata' => $paginationData,
-        ];;
+        ];
     }
+
+    public function getAllMeetingsPublic($perPage = 10, $page = 1)
+    {
+        $meetingQuery = Meeting::where('status', 'public')->orderBy('created_at', 'desc');
+        $meetings = $meetingQuery->paginate($perPage, ['*'], 'page', $page);
+        $meetingResource =  MeetingResource::collection($meetings);
+        $paginationData = $this->paginationService->getPaginationData($meetings);
+
+        return  [
+            'data' => $meetingResource,
+            'metadata' => $paginationData,
+        ];
+    }
+    
     public function searchMeeting($searchTerm)
     {
         $meetings = Meeting::where(function ($query) use ($searchTerm) {

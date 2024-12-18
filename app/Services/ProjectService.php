@@ -39,6 +39,18 @@ class ProjectService
             'metadata' => $paginationData,
         ];
     }
+    public function getAllProjectsPublic($perPage = 10, $page = 1)
+    {
+        $projectQuery = Project::where('status', 'public')->orderBy('created_at', 'desc');
+        $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
+        $projectResource = ProjectResource::collection($projects);
+        $paginationData = $this->paginationService->getPaginationData($projects);
+
+        return [
+            'data' => $projectResource,
+            'metadata' => $paginationData,
+        ];
+    }
 
     public function getProjectById($id)
     {
@@ -56,6 +68,8 @@ class ProjectService
             'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
             'files*' => 'nullable|file',
             'location' => 'nullable|string|location',
+            'status' => 'nullable',
+
         ]);
         $data['user_id'] = Auth::id();
 
@@ -122,6 +136,8 @@ class ProjectService
             'location' => 'nullable|string|location',
             'deleted_images_and_videos' => 'nullable',
             'deleted_files' => 'nullable',
+            'status' => 'nullable',
+
         ]);
 
         if ($validator->fails()) {

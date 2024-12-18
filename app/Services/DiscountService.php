@@ -36,6 +36,18 @@ class DiscountService
             'metadata' => $paginationData,
         ];
     }
+    
+    public function getAllDiscountsPublic($perPage = 10, $page = 1)
+    {
+        $discountQuery = Discount::where('status', 'public')->orderBy('created_at', 'desc');
+        $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
+        $discountResource = DiscountResource::collection($discounts);
+        $paginationData = $this->paginationService->getPaginationData($discounts);
+        return [
+            'data' => $discountResource,
+            'metadata' => $paginationData,
+        ];
+    }
 
     public function createDiscount(array $data): array
     {
@@ -47,6 +59,8 @@ class DiscountService
             'discount' => 'nullable',
             'price' => 'nullable|numeric',
             'link' => 'nullable|url',
+            'status' => 'nullable',
+
         ]);
         if ($validator->fails()) {
             return [
@@ -96,6 +110,8 @@ class DiscountService
             'price' => 'nullable|numeric',
             'deleted_images_and_videos' => 'nullable',
             'link' => 'nullable|url',
+            'status' => 'nullable',
+
         ]);
 
         if ($validator->fails()) {

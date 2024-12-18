@@ -41,6 +41,18 @@ class JobService
         ];
     }
 
+    public function getAllJobsPublic($perPage = 10, $page = 1)
+    {
+
+        $jobQuery = Job::where('status', 'public')->orderBy('created_at', 'desc');
+        $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
+        $jobCollection = JobResource::collection($jobs);
+        $paginationData = $this->paginationService->getPaginationData($jobCollection);
+        return [
+            'data' => $jobCollection,
+            'metadata' => $paginationData,
+        ];
+    }
 
 
     public function getJobById($id)
@@ -75,6 +87,7 @@ class JobService
             'company_city_id' => 'nullable|exists:cities,id',
             'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'is_training' => 'nullable',
+            'status' => 'nullable',
         ]);
         $data['user_id'] = Auth::id();
 
@@ -165,6 +178,7 @@ class JobService
             'deleted_images_and_videos' => 'nullable',
             'deleted_files' => 'nullable',
             'deleted_company_logo' => 'nullable',
+            'status' => 'nullable',
 
         ]);
         if ($validator->fails()) {

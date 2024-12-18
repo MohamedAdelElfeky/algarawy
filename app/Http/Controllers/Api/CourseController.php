@@ -24,7 +24,14 @@ class CourseController extends Controller
         $courses = $this->courseService->getAllCourses($perPage, $page);
         return response()->json($courses, 200);
     }
-
+    
+    public function getCourses(Request $request)
+    {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
+        $courses = $this->courseService->getAllCoursesPublic($perPage, $page);
+        return response()->json($courses, 200);
+    }
     public function show($id)
     {
         $course = new CourseResource($this->courseService->getCourseById($id));

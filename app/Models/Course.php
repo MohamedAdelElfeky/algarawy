@@ -16,6 +16,7 @@ class Course extends Model
         'discount',
         'user_id',
         'link',
+        'status',
     ];
 
     public function user()

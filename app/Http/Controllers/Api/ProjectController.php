@@ -24,6 +24,13 @@ class ProjectController extends Controller
         return response()->json($projects, 200);
     }
 
+    public function getProjects(Request $request)
+    {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
+        $projects = $this->projectService->getAllProjectsPublic($perPage, $page);
+        return response()->json($projects, 200);
+    }
 
     public function show($id)
     {

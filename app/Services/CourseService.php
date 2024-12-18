@@ -28,6 +28,8 @@ class CourseService
             'discount' => 'nullable',
             'link' => 'nullable|url',
             'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
+            'status' => 'nullable',
+
         ]);
         $data['user_id'] = Auth::id();
 
@@ -96,6 +98,8 @@ class CourseService
             'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
             'deleted_images_and_videos' => 'nullable',
             'deleted_files' => 'nullable',
+            'status' => 'nullable',
+
         ]);
 
         $data['user_id'] = Auth::id();
@@ -176,6 +180,20 @@ class CourseService
         } else {
             $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
         }
+        $courseResource = CourseResource::collection($courses);
+        $paginationData = $this->paginationService->getPaginationData($courses);
+
+        return [
+            'data' => $courseResource,
+            'metadata' => $paginationData,
+        ];
+        return;
+    }
+
+    public function getAllCoursesPublic($perPage = 10, $page = 1)
+    {
+        $courseQuery = Course::where('status', 'public')->orderBy('created_at', 'desc');
+        $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
         $courseResource = CourseResource::collection($courses);
         $paginationData = $this->paginationService->getPaginationData($courses);
 
