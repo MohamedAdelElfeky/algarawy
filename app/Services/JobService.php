@@ -24,15 +24,24 @@ class JobService
     public function getAllJobs($perPage = 10, $page = 1)
     {
         $user = Auth::user();
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
-        $jobQuery = Job::orderBy('created_at', 'desc');
-        if ($showNoComplaintedPosts) {
-            $jobsWithComplaints = $jobQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
-            $jobCollection = JobResource::collection($jobsWithComplaints);
-        } else {
-            $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
-            $jobCollection = JobResource::collection($jobs);
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
         }
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+
+        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
+        
+        $jobQuery = Job::whereNotIn('user_id', $blockedUserIds)
+            ->orderBy('created_at', 'desc');
+                       
+        if ($showNoComplaintedPosts) {
+            $jobQuery->doesntHave('complaints');
+        } else {
+            $jobQuery->has('complaints');
+        }
+
+        $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
+        $jobCollection = JobResource::collection($jobs);
         $paginationData = $this->paginationService->getPaginationData($jobCollection);
 
         return [

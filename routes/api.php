@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\JobApplicationController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\Api\TermsAndConditionController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\NotificationController;
@@ -103,6 +104,11 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
 
     Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
     Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
+    Route::post('/terms-and-conditions', [TermsAndConditionController::class, 'createOrUpdate']);
+    Route::get('/terms-and-conditions/last', [TermsAndConditionController::class, 'getLastTermsAndCondition']);
+    Route::post('/complaints/{complaintId}/edit', [ComplaintController::class, 'editComplaint']);
+    Route::delete('/complaints/{complaintId}', [ComplaintController::class, 'deleteComplaint']);
+    
 
     // Search 
     Route::get('/p-projectsSearch', [ProjectController::class, 'search']);

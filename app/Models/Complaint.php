@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Complaint extends Model
 {
     use HasFactory;
+    protected $fillable = ['comment', 'complaintable_id', 'complaintable_type', 'user_id'];
+
     public function complaintable()
     {
         return $this->morphTo();

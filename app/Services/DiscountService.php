@@ -22,13 +22,21 @@ class DiscountService
     public function getAllDiscounts($perPage = 10, $page = 1)
     {
         $user = Auth::user();
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
-        $discountQuery = Discount::orderBy('created_at', 'desc');
-        if ($showNoComplaintedPosts) {
-            $discounts = $discountQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
-        } else {
-            $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
         }
+
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+
+        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
+        $discountQuery = Discount::whereNotIn('user_id', $blockedUserIds)
+            ->orderBy('created_at', 'desc');
+        if ($showNoComplaintedPosts) {
+            $discountQuery->doesntHave('complaints');
+        } else {
+            $discountQuery->has('complaints');
+        }
+        $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
         $discountResource = DiscountResource::collection($discounts);
         $paginationData = $this->paginationService->getPaginationData($discounts);
         return [
@@ -36,7 +44,7 @@ class DiscountService
             'metadata' => $paginationData,
         ];
     }
-    
+
     public function getAllDiscountsPublic($perPage = 10, $page = 1)
     {
         $discountQuery = Discount::where('status', 'public')->orderBy('created_at', 'desc');

@@ -24,13 +24,22 @@ class ProjectService
     public function getAllProjects($perPage = 10, $page = 1)
     {
         $user = Auth::user();
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
-        $projectQuery = Project::orderBy('created_at', 'desc');
-        if ($showNoComplaintedPosts) {
-            $projects = $projectQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
-        } else {
-            $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
         }
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+
+        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
+
+        $projectQuery = Project::whereNotIn('user_id', $blockedUserIds)
+            ->orderBy('created_at', 'desc');
+
+        if ($showNoComplaintedPosts) {
+            $projectQuery->doesntHave('complaints');
+        } else {
+            $projectQuery->has('complaints');
+        }
+        $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
         $projectResource = ProjectResource::collection($projects);
         $paginationData = $this->paginationService->getPaginationData($projects);
 

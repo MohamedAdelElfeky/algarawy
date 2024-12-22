@@ -46,15 +46,53 @@ class ComplaintController extends Controller
         if (!in_array($type, $validModels)) {
             return response()->json(['message' => 'نوع النموذج غير صالح'], 400);
         }
-    
+
         $modelClass = 'App\Models\\' . ucfirst($type);
         $model = $modelClass::find($id);
         if (!$model) {
             return response()->json(['message' => 'النموذج غير موجود'], 404);
         }
-    
+
         $complaints = ComplaintResource::collection($model->complaints);
-    
+
         return response()->json(['message' => 'قائمة الشكاوى', 'complaints' => $complaints], 200);
+    }
+
+    public function editComplaint(Request $request, $complaintId)
+    {
+        $user = Auth::user();
+        $complaint = Complaint::find($complaintId);
+
+        // Check if the complaint exists and belongs to the logged-in user
+        if (!$complaint || $complaint->user_id !== $user->id) {
+            return response()->json(['message' => 'الشكوى غير موجودة أو لا تمتلكها'], 404);
+        }
+
+        // Validate the comment
+        $validated = $request->validate([
+            'comment' => 'required|string',
+        ]);
+
+        // Update the complaint
+        $complaint->update($validated);
+
+        return response()->json(['message' => 'تم تعديل الشكوى بنجاح', 'complaint' => new ComplaintResource($complaint)], 200);
+    }
+
+    // Delete complaint
+    public function deleteComplaint($complaintId)
+    {
+        $user = Auth::user();
+        $complaint = Complaint::find($complaintId);
+
+        // Check if the complaint exists and belongs to the logged-in user
+        if (!$complaint || $complaint->user_id !== $user->id) {
+            return response()->json(['message' => 'الشكوى غير موجودة أو لا تمتلكها'], 404);
+        }
+
+        // Delete the complaint
+        $complaint->delete();
+
+        return response()->json(['message' => 'تم حذف الشكوى بنجاح'], 200);
     }
 }

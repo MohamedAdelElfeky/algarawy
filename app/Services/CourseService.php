@@ -173,22 +173,33 @@ class CourseService
     public function getAllCourses($perPage = 10, $page = 1)
     {
         $user = Auth::user();
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
-        $courseQuery = Course::orderBy('created_at', 'desc');
-        if ($showNoComplaintedPosts) {
-            $courses = $courseQuery->has('complaints')->paginate($perPage, ['*'], 'page', $page);
-        } else {
-            $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
         }
-        $courseResource = CourseResource::collection($courses);
-        $paginationData = $this->paginationService->getPaginationData($courses);
+
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+
+        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
+
+        $courseQuery = Course::whereNotIn('user_id', $blockedUserIds)
+            ->orderBy('created_at', 'desc');
+
+        if ($showNoComplaintedPosts) {
+            $courseQuery->doesntHave('complaints');
+        } else {
+            $courseQuery->has('complaints');
+        }
+
+        $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
 
         return [
-            'data' => $courseResource,
-            'metadata' => $paginationData,
+            'data' => CourseResource::collection($courses),
+            'metadata' => $this->paginationService->getPaginationData($courses),
         ];
-        return;
     }
+
+
 
     public function getAllCoursesPublic($perPage = 10, $page = 1)
     {
@@ -201,7 +212,7 @@ class CourseService
             'data' => $courseResource,
             'metadata' => $paginationData,
         ];
-        return;
+        return;        
     }
 
     public function getCourseById($id)

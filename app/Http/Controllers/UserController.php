@@ -83,9 +83,27 @@ class UserController extends Controller
 
     public function getDataUser($userId)
     {
-        $courses = CourseResource::collection(Course::where('user_id', $userId)->get());
-        $projects = ProjectResource::collection(Project::where('user_id', $userId)->get());
-        $meetings =   MeetingResource::collection(Meeting::where('user_id', $userId)->get());
+
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+
+        // Apply filters to each query
+        $coursesQuery = Course::where('user_id', $userId);
+        $projectsQuery = Project::where('user_id', $userId);
+        $meetingsQuery = Meeting::where('user_id', $userId);
+
+        $this->applyComplaintFilter($coursesQuery, $showNoComplaintedPosts);
+        $this->applyComplaintFilter($projectsQuery, $showNoComplaintedPosts);
+        $this->applyComplaintFilter($meetingsQuery, $showNoComplaintedPosts);
+        
+        $courses = CourseResource::collection($coursesQuery->get());
+        $projects = ProjectResource::collection($projectsQuery->get());
+        $meetings = MeetingResource::collection($meetingsQuery->get());
+
         $oneRowArray = [
             'Course' => $courses,
             'Project' => $projects,
@@ -103,6 +121,24 @@ class UserController extends Controller
             $result["date"][] = $formattedData;
         }
         return $result;
+    }
+
+    /**
+     * Apply the complaint filter to the query based on user preferences.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool $showNoComplaintedPosts
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    private function applyComplaintFilter($query, $showNoComplaintedPosts)
+    {
+        if ($showNoComplaintedPosts) {
+            $query->doesntHave('complaints');
+        } else {
+            $query->has('complaints');
+        }
+
+        return $query;
     }
 
     public function updateProfile(Request $request, User $user)
