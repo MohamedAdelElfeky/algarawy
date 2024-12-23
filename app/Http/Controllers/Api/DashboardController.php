@@ -43,12 +43,12 @@ class DashboardController extends Controller
         $servicesQuery = Service::whereNotIn('user_id', $blockedUserIds);
 
         // Apply complaint filter to each query
-        $this->applyComplaintFilter($jobsQuery, $showNoComplaintedPosts);
-        $this->applyComplaintFilter($coursesQuery, $showNoComplaintedPosts);
-        $this->applyComplaintFilter($projectsQuery, $showNoComplaintedPosts);
-        $this->applyComplaintFilter($meetingsQuery, $showNoComplaintedPosts);
-        $this->applyComplaintFilter($discountsQuery, $showNoComplaintedPosts);
-        $this->applyComplaintFilter($servicesQuery, $showNoComplaintedPosts);
+        $this->applyComplaintFilter($jobsQuery, $showNoComplaintedPosts, $user);
+        $this->applyComplaintFilter($coursesQuery, $showNoComplaintedPosts, $user);
+        $this->applyComplaintFilter($projectsQuery, $showNoComplaintedPosts, $user);
+        $this->applyComplaintFilter($meetingsQuery, $showNoComplaintedPosts, $user);
+        $this->applyComplaintFilter($discountsQuery, $showNoComplaintedPosts, $user);
+        $this->applyComplaintFilter($servicesQuery, $showNoComplaintedPosts, $user);
 
         // Fetch paginated data
         $jobs = JobResource::collection($jobsQuery->paginate(5));
@@ -57,7 +57,7 @@ class DashboardController extends Controller
         $meetings = MeetingResource::collection($meetingsQuery->paginate(5));
         $discounts = DiscountResource::collection($discountsQuery->paginate(5));
         $services = ServiceResource::collection($servicesQuery->paginate(5));
-        
+
         // $jobs = JobResource::collection(Job::paginate(5));
         // $courses = CourseResource::collection(Course::paginate(5));
         // $projects = ProjectResource::collection(Project::paginate(5));
@@ -94,10 +94,12 @@ class DashboardController extends Controller
      * @param bool $showNoComplaintedPosts
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function applyComplaintFilter($query, $showNoComplaintedPosts)
+    private function applyComplaintFilter($query, $showNoComplaintedPosts, $user)
     {
         if ($showNoComplaintedPosts) {
-            $query->doesntHave('complaints');
+            $query->whereDoesntHave('complaints', function ($query) use ($user) {
+                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+            });
         } else {
             $query->has('complaints');
         }

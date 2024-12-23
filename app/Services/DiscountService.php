@@ -32,7 +32,9 @@ class DiscountService
         $discountQuery = Discount::whereNotIn('user_id', $blockedUserIds)
             ->orderBy('created_at', 'desc');
         if ($showNoComplaintedPosts) {
-            $discountQuery->doesntHave('complaints');
+            $discountQuery->whereDoesntHave('complaints', function ($query) use ($user) {
+                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+            });
         } else {
             $discountQuery->has('complaints');
         }

@@ -35,7 +35,9 @@ class ProjectService
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {
-            $projectQuery->doesntHave('complaints');
+            $projectQuery->whereDoesntHave('complaints', function ($query) use ($user) {
+                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+            });
         } else {
             $projectQuery->has('complaints');
         }

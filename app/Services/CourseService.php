@@ -186,7 +186,9 @@ class CourseService
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {
-            $courseQuery->doesntHave('complaints');
+            $courseQuery->whereDoesntHave('complaints', function ($query) use ($user) {
+                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+            });
         } else {
             $courseQuery->has('complaints');
         }
@@ -212,7 +214,7 @@ class CourseService
             'data' => $courseResource,
             'metadata' => $paginationData,
         ];
-        return;        
+        return;
     }
 
     public function getCourseById($id)

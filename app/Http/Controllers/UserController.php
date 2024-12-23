@@ -96,10 +96,10 @@ class UserController extends Controller
         $projectsQuery = Project::where('user_id', $userId);
         $meetingsQuery = Meeting::where('user_id', $userId);
 
-        $this->applyComplaintFilter($coursesQuery, $showNoComplaintedPosts);
-        $this->applyComplaintFilter($projectsQuery, $showNoComplaintedPosts);
-        $this->applyComplaintFilter($meetingsQuery, $showNoComplaintedPosts);
-        
+        $this->applyComplaintFilter($coursesQuery, $showNoComplaintedPosts, $user);
+        $this->applyComplaintFilter($projectsQuery, $showNoComplaintedPosts, $user);
+        $this->applyComplaintFilter($meetingsQuery, $showNoComplaintedPosts, $user);
+
         $courses = CourseResource::collection($coursesQuery->get());
         $projects = ProjectResource::collection($projectsQuery->get());
         $meetings = MeetingResource::collection($meetingsQuery->get());
@@ -130,10 +130,12 @@ class UserController extends Controller
      * @param bool $showNoComplaintedPosts
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function applyComplaintFilter($query, $showNoComplaintedPosts)
+    private function applyComplaintFilter($query, $showNoComplaintedPosts, $user)
     {
         if ($showNoComplaintedPosts) {
-            $query->doesntHave('complaints');
+            $query->whereDoesntHave('complaints', function ($query) use ($user) {
+                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+            });
         } else {
             $query->has('complaints');
         }

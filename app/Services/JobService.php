@@ -30,12 +30,14 @@ class JobService
         $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
-        
+
         $jobQuery = Job::whereNotIn('user_id', $blockedUserIds)
             ->orderBy('created_at', 'desc');
-                       
+
         if ($showNoComplaintedPosts) {
-            $jobQuery->doesntHave('complaints');
+            $jobQuery->whereDoesntHave('complaints', function ($query) use ($user) {
+                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+            });
         } else {
             $jobQuery->has('complaints');
         }
