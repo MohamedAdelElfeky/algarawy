@@ -102,4 +102,15 @@ class CourseController extends Controller
             'message' => $response['message'],
         ]);
     }
+
+    public function changeStatus(Request $request, Course $course)
+    {
+        $request->validate([
+            'status' => 'in:public,private',
+        ]);
+
+        $course->update(['status' => $request->status]);
+
+        return back()->with('status', 'Course status updated successfully!');
+    }
 }

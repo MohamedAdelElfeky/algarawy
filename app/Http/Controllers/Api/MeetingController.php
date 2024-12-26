@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Meeting;
 use App\Services\MeetingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MeetingController extends Controller
 {
@@ -42,14 +43,30 @@ class MeetingController extends Controller
 
         return response()->json(['message' => 'تم حذف الاجتماع بنجاح'], 200);
     }
-
+    
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $meetings = $this->meetingService->getAllMeetings($perPage, $page);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $meetings = $this->meetingService->getAllMeetings($perPage, $page);
+        } else {
+            $meetings = $this->meetingService->getAllMeetingsPublic($perPage, $page);
+        }
+
         return response()->json($meetings, 200);
     }
+
+    // public function index(Request $request)
+    // {
+    //     $perPage = $request->header('per_page');
+    //     $page = $request->header('page');
+    //     $meetings = $this->meetingService->getAllMeetings($perPage, $page);
+    //     return response()->json($meetings, 200);
+    // }
 
     public function show($id)
     {

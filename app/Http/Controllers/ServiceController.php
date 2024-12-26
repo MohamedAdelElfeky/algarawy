@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use App\Services\ServiceService;
 use Illuminate\Http\Request;
 
@@ -79,5 +80,16 @@ class ServiceController extends Controller
 
         return redirect()->route('services.index')
             ->with('success', 'Service deleted successfully.');
+    }
+
+    public function changeStatus(Request $request, Service $service)
+    {
+        $request->validate([
+            'status' => 'in:public,private',
+        ]);
+
+        $service->update(['status' => $request->status]);
+
+        return back()->with('status', 'Service status updated successfully!');
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProjectResource;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -18,11 +19,27 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $projects = $this->projectService->getAllProjects($perPage, $page);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $projects = $this->projectService->getAllProjects($perPage, $page);
+        } else {
+            $projects = $this->projectService->getAllProjectsPublic($perPage, $page);
+        }
+
         return response()->json($projects, 200);
     }
+
+    // public function index(Request $request)
+    // {
+    //     $perPage = $request->header('per_page');
+    //     $page = $request->header('page');
+    //     $projects = $this->projectService->getAllProjects($perPage, $page);
+    //     return response()->json($projects, 200);
+    // }
 
     public function getProjects(Request $request)
     {

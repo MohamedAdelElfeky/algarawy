@@ -97,4 +97,15 @@ class MeetingController extends Controller
             'message' => 'Meeting deleted successfully',
         ]);
     }
+    
+    public function changeStatus(Request $request, Meeting $meeting)
+    {
+        $request->validate([
+            'status' => 'in:public,private',
+        ]);
+
+        $meeting->update(['status' => $request->status]);
+
+        return back()->with('status', 'Meeting status updated successfully!');
+    }
 }

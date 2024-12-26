@@ -81,8 +81,45 @@
                                                 <i class="path3"></i>
                                             </i>
                                         </button>
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#statusModal{{ $job->id }}"> Change Status </button>
                                     </td>
                                 </tr>
+                                <!-- Modal -->
+                                <div class="modal fade" id="statusModal{{ $job->id }}" tabindex="-1"
+                                    aria-labelledby="statusModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="statusModalLabel">Change Job Status</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <form id="statusForm{{ $job->id }}" method="POST"
+                                                action="{{ route('jobs.changeStatus', $job->id) }}"> @csrf
+                                                @method('PUT')
+                                                <div class="modal-body">
+                                                    <div class="form-group"> <label for="status">Status</label>
+                                                        <select id="status" name="status" class="form-control">
+                                                            <option value="private"
+                                                                {{ $job->status == 'private' ? 'selected' : '' }}>
+                                                                Private</option>
+                                                            <option value="public"
+                                                                {{ $job->status == 'public' ? 'selected' : '' }}>Public
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+
+                                                    <button type="submit" class="btn btn-primary">Update
+                                                        Status</button>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
                         </tbody>
                     </table>

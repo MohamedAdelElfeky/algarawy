@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ServiceService;
 use Illuminate\Http\Request;
 use App\Http\Resources\ServiceResource;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
@@ -15,14 +16,28 @@ class ServiceController extends Controller
     {
         $this->serviceService = $serviceService;
     }
-
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $services = $this->serviceService->getAllServices($perPage, $page);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $services = $this->serviceService->getAllServices($perPage, $page);
+        } else {
+            $services = $this->serviceService->getAllServicesPublic($perPage, $page);
+        }
+
         return response()->json($services, 200);
     }
+    // public function index(Request $request)
+    // {
+    //     $perPage = $request->header('per_page');
+    //     $page = $request->header('page');
+    //     $services = $this->serviceService->getAllServices($perPage, $page);
+    //     return response()->json($services, 200);
+    // }
 
     public function getServices(Request $request)
     {
@@ -51,8 +66,7 @@ class ServiceController extends Controller
             return response()->json(['message' => 'Service not found'], 404);
         }
         $result = $this->serviceService->updateService($service, $request->all());
-            return new ServiceResource($result['data']);
-        
+        return new ServiceResource($result['data']);
     }
 
     public function destroy($id)

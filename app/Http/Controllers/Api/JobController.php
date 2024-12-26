@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Services\JobService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class JobController extends Controller
@@ -21,11 +22,20 @@ class JobController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $jobs = $this->jobService->getAllJobs($perPage, $page);
+        $perPage = $request->header('per_page', 10); // Default to 10 items per page
+        $page = $request->header('page', 1); // Default to page 1
+
+        $user = Auth::user();
+
+        if ($user) {
+            $jobs = $this->jobService->getAllJobs($perPage, $page);
+        } else {
+            $jobs = $this->jobService->getAllJobsPublic($perPage, $page);
+        }
+
         return response()->json($jobs, 200);
     }
+
     public function show($id)
     {
         $job = $this->jobService->getJobById($id);

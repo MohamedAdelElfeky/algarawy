@@ -19,9 +19,17 @@ class JobController extends Controller
     {
         // $jobQuery = Job::orderBy('created_at', 'desc')->get();
         $jobQuery = Job::with([
-            'region', 'city', 'neighborhood',
-            'companyRegion', 'companyCity', 'companyNeighborhood',
-            'user', 'images', 'pdfs', 'likes', 'favorites',
+            'region',
+            'city',
+            'neighborhood',
+            'companyRegion',
+            'companyCity',
+            'companyNeighborhood',
+            'user',
+            'images',
+            'pdfs',
+            'likes',
+            'favorites',
         ])->orderBy('created_at', 'desc')->get();
         $jobs = JobResource::collection($jobQuery);
         return view('pages.dashboards.job.index', compact('jobs'));
@@ -78,5 +86,16 @@ class JobController extends Controller
         $response = $this->jobService->deleteJob($job);
 
         return $response;
+    }
+
+    public function changeStatus(Request $request, Job $job)
+    {
+        $request->validate([
+            'status' => 'in:public,private',
+        ]);
+
+        $job->update(['status' => $request->status]);
+
+        return back()->with('status', 'Job status updated successfully!');
     }
 }

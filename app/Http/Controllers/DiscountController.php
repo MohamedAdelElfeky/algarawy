@@ -18,7 +18,11 @@ class DiscountController extends Controller
     public function index()
     {
         $discounts = Discount::with([
-            'user', 'images', 'pdfs', 'likes', 'favorites',
+            'user',
+            'images',
+            'pdfs',
+            'likes',
+            'favorites',
         ])->orderBy('created_at', 'desc')->get();
         return view('pages.dashboards.discount.index', compact('discounts'));
     }
@@ -83,5 +87,16 @@ class DiscountController extends Controller
 
         return redirect()->route('discounts.index')
             ->with('success', 'Discount deleted successfully.');
+    }
+
+    public function changeStatus(Request $request, Discount $discount)
+    {
+        $request->validate([
+            'status' => 'in:public,private',
+        ]);
+
+        $discount->update(['status' => $request->status]);
+
+        return back()->with('status', 'Discount status updated successfully!');
     }
 }

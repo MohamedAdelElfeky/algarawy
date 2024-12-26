@@ -40,6 +40,16 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/p-password/reset',  [AuthController::class, 'PasswordReset']);
 
+Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
+Route::get('p-jobs', [JobController::class, 'index']); // Manually add index route
+Route::get('p-courses', [CourseController::class, 'index']);
+Route::get('p-meetings', [MeetingController::class, 'index']);
+Route::get('p-bank-accounts', [BankAccountController::class, 'index']);
+Route::get('p-projects', [ProjectController::class, 'index']);
+Route::get('p-discounts', [DiscountController::class, 'index']);
+Route::get('p-services', [ServiceController::class, 'index']);
+Route::get('p-job-application', [JobApplicationController::class, 'index']);
+
 Route::post('p-forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('pt-forgot-password', [PasswordResetLinkController::class, 'store']);
 
@@ -82,16 +92,24 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
     Route::get('/getNewNotifications', [NotificationController::class, 'getNewNotifications']);
     Route::put('/ChangeStatus', [JobController::class, 'ChangeStatus']);
 
-    Route::apiResources([
-        'p-jobs' => JobController::class, // jobs Resource
-        'p-courses' => CourseController::class, // courses Resource
-        'p-meetings' => MeetingController::class, // meetings Resource
-        'p-bank-accounts' => BankAccountController::class, // bank-accounts Resource
-        'p-projects' => ProjectController::class,
-        'p-discounts' => DiscountController::class,
-        'p-services' => ServiceController::class,
-        'p-job-application' => JobApplicationController::class,
-    ]);
+    // Route::apiResources([
+    //     'p-jobs' => JobController::class, // jobs Resource
+    //     'p-courses' => CourseController::class, // courses Resource
+    //     'p-meetings' => MeetingController::class, // meetings Resource
+    //     'p-bank-accounts' => BankAccountController::class, // bank-accounts Resource
+    //     'p-projects' => ProjectController::class,
+    //     'p-discounts' => DiscountController::class,
+    //     'p-services' => ServiceController::class,
+    //     'p-job-application' => JobApplicationController::class,
+    // ]);
+    Route::apiResource('p-jobs', JobController::class)->except(['index']);
+    Route::apiResource('p-courses', CourseController::class)->except(['index']);
+    Route::apiResource('p-meetings', MeetingController::class)->except(['index']);
+    Route::apiResource('p-bank-accounts', BankAccountController::class)->except(['index']);
+    Route::apiResource('p-projects', ProjectController::class)->except(['index']);
+    Route::apiResource('p-discounts', DiscountController::class)->except(['index']);
+    Route::apiResource('p-services', ServiceController::class)->except(['index']);
+    Route::apiResource('p-job-application', JobApplicationController::class)->except(['index']);
 
     Route::post('/toggle-block', [BlockedUserController::class, 'toggleBlock']);
     Route::get('/blocked-user', [BlockedUserController::class, 'getBlockedUsers']);
@@ -103,12 +121,11 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
     Route::get('/p-show-complaint/{type}/{id}', [ComplaintController::class, 'showComplaints']);
 
     Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
-    Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
     Route::post('/terms-and-conditions', [TermsAndConditionController::class, 'createOrUpdate']);
     Route::get('/terms-and-conditions/last', [TermsAndConditionController::class, 'getLastTermsAndCondition']);
     Route::post('/complaints/{complaintId}/edit', [ComplaintController::class, 'editComplaint']);
     Route::delete('/complaints/{complaintId}', [ComplaintController::class, 'deleteComplaint']);
-    
+
 
     // Search 
     Route::get('/p-projectsSearch', [ProjectController::class, 'search']);

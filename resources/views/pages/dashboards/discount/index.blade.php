@@ -71,8 +71,47 @@
                                                 <i class="path3"></i>
                                             </i>
                                         </button>
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#statusModal{{ $discount->id }}"> Change Status </button>
                                     </td>
                                 </tr>
+                                <!-- Modal -->
+                                <div class="modal fade" id="statusModal{{ $discount->id }}" tabindex="-1"
+                                    aria-labelledby="statusModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="statusModalLabel">Change discount Status
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <form id="statusForm{{ $discount->id }}" method="POST"
+                                                action="{{ route('discounts.changeStatus', $discount->id) }}"> @csrf
+                                                @method('PUT')
+                                                <div class="modal-body">
+                                                    <div class="form-group"> <label for="status">Status</label>
+                                                        <select id="status" name="status" class="form-control">
+                                                            <option value="private"
+                                                                {{ $discount->status == 'private' ? 'selected' : '' }}>
+                                                                Private</option>
+                                                            <option value="public"
+                                                                {{ $discount->status == 'public' ? 'selected' : '' }}>
+                                                                Public
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+
+                                                    <button type="submit" class="btn btn-primary">Update
+                                                        Status</button>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
                         </tbody>
                     </table>

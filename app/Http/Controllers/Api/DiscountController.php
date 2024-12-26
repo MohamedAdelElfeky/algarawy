@@ -7,6 +7,7 @@ use App\Services\DiscountService;
 use Illuminate\Http\Request;
 use App\Http\Resources\DiscountResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class DiscountController extends Controller
 {
@@ -19,11 +20,25 @@ class DiscountController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $discounts = $this->discountService->getAllDiscounts($perPage, $page);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1); 
+
+        $user = Auth::user();
+
+        if ($user) {
+            $discounts = $this->discountService->getAllDiscounts($perPage, $page);
+        } else {
+            $discounts = $this->discountService->getAllDiscountsPublic($perPage, $page);
+        }
+
         return response()->json($discounts, 200);
     }
+    // public function index(Request $request)
+    // {
+    //     $perPage = $request->header('per_page');
+    //     $page = $request->header('page');
+    //     return response()->json($discounts, 200);
+    // }
 
     public function getDiscounts(Request $request)
     {
@@ -32,7 +47,7 @@ class DiscountController extends Controller
         $discounts = $this->discountService->getAllDiscountsPublic($perPage, $page);
         return response()->json($discounts, 200);
     }
-    
+
     public function show($id)
     {
         $discount = $this->discountService->getDiscountById($id);

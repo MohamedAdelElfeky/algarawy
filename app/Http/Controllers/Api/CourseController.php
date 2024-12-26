@@ -7,6 +7,7 @@ use App\Http\Resources\CourseResource;
 use App\Services\CourseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
@@ -19,12 +20,28 @@ class CourseController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $courses = $this->courseService->getAllCourses($perPage, $page);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $courses = $this->courseService->getAllCourses($perPage, $page);
+        } else {
+            $courses = $this->courseService->getAllCoursesPublic($perPage, $page);
+        }
+
         return response()->json($courses, 200);
     }
-    
+
+    // public function index(Request $request)
+    // {
+    //     $perPage = $request->header('per_page');
+    //     $page = $request->header('page');
+    //     $courses = $this->courseService->getAllCourses($perPage, $page);
+    //     return response()->json($courses, 200);
+    // }
+
     public function getCourses(Request $request)
     {
         $perPage = $request->header('per_page');

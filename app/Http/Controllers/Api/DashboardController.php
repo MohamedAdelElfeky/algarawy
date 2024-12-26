@@ -26,8 +26,9 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // If the user is not logged in, show only public data
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return $this->getPublicData();
         }
 
         // Get the user's preference for showing posts without complaints
@@ -58,23 +59,19 @@ class DashboardController extends Controller
         $discounts = DiscountResource::collection($discountsQuery->paginate(5));
         $services = ServiceResource::collection($servicesQuery->paginate(5));
 
-        // $jobs = JobResource::collection(Job::paginate(5));
-        // $courses = CourseResource::collection(Course::paginate(5));
-        // $projects = ProjectResource::collection(Project::paginate(5));
-        // $meetings =   MeetingResource::collection(Meeting::paginate(5));
-        // $discounts = DiscountResource::collection(Discount::paginate(5));
-        // $services = ServiceResource::collection(Service::paginate(5));
         $oneRowArray = [
+            'Job' => $jobs,
             'Course' => $courses,
             'Project' => $projects,
             'Meeting' => $meetings,
             'Discount' => $discounts,
             'Service' => $services,
-            // 'الوظيفة' => $jobs,
         ];
+
         $result = [
             "date" => [],
         ];
+
         foreach ($oneRowArray as $type => $data) {
             $formattedData = [
                 "type" => $type,
@@ -83,7 +80,47 @@ class DashboardController extends Controller
 
             $result["date"][] = $formattedData;
         }
-        // $jsonResult = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        return $result;
+    }
+
+    /**
+     * Get public data for non-authenticated users.
+     *
+     * @return array
+     */
+    private function getPublicData()
+    {
+        // Fetch data with public status
+        $jobs = JobResource::collection(Job::where('status', 'public')->paginate(5));
+        $courses = CourseResource::collection(Course::where('status', 'public')->paginate(5));
+        $projects = ProjectResource::collection(Project::where('status', 'public')->paginate(5));
+        $meetings = MeetingResource::collection(Meeting::where('status', 'public')->paginate(5));
+        $discounts = DiscountResource::collection(Discount::where('status', 'public')->paginate(5));
+        $services = ServiceResource::collection(Service::where('status', 'public')->paginate(5));
+
+        $oneRowArray = [
+            'Job' => $jobs,
+            'Course' => $courses,
+            'Project' => $projects,
+            'Meeting' => $meetings,
+            'Discount' => $discounts,
+            'Service' => $services,
+        ];
+
+        $result = [
+            "date" => [],
+        ];
+
+        foreach ($oneRowArray as $type => $data) {
+            $formattedData = [
+                "type" => $type,
+                "data" => $data,
+            ];
+
+            $result["date"][] = $formattedData;
+        }
+
         return $result;
     }
 
