@@ -27,13 +27,30 @@ class JobController extends Controller
 
         $user = Auth::user();
 
+        $user = Auth::guard('sanctum')->user();
+
         if ($user) {
-            $jobs = $this->jobService->getAllJobs($perPage, $page);
+            return redirect()->route('jobs.authenticated', ['perPage' => $perPage, 'page' => $page]);
         } else {
             $jobs = $this->jobService->getAllJobsPublic($perPage, $page);
         }
 
         return response()->json($jobs, 200);
+    }
+
+    public function getAuthenticatedJobs(Request $request)
+    {
+        $perPage = $request->query('perPage', 10);
+        $page = $request->query('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $jobs = $this->jobService->getAllJobs($perPage, $page);
+            return response()->json($jobs, 200);
+        } else {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
     }
 
     public function show($id)

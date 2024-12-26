@@ -21,16 +21,32 @@ class ServiceController extends Controller
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
 
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
 
         if ($user) {
-            $services = $this->serviceService->getAllServices($perPage, $page);
+            return redirect()->route('services.authenticated', ['perPage' => $perPage, 'page' => $page]);
         } else {
             $services = $this->serviceService->getAllServicesPublic($perPage, $page);
         }
 
         return response()->json($services, 200);
     }
+
+    public function getAuthenticatedServices(Request $request)
+    {
+        $perPage = $request->query('perPage', 10);
+        $page = $request->query('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $services = $this->serviceService->getAllServices($perPage, $page);
+            return response()->json($services, 200);
+        } else {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+    }
+
     // public function index(Request $request)
     // {
     //     $perPage = $request->header('per_page');

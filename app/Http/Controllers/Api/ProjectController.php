@@ -22,15 +22,30 @@ class ProjectController extends Controller
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
 
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
 
         if ($user) {
-            $projects = $this->projectService->getAllProjects($perPage, $page);
+            return redirect()->route('projects.authenticated', ['perPage' => $perPage, 'page' => $page]);
         } else {
             $projects = $this->projectService->getAllProjectsPublic($perPage, $page);
         }
 
         return response()->json($projects, 200);
+    }
+
+    public function getAuthenticatedProjects(Request $request)
+    {
+        $perPage = $request->query('perPage', 10);
+        $page = $request->query('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $projects = $this->projectService->getAllProjects($perPage, $page);
+            return response()->json($projects, 200);
+        } else {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
     }
 
     // public function index(Request $request)

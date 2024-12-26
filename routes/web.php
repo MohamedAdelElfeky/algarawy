@@ -76,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
     Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
     Route::put('/courses/{course}/change-status', [CourseController::class, 'changeStatus'])->name('courses.changeStatus');
-    Route::put('/projects/{project}/change-status', [CourseController::class, 'changeStatus'])->name('projects.changeStatus');
+    Route::put('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.changeStatus');
 });
 
 Route::get('/error', function () {

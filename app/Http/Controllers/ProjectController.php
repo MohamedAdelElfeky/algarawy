@@ -53,7 +53,6 @@ class ProjectController extends Controller
         $request->validate([
             'status' => 'in:public,private',
         ]);
-
         $project->update(['status' => $request->status]);
 
         return back()->with('status', 'Project status updated successfully!');

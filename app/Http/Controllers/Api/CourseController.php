@@ -23,15 +23,30 @@ class CourseController extends Controller
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
 
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
 
         if ($user) {
-            $courses = $this->courseService->getAllCourses($perPage, $page);
+            return redirect()->route('courses.authenticated', ['perPage' => $perPage, 'page' => $page]);
         } else {
             $courses = $this->courseService->getAllCoursesPublic($perPage, $page);
         }
 
         return response()->json($courses, 200);
+    }
+
+    public function getAuthenticatedCourses(Request $request)
+    {
+        $perPage = $request->query('perPage', 10);
+        $page = $request->query('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $courses = $this->courseService->getAllCourses($perPage, $page);
+            return response()->json($courses, 200);
+        } else {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
     }
 
     // public function index(Request $request)
