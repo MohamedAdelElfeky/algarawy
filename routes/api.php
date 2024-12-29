@@ -40,6 +40,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/p-password/reset',  [AuthController::class, 'PasswordReset']);
 
+Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
 Route::get('p-jobs', [JobController::class, 'index']); // Manually add index route
 Route::get('p-courses', [CourseController::class, 'index']);
 Route::get('p-meetings', [MeetingController::class, 'index']);
@@ -110,13 +111,13 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
 
     // Route::get('p-job-application', [JobApplicationController::class, 'index']);
     // Route::get('p-bank-accounts', [BankAccountController::class, 'index']);
-    Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
     Route::get('/projects/authenticated', [ProjectController::class, 'getAuthenticatedProjects'])->name('projects.authenticated');
     Route::get('/jobs/authenticated', [JobController::class, 'getAuthenticatedJob'])->name('jobs.authenticated');
     Route::get('/courses/authenticated', [CourseController::class, 'getAuthenticatedCourses'])->name('courses.authenticated');
     Route::get('/meetings/authenticated', [MeetingController::class, 'getAuthenticatedMeetings'])->name('meetings.authenticated');
     Route::get('/discounts/authenticated', [DiscountController::class, 'getAuthenticatedDiscounts'])->name('discounts.authenticated');
     Route::get('/services/authenticated', [ServiceController::class, 'getAuthenticatedServices'])->name('services.authenticated');
+    Route::get('/getDataDashboard/authenticated', [DashboardController::class, 'getAuthenticatedDataDashboard'])->name('dashboard.authenticated');
 
     Route::post('/toggle-block', [BlockedUserController::class, 'toggleBlock']);
     Route::get('/blocked-user', [BlockedUserController::class, 'getBlockedUsers']);

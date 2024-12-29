@@ -21,16 +21,65 @@ class DashboardController extends Controller
 {
 
 
+    public function getAuthenticatedDataDashboard()
+    {
+        return $this->getData();
+    }
 
     public function getDataDashboard()
     {
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
 
-        // If the user is not logged in, show only public data
-        if (!$user) {
+        if ($user) {
+            return redirect()->route('dashboard.authenticated');
+        } else {
             return $this->getPublicData();
         }
+    }
 
+    /**
+     * Get public data for non-authenticated users.
+     *
+     * @return array
+     */
+    private function getPublicData()
+    {
+        // Fetch data with public status
+        $jobs = JobResource::collection(Job::where('status', 'public')->paginate(5));
+        $courses = CourseResource::collection(Course::where('status', 'public')->paginate(5));
+        $projects = ProjectResource::collection(Project::where('status', 'public')->paginate(5));
+        $meetings = MeetingResource::collection(Meeting::where('status', 'public')->paginate(5));
+        $discounts = DiscountResource::collection(Discount::where('status', 'public')->paginate(5));
+        $services = ServiceResource::collection(Service::where('status', 'public')->paginate(5));
+
+        $oneRowArray = [
+            'Job' => $jobs,
+            'Course' => $courses,
+            'Project' => $projects,
+            'Meeting' => $meetings,
+            'Discount' => $discounts,
+            'Service' => $services,
+        ];
+
+        $result = [
+            "date" => [],
+        ];
+
+        foreach ($oneRowArray as $type => $data) {
+            $formattedData = [
+                "type" => $type,
+                "data" => $data,
+            ];
+
+            $result["date"][] = $formattedData;
+        }
+
+        return $result;
+    }
+
+    private function getData()
+    {
+        $user = Auth::user();
         // Get the user's preference for showing posts without complaints
         $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
@@ -85,46 +134,6 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get public data for non-authenticated users.
-     *
-     * @return array
-     */
-    private function getPublicData()
-    {
-        // Fetch data with public status
-        $jobs = JobResource::collection(Job::where('status', 'public')->paginate(5));
-        $courses = CourseResource::collection(Course::where('status', 'public')->paginate(5));
-        $projects = ProjectResource::collection(Project::where('status', 'public')->paginate(5));
-        $meetings = MeetingResource::collection(Meeting::where('status', 'public')->paginate(5));
-        $discounts = DiscountResource::collection(Discount::where('status', 'public')->paginate(5));
-        $services = ServiceResource::collection(Service::where('status', 'public')->paginate(5));
-
-        $oneRowArray = [
-            'Job' => $jobs,
-            'Course' => $courses,
-            'Project' => $projects,
-            'Meeting' => $meetings,
-            'Discount' => $discounts,
-            'Service' => $services,
-        ];
-
-        $result = [
-            "date" => [],
-        ];
-
-        foreach ($oneRowArray as $type => $data) {
-            $formattedData = [
-                "type" => $type,
-                "data" => $data,
-            ];
-
-            $result["date"][] = $formattedData;
-        }
-
-        return $result;
-    }
-
-    /**
      * Apply the complaint filter to the query based on user preferences.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -135,7 +144,7 @@ class DashboardController extends Controller
     {
         if ($showNoComplaintedPosts) {
             $query->whereDoesntHave('complaints', function ($query) use ($user) {
-                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+                $query->where('user_id', '=', $user->id); // Exclude user complaints
             });
         } else {
             $query->has('complaints');

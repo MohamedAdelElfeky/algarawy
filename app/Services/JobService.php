@@ -36,7 +36,7 @@ class JobService
 
         if ($showNoComplaintedPosts) {
             $jobQuery->whereDoesntHave('complaints', function ($query) use ($user) {
-                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+                $query->where('user_id', '=', $user->id); // Exclude user complaints
             });
         } else {
             $jobQuery->has('complaints');

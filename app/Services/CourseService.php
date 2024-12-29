@@ -187,7 +187,7 @@ class CourseService
 
         if ($showNoComplaintedPosts) {
             $courseQuery->whereDoesntHave('complaints', function ($query) use ($user) {
-                $query->where('user_id', '<>', $user->id); // Exclude user complaints
+                $query->where('user_id', '=', $user->id); // Exclude user complaints
             });
         } else {
             $courseQuery->has('complaints');
