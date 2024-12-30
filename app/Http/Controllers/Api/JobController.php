@@ -38,7 +38,7 @@ class JobController extends Controller
         return response()->json($jobs, 200);
     }
 
-    public function getAuthenticatedJobs(Request $request)
+    public function getAuthenticatedJob(Request $request)
     {
         $perPage = $request->query('perPage', 10);
         $page = $request->query('page', 1);
