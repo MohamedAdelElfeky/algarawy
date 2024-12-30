@@ -32,11 +32,12 @@ class DiscountService
         $discountQuery = Discount::whereNotIn('user_id', $blockedUserIds)
             ->orderBy('created_at', 'desc');
         if ($showNoComplaintedPosts) {
-            $discountQuery->whereDoesntHave('complaints', function ($query) use ($user) {
-                $query->where('user_id', '=', $user->id); // Exclude user complaints
+            $discountQuery->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhereDoesntHave('complaints'); 
             });
         } else {
-            $discountQuery->has('complaints');
+            $discountQuery;//->has('complaints');
         }
         $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
         $discountResource = DiscountResource::collection($discounts);

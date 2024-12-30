@@ -47,6 +47,7 @@ Route::get('p-meetings', [MeetingController::class, 'index']);
 Route::get('p-projects', [ProjectController::class, 'index']);
 Route::get('p-discounts', [DiscountController::class, 'index']);
 Route::get('p-services', [ServiceController::class, 'index']);
+Route::get('/terms-and-conditions/last', [TermsAndConditionController::class, 'getLastTermsAndCondition']);
 
 Route::post('p-forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('pt-forgot-password', [PasswordResetLinkController::class, 'store']);
@@ -130,7 +131,6 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
 
     Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
     Route::post('/terms-and-conditions', [TermsAndConditionController::class, 'createOrUpdate']);
-    Route::get('/terms-and-conditions/last', [TermsAndConditionController::class, 'getLastTermsAndCondition']);
     Route::post('/complaints/{complaintId}/edit', [ComplaintController::class, 'editComplaint']);
     Route::delete('/complaints/{complaintId}', [ComplaintController::class, 'deleteComplaint']);
 

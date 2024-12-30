@@ -35,11 +35,12 @@ class ProjectService
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {
-            $projectQuery->whereDoesntHave('complaints', function ($query) use ($user) {
-                $query->where('user_id', '=', $user->id); // Exclude user complaints
+            $projectQuery->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhereDoesntHave('complaints'); 
             });
         } else {
-            $projectQuery->has('complaints');
+            $projectQuery; //->whereHas('complaints'); 
         }
         $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
         $projectResource = ProjectResource::collection($projects);

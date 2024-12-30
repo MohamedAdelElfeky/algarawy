@@ -10,5 +10,6 @@ class support extends Model
     use HasFactory;
     protected $fillable = [
         'number',
+        'email'
     ];
 }

@@ -18,8 +18,10 @@ class SupportController extends Controller
     public function addOrUpdateNumber(Request $request)
     {
         $number = $request->input('number');
+        $email = $request->input('email');  
         $support = support::updateOrCreate(
-            ['number' => $number]
+            ['number' => $number],
+            ['email' => $email]  
         );
 
         return response()->json(['message' => 'تم إضافة / تحديث الرقم بنجاح']);
