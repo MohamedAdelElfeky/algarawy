@@ -12,18 +12,24 @@ class SupportController extends Controller
     {
         $supportRecord = Support::first();
         $number = $supportRecord ? $supportRecord->number : null;
-        return view('pages.dashboards.support.index', compact('number'));
+        $email = $supportRecord ? $supportRecord->email : null;
+        return view('pages.dashboards.support.index', compact('number', 'email'));
     }
 
     public function addOrUpdateNumber(Request $request)
     {
         $number = $request->input('number');
-        $email = $request->input('email');  
-        $support = support::updateOrCreate(
-            ['number' => $number],
-            ['email' => $email]  
-        );
+        $email = $request->input('email');
 
-        return response()->json(['message' => 'تم إضافة / تحديث الرقم بنجاح']);
+        // Delete all existing records to ensure only one record exists
+        Support::truncate();
+
+        // Create a new record with the provided data
+        Support::create([
+            'number' => $number,
+            'email' => $email,
+        ]);
+
+        return redirect()->route('support')->with('success', 'تم إضافة / تحديث الرقم بنجاح');
     }
 }
