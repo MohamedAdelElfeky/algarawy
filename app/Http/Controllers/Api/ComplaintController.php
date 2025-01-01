@@ -62,7 +62,6 @@ class ComplaintController extends Controller
     {
         $user = Auth::user();
         $complaint = Complaint::find($complaintId);
-
         // Check if the complaint exists and belongs to the logged-in user
         if (!$complaint || $complaint->user_id !== $user->id) {
             return response()->json(['message' => 'الشكوى غير موجودة أو لا تمتلكها'], 404);
@@ -85,7 +84,6 @@ class ComplaintController extends Controller
         $user = Auth::user();
         $complaint = Complaint::find($complaintId);
 
-        // Check if the complaint exists and belongs to the logged-in user
         if (!$complaint || $complaint->user_id !== $user->id) {
             return response()->json(['message' => 'الشكوى غير موجودة أو لا تمتلكها'], 404);
         }
