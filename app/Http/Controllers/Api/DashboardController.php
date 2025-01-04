@@ -143,11 +143,15 @@ class DashboardController extends Controller
     private function applyComplaintFilter($query, $showNoComplaintedPosts, $user)
     {
         if ($showNoComplaintedPosts) {
-            $query->whereDoesntHave('complaints', function ($query) use ($user) {
-                $query->where('user_id', '=', $user->id); // Exclude user complaints
+            $query->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhereDoesntHave('complaints'); 
             });
+            // $query->whereDoesntHave('complaints', function ($query) use ($user) {
+            //     $query->where('user_id', '=', $user->id); // Exclude user complaints
+            // });
         } else {
-            $query->has('complaints');
+            $query;
         }
 
         return $query;
