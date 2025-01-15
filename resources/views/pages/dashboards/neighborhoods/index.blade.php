@@ -24,8 +24,9 @@
                             @foreach ($neighborhoods as $neighborhood)
                                 <tr>
                                     <td>{{ $neighborhood->name }}</td>
-                                    <td>{{ $neighborhood->city->region->name }}</td>
-                                    <td>{{ $neighborhood->city->name }}</td>
+                                    <td>{{ optional(optional($neighborhood->city)->region)->name ?? '-' }}</td>
+                                    <td>{{ optional($neighborhood->city)->name ?? '-' }}</td>
+
                                     <td>
                                         <button
                                             class="delete-neighborhood-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"
@@ -50,7 +51,7 @@
     @section('script')
         <script>
             $(document).ready(function() {
-                $('#neighborhoodForm').submit(function(e) { 
+                $('#neighborhoodForm').submit(function(e) {
                     e.preventDefault();
                     var formData = $(this).serialize();
                     $.ajax({

@@ -16,5 +16,6 @@ class RegionSeeder extends Seeder
         Region::create(['name' => 'الشرقية']);
         Region::create(['name' => 'الشمالية']);
         Region::create(['name' => 'الغربية']);
+        Region::create(['name' => 'أخري']);
     }
 }

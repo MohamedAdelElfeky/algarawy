@@ -23,7 +23,7 @@
                             @foreach ($cities as $city)
                                 <tr>
                                     <td>{{ $city->name }}</td>
-                                    <td>{{ $city->region->name }}</td>
+                                    <td>{{ optional($city->region)->name ?? '-' }}</td>
                                     <td>
                                         <button
                                             class="delete-city-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"

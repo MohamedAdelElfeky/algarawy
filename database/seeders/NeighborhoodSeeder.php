@@ -17,5 +17,6 @@ class NeighborhoodSeeder extends Seeder
         Neighborhood::create(['name' => 'الشهابية', 'city_id' => 2]);
         Neighborhood::create(['name' => 'صويدرة', 'city_id' => 3]);
         Neighborhood::create(['name' => 'الرقيقة', 'city_id' => 4]);
+        Neighborhood::create(['name' => 'أخري', 'city_id' => null]);
     }
 }

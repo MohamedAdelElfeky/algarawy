@@ -22,5 +22,7 @@ class CitySeeder extends Seeder
         City::create(['name' => 'الدمام', 'region_id' =>  1]);
         City::create(['name' => 'جدة', 'region_id' =>  1]);
         City::create(['name' => 'المدينة المنورة', 'region_id' =>  2]);
+        City::create(['name' => 'أخري', 'region_id' =>  null]);
+
     }
 }
