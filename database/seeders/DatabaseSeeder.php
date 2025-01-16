@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
             ['id' => 8, 'name' => 'الدمام', 'region_id' => 1],
             ['id' => 9, 'name' => 'جدة', 'region_id' => 1],
             ['id' => 10, 'name' => 'المدينة المنورة', 'region_id' => 2],
-            ['id' => 11, 'name' => 'أخري', 'region_id' => null],
+            ['id' => 11, 'name' => 'أخري', 'region_id' => 5],
         ];
 
         foreach ($cities as $city) {
@@ -65,7 +65,7 @@ class DatabaseSeeder extends Seeder
             ['id' => 2, 'name' => 'الشهابية', 'city_id' => 2],
             ['id' => 3, 'name' => 'صويدرة', 'city_id' => 3],
             ['id' => 4, 'name' => 'الرقيقة', 'city_id' => 4],
-            ['id' => 5, 'name' => 'أخري', 'city_id' => null],
+            ['id' => 5, 'name' => 'أخري', 'city_id' => 11],
         ];
 
         foreach ($neighborhoods as $neighborhood) {
