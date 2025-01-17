@@ -18,7 +18,7 @@ class DiscountResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
+            'images_or_videos' => $this->images ? ImageResource::collection($this->images) :  [asset('default.png')],
             'location' => $this->location,
             'discount' => $this->discount,
             'price' => $this->price,

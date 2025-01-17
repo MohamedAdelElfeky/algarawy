@@ -42,7 +42,7 @@ class JobResource extends JsonResource
             'price' => $this->price,
             'job_status' => $this->job_status,
 
-            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
+            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : [asset('default.png')],
             'files' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
 
             'user' => new UserResource($this->user),
