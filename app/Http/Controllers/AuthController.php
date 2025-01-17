@@ -76,10 +76,6 @@ class AuthController extends Controller
             $imagePathBack = "user/" . $file_name_back;
         }
 
-
-        $region = Region::findOrFail($request->input('region_id'));
-        $city = City::findOrFail($request->input('city_id'));
-        $neighborhood = Neighborhood::findOrFail($request->input('neighborhood_id'));
         // Create the user
         $user = User::create([
             'first_name' => $request->input('first_name'),
@@ -92,9 +88,9 @@ class AuthController extends Controller
             'national_id' => $request->input('national_id'),
             'avatar' => $imagePathAvatar,
             'card_images' => $request->input('card_images'),
-            'region_id' => $region->id,
-            'city_id' => $city->id,
-            'neighborhood_id' => $neighborhood->id,
+            'region_id' => $request->input('region_id'),
+            'city_id' => $request->input('city_id'),
+            'neighborhood_id' =>$request->input('neighborhood_id'),
             'national_card_image_front' => $imagePathFront,
             'national_card_image_back' => $imagePathBack,
         ]);
