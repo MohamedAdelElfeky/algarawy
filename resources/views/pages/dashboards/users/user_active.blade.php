@@ -31,7 +31,7 @@
                                     <td>{{ $user->last_name }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->phone }}</td>
-                                    <td>{{ $user->region->name . ' ' . $user->region->city . ' ' . $user->neighborhood->name }}
+                                    {{ optional($user->region)->name . ' ' . optional($user->region)->city . ' ' . optional($user->neighborhood)->name }}
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">

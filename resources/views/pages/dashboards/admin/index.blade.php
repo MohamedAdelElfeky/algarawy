@@ -36,11 +36,7 @@
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->phone }}</td>
                                     <td>
-                                        @if ($user->region && $user->neighborhood)
-                                            {{ $user->region->name . ' ' . $user->region->city . ' ' . $user->neighborhood->name }}
-                                        @else
-                                            N/A
-                                        @endif
+                                        {{ optional($user->region)->name . ' ' . optional($user->region)->city . ' ' . optional($user->neighborhood)->name }}
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
