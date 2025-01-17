@@ -17,14 +17,16 @@ class ProjectResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'images_or_videos' => $this->images ? ImageResource::collection($this->images) :  [asset('default.png')],
+            'images_or_videos' => $this->images && $this->images->isNotEmpty()
+                ? ImageResource::collection($this->images)
+                : [asset('default.png')],
             'files' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
             'location' => $this->location,
             'user' => new UserResource($this->user),
-            
+
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'count_favorite' => $this->favorites->where('favoritable_id', $this->id)->count() > 0,
-            
+
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,
             'count_like' => $this->likes->where('likable_id', $this->id)->count(),
 

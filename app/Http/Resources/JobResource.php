@@ -17,7 +17,7 @@ class JobResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,  
+            'id' => $this->id,
             'description' => $this->description,
             'title' => $this->title,
 
@@ -42,7 +42,9 @@ class JobResource extends JsonResource
             'price' => $this->price,
             'job_status' => $this->job_status,
 
-            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : [asset('default.png')],
+            'images_or_videos' => $this->images && $this->images->isNotEmpty()
+                ? ImageResource::collection($this->images)
+                : [asset('default.png')],
             'files' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
 
             'user' => new UserResource($this->user),
@@ -56,7 +58,7 @@ class JobResource extends JsonResource
             'complaint' => $this->complaints->where('user_id', Auth::id())->where('complaintable_id', $this->id)->count() > 0,
             'count_complaint' => $this->complaints->where('complaintable_id', $this->id)->count(),
 
-            'count_apply_job' =>$this->count_of_applications, // JobApplication::where('job_id',$this->id)->count(),
+            'count_apply_job' => $this->count_of_applications, // JobApplication::where('job_id',$this->id)->count(),
             'status' => $this->status,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),

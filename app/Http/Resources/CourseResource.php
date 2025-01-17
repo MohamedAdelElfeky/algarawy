@@ -18,7 +18,9 @@ class CourseResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : [asset('images/default.png')],
+            'images_or_videos' => $this->images && $this->images->isNotEmpty()
+                ? ImageResource::collection($this->images)
+                : [asset('default.png')],
             'files' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
             'location' => $this->location,
             'discount' => $this->discount,
@@ -34,7 +36,7 @@ class CourseResource extends JsonResource
             'complaint' => $this->complaints->where('user_id', Auth::id())->where('complaintable_id', $this->id)->count() > 0,
             'count_complaint' => $this->complaints->where('complaintable_id', $this->id)->count(),
             'status' => $this->status,
-            
+
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
