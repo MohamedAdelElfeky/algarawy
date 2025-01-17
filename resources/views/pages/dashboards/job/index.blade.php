@@ -57,14 +57,22 @@
                                             </div>
                                         </div>
                                     </td>
+                                    <!-- Job Location -->
                                     <td>
-                                        {{ ($job->region ? $job->region->name : '') . ' ' . ($job->city ? $job->city->name : '') . ' ' . ($job->neighborhood ? $job->neighborhood->name : '') }}
+                                        {{ optional($job->region)->name . ' ' . optional($job->city)->name . ' ' . optional($job->neighborhood)->name }}
                                     </td>
-                                    <td>{{ $job->company_name }}</td>
-                                    <td>{{ $job->company_description }}</td>
+
+                                    <!-- Company Name -->
+                                    <td>{{ $job->company_name ?? 'N/A' }}</td>
+
+                                    <!-- Company Description -->
+                                    <td>{{ $job->company_description ?? 'N/A' }}</td>
+
+                                    <!-- Company Location -->
                                     <td>
-                                        {{ ($job->companyRegion ? $job->companyRegion->name : '') . ' ' . ($job->companyCity ? $job->companyCity->name : '') . ' ' . ($job->companyNeighborhood ? $job->companyNeighborhood->name : '') }}
+                                        {{ optional($job->companyRegion)->name . ' ' . optional($job->companyCity)->name . ' ' . optional($job->companyNeighborhood)->name }}
                                     </td>
+
                                     <td>
                                         {{ $job->likes()->count() }}
                                     </td>
