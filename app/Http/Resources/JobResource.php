@@ -32,7 +32,7 @@ class JobResource extends JsonResource
             'company_link' => $this->company_link,
             'company_logo' => $this->company_logo
                 ?  $this->company_logo
-                : asset('default_logo.png'),
+                : asset('default.png'),
 
             'company_region' =>  new RegionResource($this->companyRegion),
             'company_city' =>  new CityResource($this->companyCity),
