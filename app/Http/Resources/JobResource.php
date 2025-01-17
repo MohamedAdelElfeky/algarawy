@@ -30,7 +30,9 @@ class JobResource extends JsonResource
             'company_location' => $this->company_location,
             'company_type' => $this->company_type,
             'company_link' => $this->company_link,
-            'company_logo' => $this->company_logo,
+            'company_logo' => $this->company_logo
+                ?  $this->company_logo
+                : asset('default_logo.png'),
 
             'company_region' =>  new RegionResource($this->companyRegion),
             'company_city' =>  new CityResource($this->companyCity),
@@ -42,9 +44,7 @@ class JobResource extends JsonResource
             'price' => $this->price,
             'job_status' => $this->job_status,
 
-            'images_or_videos' => $this->images && $this->images->isNotEmpty()
-                ? ImageResource::collection($this->images)
-                : [asset('default.png')],
+            'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
             'files' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
 
             'user' => new UserResource($this->user),
