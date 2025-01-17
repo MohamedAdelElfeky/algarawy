@@ -15,7 +15,7 @@
                             <input type="text" class="form-control" id="number" name="number"
                                 value="{{ $number ?? '' }}" required>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-4 hidden">
                             <label for="number" class="form-label">
                                 بريد الالكتروني لدعم كلمة السر
                             </label>
