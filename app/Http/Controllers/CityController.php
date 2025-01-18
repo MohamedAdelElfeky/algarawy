@@ -31,11 +31,14 @@ class CityController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
+
         $name = $request->input('name');
         $region_id = $request->input('region_id');
         City::updateOrCreate(
             ['name' => $name, 'region_id' => $region_id]
         );
+        return response()->json(['message' => 'تم إضافة / تحديث الرقم بنجاح']);
     }
 
     /**
@@ -59,7 +62,11 @@ class CityController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $name = $request->input('name');
+        $region_id = $request->input('region_id');
+        City::updateOrCreate(
+            ['name' => $name, 'region_id' => $region_id]
+        );
     }
 
     /**

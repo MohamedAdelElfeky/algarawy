@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class City extends Model
 {
-    use HasFactory , SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $fillable = ['name', 'region_id'];
     public function region()
     {
@@ -18,5 +18,4 @@ class City extends Model
     {
         return $this->hasMany(Neighborhood::class);
     }
-
 }

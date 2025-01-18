@@ -11,8 +11,8 @@
                     <div class="fv-row mb-8">
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="fs-6 fw-semibold mb-2">اسم الحي</label>
-                                <input type="text" class="form-control form-control-solid" placeholder="اسم الحي"
+                                <label class="fs-6 fw-semibold mb-2">اسم المدينة</label>
+                                <input type="text" class="form-control form-control-solid" placeholder="اسم المدينة"
                                     name="name" required />
                             </div>
                             <div class="col-md-6">

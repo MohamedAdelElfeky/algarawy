@@ -51,6 +51,7 @@
                 $('#cityForm').submit(function(e) {
                     e.preventDefault();
                     var formData = $(this).serialize();
+                    alert(formData);
                     $.ajax({
                         type: 'put',
                         url: 'cities/create',
