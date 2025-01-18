@@ -137,7 +137,7 @@ class UserController extends Controller
                 $query->where('user_id', '=', $user->id); // Exclude user complaints
             });
         } else {
-            $query->has('complaints');
+            $query;//->has('complaints');
         }
 
         return $query;

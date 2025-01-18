@@ -6,7 +6,7 @@ use App\Models\Otp;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 
-class PasswordResetController extends Controller
+class fvPasswordResetController extends Controller
 {
     use ResetsPasswords;
 

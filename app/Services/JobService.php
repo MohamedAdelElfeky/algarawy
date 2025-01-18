@@ -40,7 +40,7 @@ class JobService
                     ->orWhereDoesntHave('complaints'); 
             });
         } else {
-            $jobQuery->has('complaints');
+            $jobQuery;
         }
 
         $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
