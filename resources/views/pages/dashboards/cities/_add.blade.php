@@ -1,4 +1,4 @@
-<div class="modal fade" id="kt_modal_neighborhood" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="kt_modal_city" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog mw-650px">
         <div class="modal-content">
             <div class="modal-header pb-0 border-0 justify-content-end">
@@ -7,7 +7,7 @@
                 </button>
             </div>
             <div class="modal-body scroll-y mx-5 mx-xl-18 pt-0 pb-15">
-                <form id="neighborhoodForm">
+                <form id="cityForm">
                     <div class="fv-row mb-8">
                         <div class="row">
                             <div class="col-md-6">

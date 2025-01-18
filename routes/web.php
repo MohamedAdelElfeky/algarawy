@@ -29,11 +29,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::get('/request-otp', [PasswordResetController::class, 'requestOtpForm'])->name('password.request_otp');
-Route::post('/request-otp', [PasswordResetController::class, 'sendOtp'])->name('password.send_otp');
-Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
-Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp'])->name('password.verify_otp');
+// Route::get('/request-otp', [PasswordResetController::class, 'requestOtpForm'])->name('password.request_otp');
+// Route::post('/request-otp', [PasswordResetController::class, 'sendOtp'])->name('password.send_otp');
+// Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+// Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
+// Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp'])->name('password.verify_otp');
 
 require __DIR__ . '/auth.php';
 

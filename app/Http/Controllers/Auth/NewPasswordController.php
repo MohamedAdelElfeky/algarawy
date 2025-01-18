@@ -18,9 +18,13 @@ class NewPasswordController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
-    public function create(Request $request)
+    public function create(Request $request, $token)
     {
-        return view('pages.auth.reset-password', ['request' => $request]);
+        // Extract token and email from the query parameters
+        $email = $request->query('email');
+
+        // Pass token and email to the view
+        return view('pages.auth.reset-password', compact('token', 'email'));
     }
 
     /**
@@ -33,15 +37,14 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate the incoming request
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
+        //  dd($request->all());
+        // Attempt to reset the user's password
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) use ($request) {
@@ -50,16 +53,19 @@ class NewPasswordController extends Controller
                     'remember_token' => Str::random(60),
                 ])->save();
 
-                event(new PasswordReset($user));
+                event(new PasswordReset($user));  // Optional event to notify user
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
-        return $status == Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                            ->withErrors(['email' => __($status)]);
+        // Check the result of the reset operation
+        if ($status == Password::PASSWORD_RESET) {
+            // If password reset is successful, redirect to login
+            return redirect()->route('login')->with('status', __('Your password has been reset successfully.'));
+        }
+
+        // If password reset fails, return back with input and error message
+        return back()
+            ->withInput($request->only('email'))  // Preserving the email field
+            ->withErrors(['email' => __('The provided password reset token is invalid.')]);  // Show the error message
     }
 }
