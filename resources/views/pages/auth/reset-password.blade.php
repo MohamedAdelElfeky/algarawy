@@ -9,7 +9,20 @@
     <form method="POST" action="{{ route('password.update') }}">
         {{-- <form class="form w-100" novalidate="novalidate" id="kt_sign_in_form" data-kt-redirect-url="{{ route('login') }}" action="password.update"> --}}
             @csrf
+            <div class="text-center mb-11">
+                <!--begin::Title-->
+                <h1 class="text-dark fw-bolder mb-3">
+                        تعيين كلمة المرور  .
 
+                </h1>
+                <!--end::Title-->
+    
+                <!--begin::Subtitle-->
+                {{-- <div class="text-gray-500 fw-semibold fs-6">
+                    Your Social Campaigns
+                </div> --}}
+                <!--end::Subtitle--->
+            </div>
         <!-- Password Reset Token -->
         <input type="hidden" name="token" value="{{ $token }}">
         <input type="hidden" name="email" value="{{ $email }}">

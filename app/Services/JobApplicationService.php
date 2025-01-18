@@ -83,7 +83,7 @@ class JobApplicationService
     {
         $userId = Auth::id();
 
-        $jobApplications = JobApplication::where('job_id', $jobId)->where('user_id', $userId)
+        $jobApplications = JobApplication::where('job_id', $jobId)
             ->get();
 
         return JobApplication2Resource::collection($jobApplications);
