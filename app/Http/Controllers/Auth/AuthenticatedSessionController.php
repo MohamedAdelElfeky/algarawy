@@ -32,12 +32,19 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request)
     {
         $request->authenticate();
-
+    
+        $user = auth()->user();
+    
+        if ($user->admin !== 1) {
+            auth()->logout();
+            return redirect()->route('login')->with('error', 'You are not authorized to access the dashboard.');
+        }
+    
         $request->session()->regenerate();
-
-        // return redirect()->intended(RouteServiceProvider::HOME);
-        return redirect(route('dashboard'));
+    
+        return redirect()->route('dashboard');
     }
+    
 
     /**
      * Destroy an authenticated session.

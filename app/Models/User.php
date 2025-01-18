@@ -42,6 +42,7 @@ class User extends Authenticatable
         'birthdate_visibility',
         'email_visibility',
         'show_no_complainted_posts',
+        'admin',
 
     ];
 
@@ -62,6 +63,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
+
     ];
     public function favorites()
     {
