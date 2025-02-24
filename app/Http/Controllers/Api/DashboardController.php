@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
 
     public function getAuthenticatedDataDashboard()
     {
@@ -145,7 +149,7 @@ class DashboardController extends Controller
         if ($showNoComplaintedPosts) {
             $query->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                    ->orWhereDoesntHave('complaints'); 
+                    ->orWhereDoesntHave('complaints');
             });
             // $query->whereDoesntHave('complaints', function ($query) use ($user) {
             //     $query->where('user_id', '=', $user->id); // Exclude user complaints

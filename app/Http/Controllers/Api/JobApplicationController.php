@@ -17,6 +17,7 @@ class JobApplicationController extends Controller
 
     public function __construct(JobApplicationService $jobApplicationService)
     {
+        $this->middleware('auth:sanctum');
         $this->jobApplicationService = $jobApplicationService;
     }
 
@@ -32,7 +33,7 @@ class JobApplicationController extends Controller
 
         if ($existingJobApplication) {
             return response()->json(['message' => 'لقد تقدمت بالفعل لهذه الوظيفة.'], 403);
-        }        
+        }
         $jobApplication = $this->jobApplicationService->createJobApplication($request->all());
         return response()->json(['message' => $jobApplication], 201);
     }

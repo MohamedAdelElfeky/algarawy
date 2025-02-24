@@ -42,6 +42,7 @@ Route::get('/', [AuthenticatedSessionController::class, 'create'])
 Route::middleware('auth')->group(function () {
 
     Route::get('/users', [UserController::class, 'getAllUsers'])->name('users.index');
+    Route::get('/users', [UserController::class, 'show'])->name('user');
     Route::post('/toggle-user/{id}', [UserController::class, 'toggleUser']);
     Route::get('/admin', [UserController::class, 'admin'])->name('admin');
     Route::post('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');

@@ -14,6 +14,8 @@ class BankAccountController extends Controller
 
     public function __construct(BankAccountService $bankAccountService)
     {
+//        $this->middleware('optional.auth')->only('index');
+        $this->middleware('auth:sanctum');
         $this->bankAccountService = $bankAccountService;
     }
 

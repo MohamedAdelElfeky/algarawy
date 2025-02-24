@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
+use App\Domain\Models\Job;
+use App\Domain\Models\JobCompanies;
 use App\Http\Resources\JobResource;
 use App\Models\FilePdf;
 use App\Models\Image;
-use App\Models\Job;
-use Faker\Core\Number;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -37,7 +38,7 @@ class JobService
         if ($showNoComplaintedPosts) {
             $jobQuery->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                    ->orWhereDoesntHave('complaints'); 
+                    ->orWhereDoesntHave('complaints');
             });
         } else {
             $jobQuery;
@@ -76,39 +77,10 @@ class JobService
         return $job;
     }
 
-    public function createJob(array $data)
+    public function createJob(array $data, Request $request)
     {
-        $validator = Validator::make($data, [
-            'description' => 'nullable',
-            'title' => 'nullable',
-            'company_name' => 'nullable|string',
-            'company_location' => 'nullable|string|location',
-            'company_type' => 'nullable|string',
-            'company_link' => 'nullable|url',
-            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-            'job_type' => 'nullable|string',
-            'job_duration' => 'nullable',
-            'price' => 'nullable|numeric',
-            'job_status' => 'nullable|boolean',
-            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files.*' => 'nullable|file',
-            'region_id' => 'nullable|exists:regions,id',
-            'city_id' => 'nullable|exists:cities,id',
-            'neighborhood_id' => 'nullable|exists:neighborhoods,id',
-            'company_region_id' => 'nullable|exists:regions,id',
-            'company_city_id' => 'nullable|exists:cities,id',
-            'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
-            'is_training' => 'nullable',
-            'status' => 'nullable',
-        ]);
         $data['user_id'] = Auth::id();
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
         $imagePathCompanyLogo = "";
         if (request()->hasFile('company_logo')) {
             $imageCompanyLogo = request()->file('company_logo');
@@ -116,48 +88,81 @@ class JobService
             $imageCompanyLogo->move(public_path('job/img/'), $file_name_company_logo);
             $imagePathCompanyLogo = "job/img/" . $file_name_company_logo;
         }
-        $data['company_logo'] =  $imagePathCompanyLogo;
-        // Create a new job
-        $job = Job::create($data);
+
+        // Create Job Entry
+        $jobData = [
+            'description' => $data['description'] ?? null,
+            'title' => $data['title'] ?? null,
+            'type' => $data['job_type'] ?? null,
+            'duration' => $data['job_duration'] ?? null,
+            'is_training' => $data['is_training'] ?? null,
+            'price' => $data['price'] ?? null,
+            'job_status' => $data['job_status'] ?? null,
+            'user_id' => $data['user_id'],
+            'region_id' => $data['region_id'] ?? null,
+            'city_id' => $data['city_id'] ?? null,
+            'neighborhood_id' => $data['neighborhood_id'] ?? null,
+            'status' => $data['status'] ?? null,
+        ];
+        $job = Job::create($jobData);
+
+        // Create Job Company Entry
+        if (!empty($data['company_name'])) {
+            $jobCompanyData = [
+                'job_id' => $job->id,
+                'name' => $data['company_name'],
+                'location' => $data['company_location'] ?? null,
+                'description' => $data['description'] ?? null,
+                'type' => $data['company_type'] ?? null,
+                'link' => $data['company_link'] ?? null,
+                'region_id' => $data['company_region_id'] ?? null,
+                'city_id' => $data['company_city_id'] ?? null,
+                'neighborhood_id' => $data['company_neighborhood_id'] ?? null,
+            ];
+            $jobCompany = JobCompanies::create($jobCompanyData);
+
+            // Save Company Logo in JobCompanies
+            if ($imagePathCompanyLogo) {
+                $jobCompany->images()->create([
+                    'url' => $imagePathCompanyLogo,
+                    'mime' => 'image/jpeg',
+                    'image_type' => 'company_logo',
+                ]);
+            }
+        }
+
+        // Handle Images and Videos
         if (request()->hasFile('images_or_video')) {
-            foreach (request()->file('images_or_video') as $key => $item) {
-                $image = $data['images_or_video'][$key];
-                $imageType = $image->getClientOriginalExtension();
-                $mimeType = $image->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_job.' . $image->getClientOriginalExtension();
-                $image->move(public_path('job/images/'), $file_name);
+            foreach (request()->file('images_or_video') as $item) {
+                $file_name = time() . rand(0, 9999999999999) . '_job.' . $item->getClientOriginalExtension();
+                $item->move(public_path('job/images/'), $file_name);
                 $imagePath = "job/images/" . $file_name;
-                $imageObject = new Image([
+                $job->images()->create([
                     'url' => $imagePath,
-                    'mime' => $mimeType,
-                    'image_type' => $imageType,
+                    'mime' => $item->getMimeType(),
+                    'image_type' => $item->getClientOriginalExtension(),
                 ]);
-                $job->images()->save($imageObject);
             }
         }
 
-        // Handle images/videos
+        // Handle PDF and Other Files
         if (request()->hasFile('files')) {
-            foreach (request()->file('files') as $key => $item) {
-                $pdf = $data['files'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_job.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('job/files/'), $file_name);
+            foreach (request()->file('files') as $item) {
+                $file_name = time() . rand(0, 9999999999999) . '_job.' . $item->getClientOriginalExtension();
+                $item->move(public_path('job/files/'), $file_name);
                 $pdfPath = "job/files/" . $file_name;
-                $pdfObject = new FilePdf([
+                $job->pdfs()->create([
                     'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
+                    'mime' => $item->getMimeType(),
+                    'type' => $item->getClientOriginalExtension(),
                 ]);
-                $job->pdfs()->save($pdfObject);
             }
         }
 
-        return [
+        return response()->json([
             'message' => 'تم إنشاء الوظيفة بنجاح',
             'data' => new JobResource($job),
-        ];
+        ]);
     }
 
     public function updateJob(Job $job, array $data)

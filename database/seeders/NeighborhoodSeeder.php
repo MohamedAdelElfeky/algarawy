@@ -13,10 +13,26 @@ class NeighborhoodSeeder extends Seeder
      */
     public function run(): void
     {
-        Neighborhood::create(['name' => 'الصالحية', 'city_id' => 1]);
-        Neighborhood::create(['name' => 'الشهابية', 'city_id' => 2]);
-        Neighborhood::create(['name' => 'صويدرة', 'city_id' => 3]);
-        Neighborhood::create(['name' => 'الرقيقة', 'city_id' => 4]);
-        Neighborhood::create(['name' => 'أخري', 'city_id' => null]);
+        $neighborhoods = [
+            // أحياء الرياض
+            ['id' => 1, 'name' => 'حي العليا', 'city_id' => 1],
+            ['id' => 2, 'name' => 'حي النرجس', 'city_id' => 1],
+            // أحياء جدة
+            ['id' => 3, 'name' => 'حي النسيم', 'city_id' => 4],
+            ['id' => 4, 'name' => 'حي الفيصلية', 'city_id' => 4],
+            // أحياء الدمام
+            ['id' => 5, 'name' => 'حي الشاطئ', 'city_id' => 7],
+            ['id' => 6, 'name' => 'حي المزروعية', 'city_id' => 7],
+            // أحياء المدينة المنورة
+            ['id' => 7, 'name' => 'حي قربان', 'city_id' => 10],
+            ['id' => 8, 'name' => 'حي العيون', 'city_id' => 10],
+        ];
+
+        foreach ($neighborhoods as $neighborhood) {
+            Neighborhood::updateOrCreate(['id' => $neighborhood['id']], [
+                'name' => $neighborhood['name'],
+                'city_id' => $neighborhood['city_id'],
+            ]);
+        }
     }
 }

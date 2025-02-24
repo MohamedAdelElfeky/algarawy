@@ -14,6 +14,8 @@ class ProjectController extends Controller
 
     public function __construct(ProjectService $projectService)
     {
+        $this->middleware('optional.auth')->only('index');
+        $this->middleware('auth:sanctum')->except('index');
         $this->projectService = $projectService;
     }
 

@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
     public function toggleLike(Request $request, $type, $id)
     {
         $user = Auth::user();

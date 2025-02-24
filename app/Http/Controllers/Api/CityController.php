@@ -9,11 +9,17 @@ use App\Models\Region;
 
 class CityController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
+
     public function index()
     {
         $cities = City::all();
         return CityResource::collection($cities);
     }
+
     public function getCitiesByRegion(Region $region)
     {
         $cities = $region->cities;

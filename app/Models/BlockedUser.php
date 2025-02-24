@@ -16,7 +16,7 @@ class BlockedUser extends Model
     // Define the relationships
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(\App\Domain\Models\User::class, 'user_id');
     }
 
     public function blockedUser()

@@ -14,6 +14,8 @@ class ServiceController extends Controller
 
     public function __construct(ServiceService $serviceService)
     {
+        $this->middleware('optional.auth')->only('index');
+        $this->middleware('auth:sanctum')->except('index');
         $this->serviceService = $serviceService;
     }
     public function index(Request $request)

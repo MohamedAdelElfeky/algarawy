@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\JobRequest;
 use App\Http\Resources\JobResource;
 use App\Models\Job;
 use App\Models\JobApplication;
@@ -17,6 +18,7 @@ class JobController extends Controller
 
     public function __construct(JobService $jobService)
     {
+        $this->middleware('auth:sanctum');
         $this->jobService = $jobService;
     }
 
@@ -61,10 +63,10 @@ class JobController extends Controller
         }
         return response()->json(new JobResource($job), 200);
     }
-    public function store(Request $request)
+    public function store(JobRequest $request)
     {
-        $data = $request->all();
-        $job = $this->jobService->createJob($data);
+        $data = $request->validated();
+        $job = $this->jobService->createJob($data, $request);
         return response()->json($job, 201);
     }
     public function update(Request $request, $id)

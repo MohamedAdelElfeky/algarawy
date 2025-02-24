@@ -15,10 +15,10 @@ class Service extends Model
         'user_id',
         'status',
     ];
- 
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Domain\Models\User::class);
     }
     public function images(): MorphMany
     {
@@ -28,7 +28,7 @@ class Service extends Model
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
-    
+
     public function likes()
     {
         return $this->morphMany(Like::class, 'likable');

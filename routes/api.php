@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\Route;
 Route::POST('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-Route::post('/p-password/reset',  [AuthController::class, 'PasswordReset']);
+Route::post('/p-password/reset', [AuthController::class, 'PasswordReset']);
 
 Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
 Route::get('p-jobs', [JobController::class, 'index']); // Manually add index route
@@ -64,16 +64,16 @@ Route::get('/neighborhoods', [NeighborhoodController::class, 'index']);
 Route::get('/regions/{region}/cities', [CityController::class, 'getCitiesByRegion']);
 Route::get('/cities/{city}/neighborhoods', [NeighborhoodController::class, 'getNeighborhoodsByCity']);
 Route::get('/number-support', [UserController::class, 'numberSupport']);
-
-Route::prefix('public')->group(function () {
-    Route::get('/jobs', [JobController::class, 'getJobs']);
-    Route::get('/courses', [CourseController::class, 'getCourses']);
-    Route::get('/meetings', [MeetingController::class, 'getMeetings']);
-    Route::get('/projects', [ProjectController::class, 'getProjects']);
-    Route::get('/discounts', [DiscountController::class, 'getDiscounts']);
-    Route::get('/services', [ServiceController::class, 'getServices']);
-});
-Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
+//
+//Route::prefix('public')->group(function () {
+//    Route::get('/jobs', [JobController::class, 'getJobs']);
+//    Route::get('/courses', [CourseController::class, 'getCourses']);
+//    Route::get('/meetings', [MeetingController::class, 'getMeetings']);
+//    Route::get('/projects', [ProjectController::class, 'getProjects']);
+//    Route::get('/discounts', [DiscountController::class, 'getDiscounts']);
+//    Route::get('/services', [ServiceController::class, 'getServices']);
+//});
+Route::middleware(['blocked'])->group(function () {
     // User related routes
     Route::prefix('user')->group(function () {
         Route::get('/meetings', [UserController::class, 'getMeetings']);
@@ -135,7 +135,7 @@ Route::middleware(['blocked', 'auth:sanctum'])->group(function () {
     Route::delete('/complaints/{complaintId}', [ComplaintController::class, 'deleteComplaint']);
 
 
-    // Search 
+    // Search
     Route::get('/p-projectsSearch', [ProjectController::class, 'search']);
     Route::get('/p-coursesSearch', [CourseController::class, 'search']);
     Route::get('/p-meetingsSearch', [MeetingController::class, 'search']);

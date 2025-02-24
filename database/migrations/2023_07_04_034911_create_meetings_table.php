@@ -13,18 +13,17 @@ return new class extends Migration
     {
         Schema::create('meetings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->datetime('datetime');
             $table->string('name')->nullable();
             $table->string('link')->nullable();
             $table->string('description')->nullable();
-            $table->unsignedBigInteger('user_id');
             $table->datetime('start_time')->nullable();
             $table->datetime('end_time')->nullable();
             $table->string('type')->nullable();
+            $table->enum('status', ['public', 'private'])->default('private');
+            $table->softDeletes();
             $table->timestamps();
-
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

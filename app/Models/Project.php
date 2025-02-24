@@ -17,7 +17,7 @@ class Project extends Model
     ];
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Domain\Models\User::class);
     }
 
     public function images(): MorphMany
@@ -33,7 +33,7 @@ class Project extends Model
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
-    
+
     public function likes()
     {
         return $this->morphMany(Like::class, 'likable');
@@ -43,5 +43,5 @@ class Project extends Model
         return $this->morphMany(Complaint::class, 'complaintable');
     }
 
-    
+
 }

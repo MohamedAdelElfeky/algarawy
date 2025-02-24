@@ -13,26 +13,21 @@ return new class extends Migration
     {
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->longText('description')->nullable();
             $table->string('title')->nullable();
-
-            $table->string('company_name')->nullable();
-            $table->string('company_location')->nullable();
-            $table->string('company_description')->nullable();
-            $table->string('company_type')->nullable();
-            $table->string('company_link')->nullable();
-            $table->string('company_logo')->nullable();
-
-            $table->string('job_type')->nullable();
-            $table->string('job_duration')->nullable();
+            $table->string('type')->nullable();
+            $table->string('duration')->nullable();
             $table->decimal('price', 10, 2)->nullable();
-            
             $table->boolean('job_status')->default(false);        
             $table->boolean('is_training')->nullable();        
-
+            $table->enum('status', ['public', 'private'])->default('private');
+            $table->foreignId('region_id')->nullable()->constrained();
+            $table->foreignId('city_id')->nullable()->constrained();
+            $table->foreignId('neighborhood_id')->nullable()->constrained();
+            $table->softDeletes();
             $table->timestamps();
          
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
         });
     }
 

@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Infrastructure;
 
+use App\Domain\Models\Project;
 use App\Domain\Repositories\ProjectRepository;
 
 class EloquentProjectRepository implements ProjectRepository

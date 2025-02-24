@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ComplaintController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
+
     public function toggleComplaint(Request $request, $type, $id)
     {
         $user = Auth::user();

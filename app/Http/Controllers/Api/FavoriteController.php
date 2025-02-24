@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
     public function toggleFavorite(Request $request, $type, $id)
     {
         $user = Auth::user();

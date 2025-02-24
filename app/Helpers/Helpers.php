@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+
 if (!function_exists('theme')) {
     function theme()
     {
@@ -429,5 +432,48 @@ if (!function_exists('getIcon')) {
     function getIcon($name, $class = '', $type = '')
     {
         return theme()->getIcon($name, $class, $type);
+    }
+}
+
+if (!function_exists('handleFileUpload')) {
+    /**
+     * Handle image or video file upload.
+     *
+     * @param UploadedFile $file
+     * @param string $path
+     * @return array
+     */
+    function handleFileUpload(UploadedFile $file, $path = '/images/')
+    {
+        // Ensure directory exists
+        if (!File::exists(public_path($path))) {
+            File::makeDirectory(public_path($path), 0777, true, true);
+        }
+
+        // Generate a unique file name
+        $fileName = time() . rand(1000, 9999999) . '_course.' . $file->getClientOriginalExtension();
+        
+        // Move file to the directory
+        $file->move(public_path($path), $fileName);
+
+        return [
+            'url' => $path . $fileName,
+            'mime' => $file->getMimeType(),
+            'type' => $file->getClientOriginalExtension(),
+        ];
+    }
+}
+
+if (!function_exists('handlePdfUpload')) {
+    /**
+     * Handle PDF file upload.
+     *
+     * @param UploadedFile $file
+     * @param string $path
+     * @return array
+     */
+    function handlePdfUpload(UploadedFile $file, $path = '/files/')
+    {
+        return handleFileUpload($file, $path);
     }
 }

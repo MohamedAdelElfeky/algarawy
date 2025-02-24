@@ -21,14 +21,15 @@ class UserResource extends JsonResource
             'last_name' => $this->last_name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'birth_date' => $this->birth_date ? date('Y-m-d', strtotime($this->birth_date)) : null,
-            'region' =>  new RegionResource($this->region),
-            'city' =>  new CityResource($this->city),
-            'neighborhood' =>  new NeighborhoodResource($this->neighborhood),
-            'mobile_number_visibility' =>  $this->mobile_number_visibility,
-            'birthdate_visibility' => $this->birthdate_visibility,
-            'email_visibility' => $this->email_visibility,
-            'show_no_complainted_posts' => $this->show_no_complainted_posts,
+
+            'settings' => [
+//                'mobile_number_visibility' => (bool) $this->getSettingValue('mobile_number_visibility', 1),
+//                'birthdate_visibility' => (bool) $this->getSettingValue('birthdate_visibility', 1),
+//                'email_visibility' => (bool) $this->getSettingValue('email_visibility', 1),
+//                'show_no_complainted_posts' => (bool) $this->getSettingValue('show_no_complainted_posts', 0),
+            ],
+
+            'details' => $this->details ? new UserDetailResource($this->details) : null,
         ];
     }
 }

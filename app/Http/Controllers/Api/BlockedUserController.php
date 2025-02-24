@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class BlockedUserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
     public function toggleBlock(Request $request)
     {
         $user = Auth::user();
@@ -51,14 +55,14 @@ class BlockedUserController extends Controller
     public function getBlockedUsers()
     {
         $user = Auth::user();
-    
+
         $blockedUsers = BlockedUser::where('user_id', $user->id)->get();
-    
+
         // Assuming BlockedUser has a relationship with User to fetch the blocked user details
         $blockedUsersDetails = $blockedUsers->map(function ($blockedUser) {
             return $blockedUser->blockedUser; // Adjust this based on your relationship naming
         });
-    
+
         return response()->json(['data' => UserResource::collection($blockedUsersDetails)]);
     }
 }

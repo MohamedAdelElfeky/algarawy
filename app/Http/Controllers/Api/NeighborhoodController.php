@@ -10,11 +10,17 @@ use Illuminate\Http\Request;
 
 class NeighborhoodController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
+
     public function index()
     {
         $neighborhoods = Neighborhood::all();
         return NeighborhoodResource::collection($neighborhoods);
     }
+
     public function getNeighborhoodsByCity(City $city)
     {
         $neighborhoods = $city->neighborhoods;

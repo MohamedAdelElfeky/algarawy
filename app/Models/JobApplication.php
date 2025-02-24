@@ -16,10 +16,10 @@ class JobApplication extends Model
         'job_id',
 
     ];
-    
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Domain\Models\User::class);
     }
     public function job()
     {

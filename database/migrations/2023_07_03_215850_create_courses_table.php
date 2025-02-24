@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->longText('description')->nullable();
             $table->json('files')->nullable();
             $table->string('location')->nullable();
             $table->string('discount')->nullable();
             $table->string('link')->nullable();
-            $table->unsignedBigInteger('user_id');
             $table->json('images_and_videos')->nullable();
+            $table->enum('status', ['public', 'private'])->default('private');
+            $table->softDeletes();
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

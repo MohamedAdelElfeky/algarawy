@@ -23,13 +23,13 @@ class Meeting extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Domain\Models\User::class);
     }
     public function favorites()
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
-    
+
     public function likes()
     {
         return $this->morphMany(Like::class, 'likable');

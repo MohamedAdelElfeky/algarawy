@@ -15,13 +15,14 @@ class DiscountController extends Controller
 
     public function __construct(DiscountService $discountService)
     {
+        $this->middleware('auth:sanctum');
         $this->discountService = $discountService;
     }
 
     public function index(Request $request)
     {
         $perPage = $request->header('per_page', 10);
-        $page = $request->header('page', 1); 
+        $page = $request->header('page', 1);
 
         $user = Auth::guard('sanctum')->user();
 
