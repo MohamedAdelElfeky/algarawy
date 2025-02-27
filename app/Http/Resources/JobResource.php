@@ -25,18 +25,18 @@ class JobResource extends JsonResource
             'city' =>  new CityResource($this->city),
             'neighborhood' =>  new NeighborhoodResource($this->neighborhood),
 
-            'company_name' => $this->company_name,
-            'company_description' => $this->company_description,
-            'company_location' => $this->company_location,
-            'company_type' => $this->company_type,
-            'company_link' => $this->company_link,
+            'company_name' => optional($this->JobCompanies)->name,
+            'company_description' =>  optional($this->JobCompanies)->description,
+            'company_location' => optional($this->JobCompanies)->location,
+            'company_type' =>optional($this->JobCompanies)->type,
+            'company_link' => optional($this->JobCompanies)->link,
             'company_logo' => $this->company_logo
                 ?  $this->company_logo
                 : 'default.png',
 
-            'company_region' =>  new RegionResource($this->companyRegion),
-            'company_city' =>  new CityResource($this->companyCity),
-            'company_neighborhood' =>  new NeighborhoodResource($this->companyNeighborhood),
+            'company_region' =>  new RegionResource(optional($this->JobCompanies)->region),
+            'company_city' =>  new CityResource(optional($this->JobCompanies)->city),
+            'company_neighborhood' =>  new NeighborhoodResource(optional($this->JobCompanies)->neighborhood),
 
             'job_type' => $this->job_type,
             'job_duration' => $this->job_duration,

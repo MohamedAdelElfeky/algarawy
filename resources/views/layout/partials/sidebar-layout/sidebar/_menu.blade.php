@@ -125,6 +125,14 @@
                         <span class="menu-title">  الحى </span>
                     </a>
                 </div>
+                <div class="menu-item">
+                    <a class="menu-link" href="{{ route('user.import.form') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title">  استيراد الأعضاء </span>
+                    </a>
+                </div>
             </div>
         </div>
         <!--end::Menu-->

@@ -211,6 +211,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'Twilio' => 'Aloha\Twilio\Support\Laravel\Facade',
     ])->toArray(),
 
 ];

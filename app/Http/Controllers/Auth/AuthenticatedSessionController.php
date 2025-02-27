@@ -35,10 +35,10 @@ class AuthenticatedSessionController extends Controller
     
         $user = auth()->user();
     
-        if ($user->admin !== 1) {
-            auth()->logout();
-            return redirect()->route('login')->with('error', 'You are not authorized to access the dashboard.');
-        }
+        // if ($user->admin !== 1) {
+        //     auth()->logout();
+        //     return redirect()->route('login')->with('error', 'You are not authorized to access the dashboard.');
+        // }
     
         $request->session()->regenerate();
     

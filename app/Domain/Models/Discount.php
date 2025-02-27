@@ -16,7 +16,6 @@ class Discount extends Model
         'price',
         'link',
         'user_id',
-        'status',
     ];
 
     public function user()
@@ -43,5 +42,41 @@ class Discount extends Model
     public function complaints()
     {
         return $this->morphMany(Complaint::class, 'complaintable');
+    }
+
+    public function scopeApprovalStatus($query, $status = 'pending')
+    {
+        $allowedStatuses = ['pending', 'approved', 'rejected'];
+    
+        if (!in_array($status, $allowedStatuses)) {
+            $status = 'pending';
+        }
+    
+        return $query->whereHas('postApproval', function ($query) use ($status) {
+            $query->where('status', $status);
+        });
+    }
+
+    public function visibility()
+    {
+        return $this->morphOne(Visibility::class, 'visible');
+    }
+    
+    public function scopeVisibilityStatus($query, $status = 'public')
+    {
+        $allowedStatuses = ['public', 'private'];
+
+        if (!in_array($status, $allowedStatuses)) {
+            $status = 'public';
+        }
+
+        return $query->whereHas('visibility', function ($q) use ($status) {
+            $q->where('status', $status);
+        });
+    }
+
+    public function memberships()
+    {
+        return $this->morphMany(MembershipAssignment::class, 'assignable');
     }
 }

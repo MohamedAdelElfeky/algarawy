@@ -26,7 +26,7 @@ class Setting extends Model
 
     public static function getSettingsByType($type)
     {
-        return self::where('type', $type)->get();
+        return self::where('key', $type)->get();
     }
 
 }

@@ -43,8 +43,8 @@ class EloquentUserRepository implements UserRepositoryInterface
     }
 
     public function findByNationalId(string $nationalId)
-    {
-        $user = User::where('national_id', $nationalId)->first();
+    {   
+        $user = User::with(['userSettings','details.images'])->where('national_id', $nationalId)->first();
         return $user ? new UserResource($user) : null;
     }
 }

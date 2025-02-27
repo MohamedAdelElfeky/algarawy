@@ -32,40 +32,39 @@
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->phone }}</td>
                                     <td>
-                                        {{ optional($user->region)->name . ' ' . optional($user->region)->city . ' ' . optional($user->neighborhood)->name }}
+                                        {{ optional($user->details)->getFullLocation() }}
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="symbol symbol-45px me-5">
-                                                <img src="{{ $user->avatar !== null && $user->avatar !== '' ? asset($user->avatar) : asset('default.png') }}"
-                                                    alt="" />
+                                                <img src="{{ optional($user->details)->getImageByType('avatar') }}"
+                                                    alt="User Avatar" class="img-thumbnail img-clickable"
+                                                    data-bs-toggle="modal" data-bs-target="#imageModal"
+                                                    data-img-src="{{ optional($user->details)->getImageByType('avatar') }}" />
                                             </div>
-
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="symbol symbol-45px me-5">
-                                                <img src="{{ $user->national_card_image_front !== null && $user->national_card_image_front !== '' ? asset($user->national_card_image_front) : asset('default.png') }}"
-                                                    alt="" />
-
-
+                                                <img src="{{ optional($user->details)->getImageByType('national_card_image_front') }}"
+                                                    alt="National Card Front" class="img-thumbnail img-clickable"
+                                                    data-bs-toggle="modal" data-bs-target="#imageModal"
+                                                    data-img-src="{{ optional($user->details)->getImageByType('national_card_image_front') }}" />
                                             </div>
-
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="symbol symbol-45px me-5">
-                                                <img src="{{ $user->national_card_image_back !== null && $user->national_card_image_back !== '' ? asset($user->national_card_image_back) : asset('default.png') }}"
-                                                    alt="" />
-
-
+                                                <img src="{{ optional($user->details)->getImageByType('national_card_image_back') }}"
+                                                    alt="National Card Back" class="img-thumbnail img-clickable"
+                                                    data-bs-toggle="modal" data-bs-target="#imageModal"
+                                                    data-img-src="{{ optional($user->details)->getImageByType('national_card_image_back') }}" />
                                             </div>
-
                                         </div>
                                     </td>
-                                    <td>{{ $user->birth_date }}</td>
+                                    <td>{{ optional($user->details)->birthdate }}</td>
                                     <td>{{ $user->national_id }}</td>
                                     <td>
                                         <button
@@ -90,6 +89,19 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" class="img-fluid" alt="Preview Image">
                 </div>
             </div>
         </div>
@@ -170,6 +182,14 @@
                                 });
                             }
                         }
+                    });
+                });
+            });
+            document.addEventListener("DOMContentLoaded", function() {
+                let modalImage = document.getElementById("modalImage");
+                document.querySelectorAll(".img-clickable").forEach(img => {
+                    img.addEventListener("click", function() {
+                        modalImage.src = this.getAttribute("data-img-src");
                     });
                 });
             });

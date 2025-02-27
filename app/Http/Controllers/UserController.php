@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\Setting;
 use App\Http\Resources\CourseResource;
 use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -137,7 +139,7 @@ class UserController extends Controller
                 $query->where('user_id', '=', $user->id); // Exclude user complaints
             });
         } else {
-            $query;//->has('complaints');
+            $query; //->has('complaints');
         }
 
         return $query;
@@ -269,28 +271,74 @@ class UserController extends Controller
     public function toggleUser($id)
     {
         $user = User::findOrFail($id);
-        $user->update(['registration_confirmed' => !$user->registration_confirmed]);
+
+        $setting = Setting::where('key', 'registration_confirmed')->first();
+
+        if (!$setting) {
+            return response()->json(['success' => false, 'message' => 'Setting not found'], 404);
+        }
+
+        $userSetting = $user->userSettings()->where('setting_id', $setting->id)->first();
+
+        if ($userSetting) {
+            $newValue = !$userSetting->value;
+
+            $userSetting->update(['value' => $newValue]);
+        } else {
+            $user->userSettings()->create([
+                'setting_id' => $setting->id,
+                'value' => true, 
+            ]);
+        }
 
         return response()->json(['success' => true]);
     }
 
 
+
+
     public function userActive()
     {
-        $users = User::where('registration_confirmed', 1)->where('admin', 0)->get();
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'user');
+        })
+        ->whereHas('userSettings', function ($query) {
+            $query->whereHas('setting', function ($subQuery) {
+                $subQuery->where('key', 'registration_confirmed')
+                         ->where('value', true); 
+            });
+        })
+            ->with(['details', 'roles', 'userSettings.setting'])
+            ->get();
         return view('pages.dashboards.users.user_active', compact('users'));
     }
+
     public function userNotActive()
     {
-        $users =  User::where('registration_confirmed', 0)->where('admin', 0)->get();
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'user');
+        })
+        ->whereHas('userSettings', function ($query) {
+            $query->whereHas('setting', function ($subQuery) {
+                $subQuery->where('key', 'registration_confirmed')
+                         ->where('value', false); 
+            });
+        })
+            ->with(['details', 'roles', 'userSettings.setting'])
+            ->get();
         return view('pages.dashboards.users.user_not_active', compact('users'));
     }
 
     public function admin()
     {
-        $users =  User::where('admin', 1)->get();
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })
+            ->with(['details', 'roles'])
+            ->get();
         return view('pages.dashboards.admin.index', compact('users'));
     }
+
 
     public function addUser(Request $request)
     {
@@ -367,5 +415,18 @@ class UserController extends Controller
         $user->save();
 
         return response()->json(['message' => 'تم تغيير الرقم السري بنجاح']);
+    }
+
+    public function makeAdmin($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        // Ensure the "admin" role exists, if not create it
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+
+        // Assign the role to the user
+        $user->assignRole($adminRole);
+
+        return redirect()->back()->with('success', 'User has been assigned as Admin.');
     }
 }

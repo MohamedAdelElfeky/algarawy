@@ -2,103 +2,109 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Domain\Models\Membership;
+use App\Domain\Models\MembershipAssignment;
+use App\Domain\Models\Setting;
+use App\Domain\Models\UserDetail;
+use App\Domain\Models\UserSetting;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
-    use SoftDeletes;
-
+    use HasFactory, HasRoles, SoftDeletes, HasApiTokens, Notifiable;
     protected $dates = ['deleted_at'];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'first_name',
         'last_name',
         'email',
         'phone',
         'password',
-        'location',
-        'birth_date',
         'national_id',
-        'avatar',
-        'card_images',
-        'neighborhood_id',
-        'region_id',
-        'city_id',
-        'registration_confirmed',
-        'national_card_image_front',
-        'national_card_image_back',
-        'mobile_number_visibility',
-        'birthdate_visibility',
-        'email_visibility',
-        'show_no_complainted_posts',
-        'admin',
-
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
+        'email_verified_at',
         'remember_token',
+        'points'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    protected $hidden = ['password', 'remember_token'];
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_admin' => 'boolean',
 
     ];
-    public function favorites()
+    public function details()
     {
-        return $this->hasMany(Favorite::class, 'user_id');
-    }
-    public function likes()
-    {
-        return $this->hasMany(Like::class, 'user_id');
-    }
-    public function region()
-    {
-        return $this->belongsTo(Region::class, 'region_id');
+        return $this->hasOne(UserDetail::class);
     }
 
-    public function city()
+    public function userSettings()
     {
-        return $this->belongsTo(City::class, 'city_id');
+        return $this->hasMany(UserSetting::class);
     }
 
-    public function neighborhood()
+    public function getSettingValue($key, $default = null)
     {
-        return $this->belongsTo(Neighborhood::class, 'neighborhood_id');
+        $userSetting = $this->userSettings()->whereHas('setting', function ($query) use ($key) {
+            $query->where('key', $key);
+        })->first();
+
+        if ($userSetting) {
+            return $userSetting->value;
+        }
+
+        $globalSetting = Setting::where('key', $key)->first();
+
+        return $globalSetting ? $globalSetting->value : $default;
     }
-    public function notifications()
+
+    public function settings()
     {
-        return $this->hasMany(Notification::class, 'user_id');
-    }
-    public function complaints()
-    {
-        return $this->hasMany(Complaint::class, 'user_id');
+        return $this->belongsToMany(Setting::class, 'user_settings')
+            ->withPivot('value')
+            ->withTimestamps();
     }
 
     public function blockedUsers()
     {
         return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id');
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class, 'user_id');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'user_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class, 'user_id');
+    }
+
+    public function evaluateMembership($user)
+    {
+        $points = $user->points;
+        $membership = Membership::where('points_required', '<=', $points)
+            ->orderByDesc('points_required')
+            ->first();
+
+        if ($membership) {
+            MembershipAssignment::updateOrCreate(
+                ['assignable_type' => get_class($user), 'assignable_id' => $user->id],
+                ['membership_id' => $membership->id]
+            );
+        }
     }
 }

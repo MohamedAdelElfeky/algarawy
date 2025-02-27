@@ -84,7 +84,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
-                                            {{-- <form id="statusForm{{ $project->id }}" method="POST"
+                                            <form id="statusForm{{ $project->id }}" method="POST"
                                                 action="{{ route('projects.changeStatus', $project->id) }}"> @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
@@ -102,10 +102,11 @@
                                                 </div>
                                                 <div class="modal-footer">
 
-                                                    <button type="submit" class="btn btn-primary">تعديل الحاله</button>
+                                                    <button type="submit" class="btn btn-primary">Update
+                                                        Status</button>
                                                 </div>
 
-                                            </form> --}}
+                                            </form>
                                         </div>
                                     </div>
                                 </div>

@@ -7,12 +7,14 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\NeighborhoodController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegionController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('courses', CourseController::class);
     Route::resource('discounts', DiscountController::class);
     Route::resource('meetings', MeetingController::class);
+    Route::resource('services', ServiceController::class);
 
     Route::resource('bank-accounts', BankAccountController::class);
     Route::post('/banks/activate/{id}', [BankAccountController::class, 'activate'])->name('banks.activate');
@@ -75,9 +78,13 @@ Route::middleware('auth')->group(function () {
     Route::put('addNeighborhoods', [NeighborhoodController::class, 'addNeighborhood'])->name('addNeighborhood');
     Route::put('/jobs/{job}/change-status', [JobController::class, 'changeStatus'])->name('jobs.changeStatus');
     Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
-    Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
     Route::put('/courses/{course}/change-status', [CourseController::class, 'changeStatus'])->name('courses.changeStatus');
     Route::put('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.changeStatus');
+
+    Route::get('/import', [ImportController::class, 'showForm'])->name('user.import.form');
+    Route::post('/import', [ImportController::class, 'import'])->name('import');
+    Route::get('/user/{id}/make-admin', [UserController::class, 'makeAdmin'])->name('user.makeAdmin');
+
 });
 
 Route::get('/error', function () {

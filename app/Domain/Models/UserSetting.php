@@ -10,7 +10,9 @@ class UserSetting extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'setting_id', 'value'];
-
+    protected $casts = [
+        'value' => 'boolean',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class);

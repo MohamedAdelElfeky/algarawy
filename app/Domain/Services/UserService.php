@@ -18,7 +18,6 @@ class UserService
 
     public function createUser(array $data)
     {
-        dd($data);
         $user = $this->userRepository->createUser($data);
         if (isset($data['birth_date'])) {
             $user->details()->create([
