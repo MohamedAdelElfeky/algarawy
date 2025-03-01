@@ -17,8 +17,15 @@ class UserSettingSeeder extends Seeder
             ['key' => 'email_visibility', 'type' => 'User', 'value' => true],
             ['key' => 'show_no_complaints_posts', 'type' => 'User', 'value' => true],
             ['key' => 'birthdate_visibility', 'type' => 'User', 'value' => true],
+            ['key' => 'registration_confirmed', 'type' => 'User', 'value' => true],
         ];
-
-        Setting::insert($settings);
+        
+        foreach ($settings as $setting) {
+            Setting::updateOrInsert(
+                ['key' => $setting['key'], 'type' => $setting['type']], 
+                ['value' => $setting['value']]
+            );
+        }
+        
     }
 }
