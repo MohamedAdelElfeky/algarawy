@@ -21,8 +21,9 @@ class NotificationResource extends JsonResource
             'read' => $this->read,
             'user' => new UserResource($this->user),
             'read_at' => $this->read_at,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => optional($this->updated_at)->format('Y-m-d H:i:s'),
+
         ];
     }
 }

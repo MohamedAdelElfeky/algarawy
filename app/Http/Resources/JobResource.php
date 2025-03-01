@@ -28,7 +28,7 @@ class JobResource extends JsonResource
             'company_name' => optional($this->JobCompanies)->name,
             'company_description' =>  optional($this->JobCompanies)->description,
             'company_location' => optional($this->JobCompanies)->location,
-            'company_type' =>optional($this->JobCompanies)->type,
+            'company_type' => optional($this->JobCompanies)->type,
             'company_link' => optional($this->JobCompanies)->link,
             'company_logo' => $this->company_logo
                 ?  $this->company_logo
@@ -60,8 +60,10 @@ class JobResource extends JsonResource
 
             'count_apply_job' => $this->count_of_applications, // JobApplication::where('job_id',$this->id)->count(),
             'status' => $this->status,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            
+            'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => optional($this->updated_at)->format('Y-m-d H:i:s'),
+
         ];
     }
 }

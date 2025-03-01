@@ -21,10 +21,10 @@ class ProjectResource extends JsonResource
             'files' => $this->pdfs ? FilePdfResource::collection($this->pdfs) : null,
             'location' => $this->location,
             'user' => new UserResource($this->user),
-            
+
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'count_favorite' => $this->favorites->where('favoritable_id', $this->id)->count() > 0,
-            
+
             'like' => $this->likes->where('user_id', Auth::id())->where('likable_id', $this->id)->count() > 0,
             'count_like' => $this->likes->where('likable_id', $this->id)->count(),
 
@@ -32,8 +32,9 @@ class ProjectResource extends JsonResource
             'count_complaint' => $this->complaints->where('complaintable_id', $this->id)->count(),
             'status' => $this->status,
 
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => optional($this->updated_at)->format('Y-m-d H:i:s'),
+
         ];
     }
 }

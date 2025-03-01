@@ -21,7 +21,7 @@ class ServiceResource extends JsonResource
             'images_or_videos' => $this->images ? ImageResource::collection($this->images) : null,
             'location' => $this->location,
             'user' => new UserResource($this->user),
-            
+
             'favorite' => $this->favorites->where('user_id', Auth::id())->where('favoritable_id', $this->id)->count() > 0,
             'count_favorite' => $this->favorites->where('favoritable_id', $this->id)->count() > 0,
 
@@ -31,9 +31,10 @@ class ServiceResource extends JsonResource
             'complaint' => $this->complaints->where('user_id', Auth::id())->where('complaintable_id', $this->id)->count() > 0,
             'count_complaint' => $this->complaints->where('complaintable_id', $this->id)->count(),
             'status' => $this->status,
+            
+            'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => optional($this->updated_at)->format('Y-m-d H:i:s'),
 
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 }

@@ -18,7 +18,7 @@ class ComplaintResource extends JsonResource
             'id' => $this->id,
             'comment' => $this->comment,
             'user' => new UserResource($this->user),
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
         ];
     }
 }
