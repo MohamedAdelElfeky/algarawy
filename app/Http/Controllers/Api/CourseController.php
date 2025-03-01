@@ -15,8 +15,8 @@ class CourseController extends Controller
 
     public function __construct(CourseService $courseService)
     {
-        $this->middleware('auth:sanctum');
-
+        $this->middleware('optional.auth')->only('index');
+        $this->middleware('auth:sanctum')->except('index');
         $this->courseService = $courseService;
     }
 
@@ -27,11 +27,9 @@ class CourseController extends Controller
 
         $user = Auth::guard('sanctum')->user();
 
-        if ($user) {
-            return redirect()->route('courses.authenticated', ['perPage' => $perPage, 'page' => $page]);
-        } else {
-            $courses = $this->courseService->getAllCoursesPublic($perPage, $page);
-        }
+        $courses = $user
+        ? $this->courseService->getAllCourses($perPage, $page)  
+        : $this->courseService->getAllCoursesPublic($perPage, $page);
 
         return response()->json($courses, 200);
     }

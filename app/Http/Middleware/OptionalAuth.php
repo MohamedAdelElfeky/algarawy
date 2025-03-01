@@ -16,8 +16,9 @@ class OptionalAuth
     public function handle(Request $request, Closure $next)
     {
         Auth::shouldUse('web');
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
         $request->merge(['auth_user' => $user]);
+
         return $next($request);
     }
 }

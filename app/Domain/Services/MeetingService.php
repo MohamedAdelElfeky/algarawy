@@ -53,4 +53,5 @@ class MeetingService
         $meetings = $this->repository->getAll($perPage, $page);
         return MeetingResource::collection($meetings);
     }
+    
 }

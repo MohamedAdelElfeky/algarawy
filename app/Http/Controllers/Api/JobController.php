@@ -18,25 +18,20 @@ class JobController extends Controller
 
     public function __construct(JobService $jobService)
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('optional.auth')->only('index');
+        $this->middleware('auth:sanctum')->except('index');
         $this->jobService = $jobService;
     }
 
     public function index(Request $request)
     {
-        $perPage = $request->header('per_page', 10); // Default to 10 items per page
-        $page = $request->header('page', 1); // Default to page 1
-
-        $user = Auth::user();
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
 
         $user = Auth::guard('sanctum')->user();
-
-        if ($user) {
-            return redirect()->route('jobs.authenticated', ['perPage' => $perPage, 'page' => $page]);
-        } else {
-            $jobs = $this->jobService->getAllJobsPublic($perPage, $page);
-        }
-
+        $jobs = $user
+            ? $this->jobService->getAllJobs($perPage, $page)
+            : $this->jobService->getAllJobsPublic($perPage, $page);
         return response()->json($jobs, 200);
     }
 

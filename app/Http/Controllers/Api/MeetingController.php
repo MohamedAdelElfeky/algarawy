@@ -15,8 +15,8 @@ class MeetingController extends Controller
 
     public function __construct(MeetingService $meetingService)
     {
-        // $this->middleware('optional.auth')->only('index');
-        $this->middleware('auth:sanctum');
+        $this->middleware('optional.auth')->only('index');
+        $this->middleware('auth:sanctum')->except('index');
         $this->meetingService = $meetingService;
     }
 
@@ -47,20 +47,10 @@ class MeetingController extends Controller
     public function index(Request $request)
     {
         $user = $request->auth_user;
-
-        // if ($user) {
-        //     return response()->json([
-        //         'message' => 'تم تسجيل الدخول',
-        //         'user' => $user
-        //     ], 200);
-        // }
-
-        // return response()->json([
-        //     'message' => 'أنت غير مسجل دخول'
-        // ], 200);
         $perPage = $request->query('per_page', 10);
         $page = $request->query('page', 1);
         $meetings = $this->meetingService->getAllMeetings($perPage, $page);
         return response()->json($meetings, 200);
     }
+    
 }

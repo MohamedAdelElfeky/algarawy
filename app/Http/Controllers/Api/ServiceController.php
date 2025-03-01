@@ -25,11 +25,9 @@ class ServiceController extends Controller
 
         $user = Auth::guard('sanctum')->user();
 
-        if ($user) {
-            return redirect()->route('services.authenticated', ['perPage' => $perPage, 'page' => $page]);
-        } else {
-            $services = $this->serviceService->getAllServicesPublic($perPage, $page);
-        }
+        $services = $user
+        ? $this->serviceService->getAllServices($perPage, $page)  
+        : $this->serviceService->getAllServicesPublic($perPage, $page);
 
         return response()->json($services, 200);
     }

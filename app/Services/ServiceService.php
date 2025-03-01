@@ -125,6 +125,10 @@ class ServiceService
 
     public function getAllServices($perPage = 10, $page = 1)
     {
+        $user = Auth::guard('sanctum')->user(); 
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
         $servicesQuery = Service::orderBy('created_at', 'desc');
         $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
         $serviceResource = ServiceResource::collection($services);

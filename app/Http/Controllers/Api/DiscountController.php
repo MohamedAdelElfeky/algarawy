@@ -15,7 +15,8 @@ class DiscountController extends Controller
 
     public function __construct(DiscountService $discountService)
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('optional.auth')->only('index');
+        $this->middleware('auth:sanctum')->except('index');
         $this->discountService = $discountService;
     }
 
@@ -23,32 +24,29 @@ class DiscountController extends Controller
     {
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
+        $user = $request->auth_user; 
 
-        $user = Auth::guard('sanctum')->user();
-
-       if ($user) {
-           return redirect()->route('discounts.authenticated', ['perPage' => $perPage, 'page' => $page]);
-        } else {
-            $discounts = $this->discountService->getAllDiscountsPublic($perPage, $page);
-        }
+        $discounts = $user
+            ? $this->discountService->getAllDiscounts($perPage, $page)  
+            : $this->discountService->getAllDiscountsPublic($perPage, $page);
 
         return response()->json($discounts, 200);
     }
 
-    public function getAuthenticatedDiscounts(Request $request)
-    {
-        $perPage = $request->query('perPage', 10);
-        $page = $request->query('page', 1);
+    // public function getAuthenticatedDiscounts(Request $request)
+    // {
+    //     $perPage = $request->query('perPage', 10);
+    //     $page = $request->query('page', 1);
 
-        $user = Auth::user();
+    //     $user = Auth::user();
 
-        if ($user) {
-            $discounts = $this->discountService->getAllDiscounts($perPage, $page);
-            return response()->json($discounts, 200);
-        } else {
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
-    }
+    //     if ($user) {
+    //         $discounts = $this->discountService->getAllDiscounts($perPage, $page);
+    //         return response()->json($discounts, 200);
+    //     } else {
+    //         return response()->json(['error' => 'User not authenticated'], 401);
+    //     }
+    // }
 
     // public function index(Request $request)
     // {
@@ -57,13 +55,13 @@ class DiscountController extends Controller
     //     return response()->json($discounts, 200);
     // }
 
-    public function getDiscounts(Request $request)
-    {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $discounts = $this->discountService->getAllDiscountsPublic($perPage, $page);
-        return response()->json($discounts, 200);
-    }
+    // public function getDiscounts(Request $request)
+    // {
+    //     $perPage = $request->header('per_page');
+    //     $page = $request->header('page');
+    //     $discounts = $this->discountService->getAllDiscountsPublic($perPage, $page);
+    //     return response()->json($discounts, 200);
+    // }
 
     public function show($id)
     {
