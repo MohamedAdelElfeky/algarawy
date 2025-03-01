@@ -27,6 +27,7 @@ class UserController extends Controller
 
     public function __construct(PaginationService $paginationService)
     {
+        $this->middleware('auth:sanctum');
         $this->paginationService = $paginationService;
     }
 
@@ -48,7 +49,7 @@ class UserController extends Controller
 
     public function getUser()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('details.region', 'details.city', 'details.neighborhood', 'details.images');
         return response()->json([
             'user' =>  new UserResource($user),
         ], 200);
@@ -66,10 +67,25 @@ class UserController extends Controller
             if ($request->has($field)) {
                 $visibility = $request->input($field);
 
-                if (!is_bool($visibility)) {
+                if (!in_array($visibility, [true, false, 'true', 'false', 1, 0, '1', '0'], true)) {
                     $errors[] = "قيمة رؤية غير صالحة لـ {$field}.";
+                    continue;
+                }
+
+                $setting = Setting::where('key', "{$field}_visibility")->first();
+                if (!$setting) {
+                    $errors[] = "الإعداد {$field}_visibility غير موجود.";
+                    continue;
+                }
+
+                $userSetting = $user->userSettings()->where('setting_id', $setting->id)->first();
+                if ($userSetting) {
+                    $userSetting->update(['value' => filter_var($visibility, FILTER_VALIDATE_BOOLEAN)]);
                 } else {
-                    $user->{$field . '_visibility'} = $visibility;
+                    $user->userSettings()->create([
+                        'setting_id' => $setting->id,
+                        'value' => filter_var($visibility, FILTER_VALIDATE_BOOLEAN),
+                    ]);
                 }
             }
         }
@@ -78,10 +94,10 @@ class UserController extends Controller
             return response()->json(['errors' => $errors], 400);
         }
 
-        $user->save();
-
-        return response()->json(['message' => 'تم تحديث إعدادات الرؤية.']);
+        return response()->json(['message' => 'تم تحديث إعدادات الرؤية بنجاح.']);
     }
+
+
 
     public function getDataUser($userId)
     {
@@ -153,7 +169,7 @@ class UserController extends Controller
             'email' => 'nullable|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|unique:users,phone,' . $user->id,
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-            'is_avatar_deleted' => 'nullable|boolean', // New field to handle avatar deletion
+            'is_avatar_deleted' => 'nullable|boolean', 
         ]);
 
         if ($validator->fails()) {
@@ -268,6 +284,8 @@ class UserController extends Controller
         $users = User::all();
         return view('pages.dashboards.users.index', compact('users'));
     }
+
+
     public function toggleUser($id)
     {
         $user = User::findOrFail($id);
@@ -287,7 +305,7 @@ class UserController extends Controller
         } else {
             $user->userSettings()->create([
                 'setting_id' => $setting->id,
-                'value' => true, 
+                'value' => true,
             ]);
         }
 
@@ -302,12 +320,12 @@ class UserController extends Controller
         $users = User::whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })
-        ->whereHas('userSettings', function ($query) {
-            $query->whereHas('setting', function ($subQuery) {
-                $subQuery->where('key', 'registration_confirmed')
-                         ->where('value', true); 
-            });
-        })
+            ->whereHas('userSettings', function ($query) {
+                $query->whereHas('setting', function ($subQuery) {
+                    $subQuery->where('key', 'registration_confirmed')
+                        ->where('value', true);
+                });
+            })
             ->with(['details', 'roles', 'userSettings.setting'])
             ->get();
         return view('pages.dashboards.users.user_active', compact('users'));
@@ -318,12 +336,12 @@ class UserController extends Controller
         $users = User::whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })
-        ->whereHas('userSettings', function ($query) {
-            $query->whereHas('setting', function ($subQuery) {
-                $subQuery->where('key', 'registration_confirmed')
-                         ->where('value', false); 
-            });
-        })
+            ->whereHas('userSettings', function ($query) {
+                $query->whereHas('setting', function ($subQuery) {
+                    $subQuery->where('key', 'registration_confirmed')
+                        ->where('value', false);
+                });
+            })
             ->with(['details', 'roles', 'userSettings.setting'])
             ->get();
         return view('pages.dashboards.users.user_not_active', compact('users'));

@@ -19,6 +19,8 @@
                             <!-- File Input -->
                             <div class="mb-3">
                                 <label for="file" class="form-label fw-bold">Select Excel File:</label>
+                                <a href="{{ route('download.example') }}" class="btn btn-info btn-sm">⬇️ Download Example File</a>
+
                                 <input type="file" name="file" id="file"
                                     class="form-control @error('file') is-invalid @enderror" accept=".xlsx, .xls, .csv"
                                     required>

@@ -30,7 +30,7 @@ class UsersImport implements ToModel, WithHeadingRow
             [
                 'first_name'       => $row['first_name'],
                 'last_name'        => $row['last_name'],
-                'password'         => Hash::make($row['password']),
+                'password'         => Hash::make($row['password'])?? Hash::make('123456'),
                 'email_verified_at' => now(),
                 'remember_token'   => $row['remember_token'] ?? null,
             ]

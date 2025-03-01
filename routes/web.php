@@ -11,13 +11,13 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\NeighborhoodController;
-use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/import', [ImportController::class, 'showForm'])->name('user.import.form');
     Route::post('/import', [ImportController::class, 'import'])->name('import');
     Route::get('/user/{id}/make-admin', [UserController::class, 'makeAdmin'])->name('user.makeAdmin');
+    Route::get('/download-example',  [ImportController::class, 'users_example'])->name('download.example');
 
 });
 

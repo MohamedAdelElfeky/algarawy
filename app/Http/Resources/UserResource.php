@@ -21,10 +21,10 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
 
-            'birthdate' => optional($this->details)->birthdate,
-            'region' => optional($this->details->region)->name,
-            'city' => optional($this->details->city)->name,
-            'neighborhood' => optional($this->details->neighborhood)->name,
+            'birthdate' => optional($this->details)->birthdate  ? optional($this->details)->birthdate : null,
+            'region' => optional($this->details)->region ? optional($this->details->region)->name : null,
+            'city' => optional($this->details->city)->name ? optional($this->details->city)->name : null,
+            'neighborhood' => optional($this->details->neighborhood)->name ? optional($this->details->neighborhood)->name : null,
 
             'mobile_number_visibility' => $this->getBooleanSetting('mobile_number_visibility'),
             'birthdate_visibility' => $this->getBooleanSetting('birthdate_visibility'),
