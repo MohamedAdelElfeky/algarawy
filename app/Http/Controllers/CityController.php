@@ -14,7 +14,7 @@ class CityController extends Controller
     public function index()
     {
         $regions = Region::all();
-        $cities = City::all();
+        $cities = City::paginate(25);
         return view('pages.dashboards.cities.index', compact('cities', 'regions'));
     }
 

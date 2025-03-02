@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
     Route::get('/userActive', [UserController::class, 'userActive'])->name('userActive');
     Route::get('/userNotActive', [UserController::class, 'userNotActive'])->name('userNotActive');
-    Route::post('/changePasswordByAdmin', [UserController::class, 'changePasswordByAdmin'])->name('password.update.admin');
+    Route::post('/changePasswordByAdmin', [UserController::class, 'changePasswordByAdmin'])->name('changePasswordByAdmin');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

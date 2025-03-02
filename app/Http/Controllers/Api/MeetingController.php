@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Domain\Models\Meeting;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MeetingRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Domain\Services\MeetingService;
+use App\Models\Meeting;
+use App\Services\MeetingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MeetingController extends Controller
 {
@@ -20,37 +19,91 @@ class MeetingController extends Controller
         $this->meetingService = $meetingService;
     }
 
-    public function store(MeetingRequest $request)
+    public function store(Request $request)
     {
-        $meeting = $this->meetingService->createMeeting($request->validated());
+        $meeting = $this->meetingService->createMeeting($request->all());
+
         return response()->json($meeting, 201);
     }
 
-    public function update(MeetingRequest $request, Meeting $meeting)
+    public function update(Request $request, $id)
     {
-        $updatedMeeting = $this->meetingService->updateMeeting($meeting, $request->validated());
+        $meeting = Meeting::findOrFail($id);
+        if (!$meeting) {
+            return response()->json(['message' => 'الاجتماع غير موجودة'], 404);
+        }
+        $updatedMeeting = $this->meetingService->updateMeeting($meeting, $request->all());
+
         return response()->json($updatedMeeting);
     }
 
-    public function destroy(Meeting $meeting)
-    {
-        $this->meetingService->deleteMeeting($meeting);
-        return response()->json(['message' => 'تم حذف الاجتماع بنجاح'], 200);
-    }
-
-    public function show($id)
+    public function destroy($id)
     {
         $meeting = $this->meetingService->getMeeting($id);
-        return response()->json($meeting);
+
+        $this->meetingService->deleteMeeting($meeting);
+
+        return response()->json(['message' => 'تم حذف الاجتماع بنجاح'], 200);
     }
 
     public function index(Request $request)
     {
-        $user = $request->auth_user;
-        $perPage = $request->query('per_page', 10);
-        $page = $request->query('page', 1);
-        $meetings = $this->meetingService->getAllMeetings($perPage, $page);
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+
+        $user = Auth::guard('sanctum')->user();
+
+        $meetings = $user
+            ? $this->meetingService->getAllMeetings($perPage, $page)
+            : $this->meetingService->getAllMeetingsPublic($perPage, $page);
         return response()->json($meetings, 200);
     }
-    
+
+    public function getAuthenticatedMeetings(Request $request)
+    {
+        $perPage = $request->query('perPage', 10);
+        $page = $request->query('page', 1);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $meetings = $this->meetingService->getAllMeetings($perPage, $page);
+            return response()->json($meetings, 200);
+        } else {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+    }
+
+    // public function index(Request $request)
+    // {
+    //     $perPage = $request->header('per_page');
+    //     $page = $request->header('page');
+    //     $meetings = $this->meetingService->getAllMeetings($perPage, $page);
+    //     return response()->json($meetings, 200);
+    // }
+
+    public function show($id)
+    {
+        $meeting = $this->meetingService->getMeeting($id);
+
+        if (!$meeting) {
+            return response()->json(['message' => 'الاجتماع غير موجود'], 404);
+        }
+
+        return response()->json($meeting);
+    }
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $results = $this->meetingService->searchMeeting($searchTerm);
+        return response()->json(['data' => $results]);
+    }
+
+    public function getMeetings(Request $request)
+    {
+        $perPage = $request->header('per_page');
+        $page = $request->header('page');
+        $meetings = $this->meetingService->getAllMeetingsPublic($perPage, $page);
+        return response()->json($meetings, 200);
+    }
 }

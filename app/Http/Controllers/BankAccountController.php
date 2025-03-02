@@ -98,12 +98,12 @@ class BankAccountController extends Controller
 
     public function accountCharitySaving()
     {
-        $banks =  BankAccount::whereIn('type', ['charity', 'saving'])->get();
+        $banks =  BankAccount::whereIn('type', ['charity', 'saving'])->paginate(25);
         return view('pages.dashboards.bank.account_charity_saving', compact('banks'));
     }
     public function accountInvestment()
     {
-        $banks =  BankAccount::where('type', 'investment')->get();
+        $banks =  BankAccount::where('type', 'investment')->paginate(25);
         return view('pages.dashboards.bank.account_investment', compact('banks'));
     }
 

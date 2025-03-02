@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\Job;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobRequest;
 use App\Http\Resources\JobResource;
-use App\Models\Job;
 use App\Models\JobApplication;
 use App\Services\JobService;
 use Illuminate\Http\Request;

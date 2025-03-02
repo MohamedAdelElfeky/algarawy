@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Models\Setting;
+use App\Domain\Models\UserDetail;
+use App\Domain\Models\UserSetting;
 use App\Http\Resources\CourseResource;
 use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
@@ -169,7 +171,7 @@ class UserController extends Controller
             'email' => 'nullable|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|unique:users,phone,' . $user->id,
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-            'is_avatar_deleted' => 'nullable|boolean', 
+            'is_avatar_deleted' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -317,33 +319,35 @@ class UserController extends Controller
 
     public function userActive()
     {
+        $registrationConfirmedSetting = Setting::where('key', 'registration_confirmed')->first();
+
         $users = User::whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })
-            ->whereHas('userSettings', function ($query) {
-                $query->whereHas('setting', function ($subQuery) {
-                    $subQuery->where('key', 'registration_confirmed')
-                        ->where('value', true);
-                });
+            ->whereHas('userSettings', function ($query) use ($registrationConfirmedSetting) {
+                $query->where('setting_id', $registrationConfirmedSetting->id)
+                    ->where('value', 1);
             })
             ->with(['details', 'roles', 'userSettings.setting'])
-            ->get();
+            ->paginate(25);
+
         return view('pages.dashboards.users.user_active', compact('users'));
     }
 
     public function userNotActive()
     {
+        $registrationConfirmedSetting = Setting::where('key', 'registration_confirmed')->first();
+
         $users = User::whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })
-            ->whereHas('userSettings', function ($query) {
-                $query->whereHas('setting', function ($subQuery) {
-                    $subQuery->where('key', 'registration_confirmed')
-                        ->where('value', false);
-                });
+            ->whereHas('userSettings', function ($query) use ($registrationConfirmedSetting) {
+                $query->where('setting_id', $registrationConfirmedSetting->id)
+                    ->where('value', 0);
             })
             ->with(['details', 'roles', 'userSettings.setting'])
-            ->get();
+            ->paginate(25);
+
         return view('pages.dashboards.users.user_not_active', compact('users'));
     }
 
@@ -353,14 +357,13 @@ class UserController extends Controller
             $query->where('name', 'admin');
         })
             ->with(['details', 'roles'])
-            ->get();
+            ->paginate(25);
         return view('pages.dashboards.admin.index', compact('users'));
     }
 
 
     public function addUser(Request $request)
     {
-        // Validate the incoming data
         $validatedData = $request->validate([
             'first_name' => 'required',
             'last_name' => 'required',
@@ -371,68 +374,90 @@ class UserController extends Controller
             'national_id' => 'required|unique:users',
             'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-            'avatar' => 'nullable|string',
-
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
-        $imagePathAvatar = "";
-        if (request()->hasFile('avatar')) {
-            $imageAvatar = request()->file('avatar');
-            $file_name_avatar = time() . rand(0, 9999999999999) . '_avatar.' . $imageAvatar->getClientOriginalExtension();
-            $imageAvatar->move(public_path('user/'), $file_name_avatar);
-            $imagePathAvatar = "user/" . $file_name_avatar;
-        }
-        $imagePathFront = "";
-        if (request()->hasFile('national_card_image_front')) {
-            $imageFront = request()->file('national_card_image_front');
-            $file_name_front = time() . rand(0, 9999999999999) . '_front.' . $imageFront->getClientOriginalExtension();
-            $imageFront->move(public_path('user/'), $file_name_front);
-            $imagePathFront = "user/" . $file_name_front;
-        }
-        $imagePathBack = "";
-        if (request()->hasFile('national_card_image_back')) {
-            $imageBack = request()->file('national_card_image_back');
-            $file_name_back = time() . rand(0, 9999999999999) . '_back.' . $imageBack->getClientOriginalExtension();
-            $imageBack->move(public_path('user/'), $file_name_back);
-            $imagePathBack = "user/" . $file_name_back;
-        }
-        // Create the user
-        $user = new User([
-            'first_name' => $validatedData['first_name'],
-            'last_name' => $validatedData['last_name'],
-            'email' => $validatedData['email'],
-            'phone' => $validatedData['phone'],
-            'password' => bcrypt($validatedData['password']),
-            'birth_date' => $validatedData['birth_date'],
-            'national_id' => $validatedData['national_id'],
-            'avatar' => $imagePathAvatar,
-            'national_card_image_front' => $imagePathFront,
-            'national_card_image_back' => $imagePathBack,
-            'admin' => 1,
-            'registration_confirmed' => 1,
 
-        ]);
-        $user->save();
+        $imagePaths = [];
+        $fileFields = ['avatar', 'national_card_image_front', 'national_card_image_back'];
 
-        return response()->json(['message' => 'تمت إضافة المستخدم بنجاح']);
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $fileName = time() . rand(1000, 9999) . "_{$field}." . $file->getClientOriginalExtension();
+                $path = $file->storeAs('users', $fileName, 'public');
+                $imagePaths[$field] = "storage/" . $path;
+            }
+        }
+
+        // Create or update the User
+        $user = User::updateOrCreate(
+            ['email' => $validatedData['email']],
+            [
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'phone' => $validatedData['phone'],
+                'password' => Hash::make($validatedData['password']),
+                'national_id' => $validatedData['national_id'],
+            ]
+        );
+
+        // Create or update User Detail
+        $userDetail = UserDetail::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'birthdate' => $validatedData['birth_date'],
+            ]
+        );
+        foreach ($imagePaths as $field => $imagePath) {
+            if (!empty($imagePath)) {
+                $userDetail->images()->create([
+                    'url'            => $imagePath,
+                    'imageable_type' => UserDetail::class,
+                    'imageable_id'   => $userDetail->id,
+                    'type'           => $field,
+                ]);
+            }
+        }
+        // Assign Admin Role
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $user->assignRole($adminRole);
+
+        // Assign User Settings
+        $settings = [
+            'mobile_number_visibility' => true,
+            'birthdate_visibility' => true,
+            'email_visibility' => true,
+            'registration_confirmed' => true,
+            'show_no_complaints_posts' => true,
+        ];
+
+        foreach ($settings as $settingName => $value) {
+            UserSetting::updateOrCreate(
+                ['user_id' => $user->id, 'setting_id' => $this->getSettingIdByName($settingName)],
+                ['value' => $value]
+            );
+        }
+
+        return response()->json(['message' => 'تمت إضافة المسؤول بنجاح']);
+    }
+
+    private function getSettingIdByName($name)
+    {
+        return Setting::where('key', $name)->value('id');
     }
 
     public function changePasswordByAdmin(Request $request)
     {
         $request->validate([
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'user_id' => 'required|exists:users,id',
+            'password' => 'required|min:6|confirmed',
         ]);
-
+        // dd($request->all());
         $user = User::find($request->user_id);
-
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-
         $user->password = Hash::make($request->password);
         $user->save();
-
-        return response()->json(['message' => 'تم تغيير الرقم السري بنجاح']);
+        // dd($user);
+        return response()->json(['message' => 'تم تغيير كلمة المرور بنجاح']);
     }
 
     public function makeAdmin($userId)

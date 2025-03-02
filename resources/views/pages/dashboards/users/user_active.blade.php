@@ -80,7 +80,7 @@
                                     <td>
                                         <button class="btn btn-sm btn-primary change-password-btn"
                                             data-user-id="{{ $user->id }}" data-bs-toggle="modal"
-                                            data-bs-target="#kt_modal_admin">
+                                            data-bs-target="#kt_modal_password">
                                             تغيير كلمة المرور
                                         </button>
                                         @include('pages/dashboards/admin/_edit_password')
@@ -89,6 +89,60 @@
                             @endforeach
                         </tbody>
                     </table>
+
+                    <div
+                        class="card-footer flex flex-col md:flex-row gap-5 justify-center md:justify-between text-gray-600 text-sm font-medium">
+                        @if ($users->hasPages())
+                            <nav role="navigation" aria-label="Pagination Navigation"
+                                class="flex items-center justify-between w-full">
+                                {{-- Small screens: Previous & Next buttons --}}
+                                <div class="flex justify-between flex-1 sm:hidden">
+                                    <a href="{{ $users->previousPageUrl() }}"
+                                        class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:ring focus:ring-gray-300 {{ $users->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                        « Previous
+                                    </a>
+                                    <a href="{{ $users->nextPageUrl() }}"
+                                        class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:ring focus:ring-gray-300 {{ $users->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
+                                        Next »
+                                    </a>
+                                </div>
+
+                                {{-- Large screens: Pagination --}}
+                                <div class="hidden sm:flex sm:items-center sm:justify-between w-full">
+                                    <p class="text-sm text-gray-700">
+                                        Showing <span class="font-medium">{{ $users->firstItem() }}</span>
+                                        to <span class="font-medium">{{ $users->lastItem() }}</span>
+                                        of <span class="font-medium">{{ $users->total() }}</span> results
+                                    </p>
+
+                                    {{-- Pagination Controls --}}
+                                    <div class="inline-flex items-center shadow-sm rounded-md">
+                                        {{-- Previous button --}}
+                                        <a href="{{ $users->previousPageUrl() }}"
+                                            class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:text-gray-400 focus:ring focus:ring-gray-300 {{ $users->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                            «
+                                        </a>
+
+                                        {{-- Page Numbers (Centered) --}}
+                                        @foreach ($users->links()->elements[0] as $page => $url)
+                                            <a href="{{ $url }}"
+                                                class="relative inline-flex items-center px-4 py-2 text-sm font-medium border border-gray-300 {{ $page == $users->currentPage() ? 'bg-gray-200 text-gray-500 cursor-default' : 'bg-white text-gray-700 hover:text-gray-500' }}">
+                                                {{ $page }}
+                                            </a>
+                                        @endforeach
+
+                                        {{-- Next button --}}
+                                        <a href="{{ $users->nextPageUrl() }}"
+                                            class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:text-gray-400 focus:ring focus:ring-gray-300 {{ $users->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
+                                            »
+                                        </a>
+                                    </div>
+                                </div>
+                            </nav>
+                        @endif
+                    </div>
+
+
                 </div>
             </div>
         </div>
@@ -148,43 +202,37 @@
 
 
             $(document).ready(function() {
+                $('.change-password-btn').click(function() {
+                    $('#user-id').val($(this).data('user-id'));
+                });
+
                 $('#change-password-form').on('submit', function(e) {
                     e.preventDefault();
-
                     $.ajax({
                         type: 'POST',
-                        url: 'changePasswordByAdmin',
+                        url: '{{ route('changePasswordByAdmin') }}',
                         data: $(this).serialize(),
                         success: function(response) {
-                            $('#kt_modal_admin').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'تم تغيير كلمة المرور بنجاح',
                                 showConfirmButton: false,
-                                timer: 1500 // Close the alert after 1.5 seconds
+                                timer: 1500
+                            }).then(function() {
+                                $('#kt_modal_password').modal('hide');
+                                location.reload();
                             });
                         },
                         error: function(xhr) {
-                            $('#kt_modal_admin').modal('hide');
-                            if (xhr.status === 404) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'خطأ',
-                                    text: 'المستخدم غير موجود'
-                                });
-                            } else if (xhr.status === 400) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'خطأ',
-                                    text: 'كلمة المرور القديمة غير صحيحة'
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'خطأ',
-                                    text: 'حدث خطأ ما'
-                                });
-                            }
+                            let errorMsg = 'حدث خطأ ما';
+                            if (xhr.status === 404) errorMsg = 'المستخدم غير موجود';
+                            else if (xhr.status === 400) errorMsg = 'كلمة المرور القديمة غير صحيحة';
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ',
+                                text: errorMsg
+                            });
                         }
                     });
                 });

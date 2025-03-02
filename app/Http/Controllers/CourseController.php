@@ -21,7 +21,7 @@ class CourseController extends Controller
     {
         $courses = Course::with([
             'user', 'images', 'pdfs', 'likes', 'favorites',
-        ])->orderBy('created_at', 'desc')->get();
+        ])->orderBy('created_at', 'desc')->paginate(25);
         return view('pages.dashboards.course.index', compact('courses'));
 
     }

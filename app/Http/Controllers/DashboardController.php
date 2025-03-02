@@ -7,7 +7,7 @@ use App\Domain\Models\Discount;
 use App\Domain\Models\Job;
 use App\Domain\Models\Project;
 use App\Domain\Models\Setting;
-use App\Domain\Models\User;
+use App\Models\User;
 
 use App\Models\BankAccount;
 use App\Services\MeetingService;
@@ -25,13 +25,13 @@ class DashboardController extends Controller
         $registrationConfirmedSetting = Setting::where('key', 'registration_confirmed')->first();
         $userActive = User::whereHas('userSettings', function ($query) use ($registrationConfirmedSetting) {
             $query->where('setting_id', $registrationConfirmedSetting->id)->where('value', 1);
-        })->whereDoesntHave('roles', function ($query) {
+        })->whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })->count();
     
         $userNotActive = User::whereHas('userSettings', function ($query) use ($registrationConfirmedSetting) {
             $query->where('setting_id', $registrationConfirmedSetting->id)->where('value', 0);
-        })->whereDoesntHave('roles', function ($query) {
+        })->whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })->count();
         // $userActive = User::where('registration_confirmed', 1)->where('admin', 0)->count();

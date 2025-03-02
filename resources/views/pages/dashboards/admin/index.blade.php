@@ -71,19 +71,69 @@
                                     <td>{{ optional($user->details)->birthdate }}</td>
                                     <td>{{ $user->national_id }}</td>
                                     <td>
-
                                         <button class="btn btn-sm btn-primary change-password-btn"
                                             data-user-id="{{ $user->id }}" data-bs-toggle="modal"
-                                            data-bs-target="#kt_modal_admin">
+                                            data-bs-target="#kt_modal_password">
                                             تغيير كلمة المرور
                                         </button>
-                                        @include('pages/dashboards/admin/_edit_password')
-
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                    
+                    <div
+                        class="card-footer flex flex-col md:flex-row gap-5 justify-center md:justify-between text-gray-600 text-sm font-medium">
+                        @if ($users->hasPages())
+                            <nav role="navigation" aria-label="Pagination Navigation"
+                                class="flex items-center justify-between w-full">
+                                {{-- Small screens: Previous & Next buttons --}}
+                                <div class="flex justify-between flex-1 sm:hidden">
+                                    <a href="{{ $users->previousPageUrl() }}"
+                                        class="pagination-btn {{ $users->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                        « Previous
+                                    </a>
+                                    <a href="{{ $users->nextPageUrl() }}"
+                                        class="pagination-btn {{ $users->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
+                                        Next »
+                                    </a>
+                                </div>
+
+                                {{-- Large screens: Pagination details and numbered links --}}
+                                <div class="hidden sm:flex sm:items-center sm:justify-between w-full">
+                                    <p class="text-sm text-gray-700">
+                                        Showing <span class="font-medium">{{ $users->firstItem() }}</span>
+                                        to <span class="font-medium">{{ $users->lastItem() }}</span>
+                                        of <span class="font-medium">{{ $users->total() }}</span> results
+                                    </p>
+
+                                    {{-- Pagination controls --}}
+                                    <div class="inline-flex rtl:flex-row-reverse shadow-sm rounded-md">
+                                        {{-- Previous button --}}
+                                        <a href="{{ $users->previousPageUrl() }}"
+                                            class="pagination-btn {{ $users->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                            «
+                                        </a>
+
+                                        {{-- Page numbers --}}
+                                        @foreach ($users->links()->elements[0] as $page => $url)
+                                            <a href="{{ $url }}"
+                                                class="pagination-btn {{ $page == $users->currentPage() ? 'bg-gray-200 text-gray-500 cursor-default' : '' }}">
+                                                {{ $page }}
+                                            </a>
+                                        @endforeach
+
+                                        {{-- Next button --}}
+                                        <a href="{{ $users->nextPageUrl() }}"
+                                            class="pagination-btn {{ $users->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
+                                            »
+                                        </a>
+                                    </div>
+                                </div>
+                            </nav>
+                        @endif
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -101,6 +151,7 @@
             </div>
         </div>
     </div>
+    @include('pages/dashboards/admin/_edit_password')
     @include('pages/dashboards/admin/_add')
     @section('script')
         <script>
@@ -139,87 +190,40 @@
                 });
             });
 
-            // $(document).ready(function() {
-            //     $('.change-password-btn').click(function() {
-            //         const userId = $(this).data('user-id');
-            //         // Set user ID in a hidden input field within the form
-            //         $('#user-id').val(userId);
-            //     });
 
-            //     $('#adminForm').submit(function(e) {
-            //         e.preventDefault();
-            //         var formData = $(this).serialize();
-            //         $.ajax({
-            //             type: 'POST',
-            //             url: 'admin/change-password',
-            //             data: formData,
-            //             headers: {
-            //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            //             },
-            //             success: function(response) {
-            //                 Swal.fire({
-            //                     icon: 'success',
-            //                     title: 'Success!',
-            //                     text: 'Password has been changed successfully.',
-            //                     showConfirmButton: false,
-            //                     timer: 1500
-            //                 }).then(function() {
-            //                     // Close the modal
-            //                     $('#kt_modal_admin').modal('hide');
-            //                     location.reload();
-            //                 });
-            //             },
-            //             error: function(error) {
-            //                 Swal.fire({
-            //                     icon: 'error',
-            //                     title: 'Error!',
-            //                     text: 'Failed to change password.',
-            //                     showConfirmButton: false,
-            //                     timer: 1500
-            //                 });
-            //             }
-            //         });
-            //     });
-            // });
 
             $(document).ready(function() {
+                $('.change-password-btn').click(function() {
+                    $('#user-id').val($(this).data('user-id'));
+                });
+
                 $('#change-password-form').on('submit', function(e) {
                     e.preventDefault();
-
                     $.ajax({
                         type: 'POST',
-                        url: 'changePasswordByAdmin',
+                        url: '{{ route('changePasswordByAdmin') }}',
                         data: $(this).serialize(),
                         success: function(response) {
-                            $('#kt_modal_admin').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'تم تغيير كلمة المرور بنجاح',
                                 showConfirmButton: false,
-                                timer: 1500 // Close the alert after 1.5 seconds
+                                timer: 1500
+                            }).then(function() {
+                                $('#kt_modal_password').modal('hide');
+                                location.reload();
                             });
                         },
                         error: function(xhr) {
-                            $('#kt_modal_admin').modal('hide');
-                            if (xhr.status === 404) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'خطأ',
-                                    text: 'المستخدم غير موجود'
-                                });
-                            } else if (xhr.status === 400) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'خطأ',
-                                    text: 'كلمة المرور القديمة غير صحيحة'
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'خطأ',
-                                    text: 'حدث خطأ ما'
-                                });
-                            }
+                            let errorMsg = 'حدث خطأ ما';
+                            if (xhr.status === 404) errorMsg = 'المستخدم غير موجود';
+                            else if (xhr.status === 400) errorMsg = 'كلمة المرور القديمة غير صحيحة';
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ',
+                                text: errorMsg
+                            });
                         }
                     });
                 });
