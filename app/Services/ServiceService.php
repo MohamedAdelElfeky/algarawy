@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Service;
+use App\Domain\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ServiceResource;
@@ -125,11 +125,27 @@ class ServiceService
 
     public function getAllServices($perPage = 10, $page = 1)
     {
-        $user = Auth::guard('sanctum')->user(); 
+        $user = Auth::user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
-        $servicesQuery = Service::orderBy('created_at', 'desc');
+        $showNoComplaintedPosts = $user->userSettings()
+            ->whereHas('setting', function ($query) {
+                $query->where('key', 'show_no_complaints_posts');
+            })
+            ->value('value') ?? false;
+
+        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
+
+        $servicesQuery = Service::whereNotIn('user_id', $blockedUserIds)
+            ->orderBy('created_at', 'desc');
+
+        if ($showNoComplaintedPosts) {
+            $servicesQuery->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhereDoesntHave('complaints');
+            });
+        }
         $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
         $serviceResource = ServiceResource::collection($services);
         $paginationData = $this->paginationService->getPaginationData($services);

@@ -24,11 +24,15 @@ class JobService
 
     public function getAllJobs($perPage = 10, $page = 1)
     {
-        $user = Auth::guard('sanctum')->user(); 
+        $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+        $showNoComplaintedPosts = $user->userSettings()
+            ->whereHas('setting', function ($query) {
+                $query->where('key', 'show_no_complaints_posts');
+            })
+            ->value('value') ?? false;
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
@@ -40,8 +44,6 @@ class JobService
                 $query->where('user_id', $user->id)
                     ->orWhereDoesntHave('complaints');
             });
-        } else {
-            $jobQuery;
         }
 
         $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);

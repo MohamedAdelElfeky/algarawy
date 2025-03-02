@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Domain\Models\Course;
 use App\Http\Resources\CourseResource;
-use App\Models\Course;
 use App\Models\FilePdf;
 use App\Models\Image;
 use Illuminate\Support\Facades\Auth;
@@ -172,13 +172,17 @@ class CourseService
 
     public function getAllCourses($perPage = 10, $page = 1)
     {
-        $user = Auth::guard('sanctum')->user(); 
+        $user = Auth::guard('sanctum')->user();
 
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
 
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+        $showNoComplaintedPosts = $user->userSettings()
+            ->whereHas('setting', function ($query) {
+                $query->where('key', 'show_no_complaints_posts');
+            })
+            ->value('value') ?? false;
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
@@ -190,10 +194,7 @@ class CourseService
                 $query->where('user_id', $user->id)
                     ->orWhereDoesntHave('complaints');
             });
-        } else {
-            $courseQuery; //->has('complaints');
         }
-
         $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
 
         return [
@@ -201,8 +202,6 @@ class CourseService
             'metadata' => $this->paginationService->getPaginationData($courses),
         ];
     }
-
-
 
     public function getAllCoursesPublic($perPage = 10, $page = 1)
     {

@@ -62,22 +62,27 @@ class Job extends Model
     {
         return $this->belongsTo(Neighborhood::class, 'neighborhood_id');
     }
+    
     public function jobApplications()
     {
         return $this->hasMany(JobApplication::class, 'job_id');
     }
+
     public function getCountOfApplicationsAttribute()
     {
         return $this->jobApplications()->count();
     }
+
     public function complaints()
     {
         return $this->morphMany(Complaint::class, 'complaintable');
     }
+
     public function JobCompanies()
     {
         return $this->hasOne(JobCompanies::class);
     }
+
     public function approval()
     {
         return $this->morphOne(PostApproval::class, 'approvable');

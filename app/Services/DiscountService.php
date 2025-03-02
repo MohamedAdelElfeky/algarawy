@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Discount;
+use App\Domain\Models\Discount;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\DiscountResource;
@@ -21,12 +21,16 @@ class DiscountService
 
     public function getAllDiscounts($perPage = 10, $page = 1)
     {
-        $user = Auth::guard('sanctum')->user(); 
+        $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
 
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+        $showNoComplaintedPosts = $user->userSettings()
+            ->whereHas('setting', function ($query) {
+                $query->where('key', 'show_no_complaints_posts');
+            })
+            ->value('value') ?? false;
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
         $discountQuery = Discount::whereNotIn('user_id', $blockedUserIds)
@@ -34,10 +38,8 @@ class DiscountService
         if ($showNoComplaintedPosts) {
             $discountQuery->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                    ->orWhereDoesntHave('complaints'); 
+                    ->orWhereDoesntHave('complaints');
             });
-        } else {
-            $discountQuery;//->has('complaints');
         }
         $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
         $discountResource = DiscountResource::collection($discounts);

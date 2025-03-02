@@ -22,7 +22,7 @@ class ComplaintController extends Controller
         if (!in_array($type, $validModels)) {
             return response()->json(['message' => 'نوع النموذج غير صالح'], 400);
         }
-        $modelClass = 'App\Models\\' . ucfirst($type);
+        $modelClass = 'App\Domain\Models\\' . ucfirst($type);
         $model = $modelClass::find($id);
         if (!$model) {
             return response()->json(['message' => 'النموذج غير موجود'], 404);

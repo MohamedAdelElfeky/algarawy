@@ -2,15 +2,11 @@
 
 namespace App\Services;
 
+use App\Domain\Models\Meeting;
 use App\Http\Resources\MeetingResource;
-use App\Models\Meeting;
-use App\Models\Notification;
-// use Illuminate\Support\Facades\Notification;
 use App\Models\User;
-use App\Notifications\MeetingNotification;
 use DateTime;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class MeetingService
@@ -134,7 +130,25 @@ class MeetingService
 
     public function getAllMeetings($perPage = 10, $page = 1)
     {
-        $meetingQuery = Meeting::orderBy('created_at', 'desc');
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+        $showNoComplaintedPosts = $user->userSettings()
+            ->whereHas('setting', function ($query) {
+                $query->where('key', 'show_no_complaints_posts');
+            })
+            ->value('value') ?? false;
+
+        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
+        $meetingQuery = Meeting::whereNotIn('user_id', $blockedUserIds)
+            ->orderBy('created_at', 'desc');
+        if ($showNoComplaintedPosts) {
+            $meetingQuery->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhereDoesntHave('complaints');
+            });
+        }
         $meetings = $meetingQuery->paginate($perPage, ['*'], 'page', $page);
         $meetingResource =  MeetingResource::collection($meetings);
         $paginationData = $this->paginationService->getPaginationData($meetings);
@@ -157,7 +171,7 @@ class MeetingService
             'metadata' => $paginationData,
         ];
     }
-    
+
     public function searchMeeting($searchTerm)
     {
         $meetings = Meeting::where(function ($query) use ($searchTerm) {

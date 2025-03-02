@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Domain\Models\Project;
 use App\Http\Resources\ProjectResource;
 use App\Models\FilePdf;
 use App\Models\Image;
-use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
@@ -27,7 +27,11 @@ class ProjectService
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+        $showNoComplaintedPosts = $user->userSettings()
+            ->whereHas('setting', function ($query) {
+                $query->where('key', 'show_no_complaints_posts');
+            })
+            ->value('value') ?? false;
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
@@ -37,11 +41,9 @@ class ProjectService
         if ($showNoComplaintedPosts) {
             $projectQuery->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                    ->orWhereDoesntHave('complaints'); 
+                    ->orWhereDoesntHave('complaints');
             });
-        } else {
-            $projectQuery; //->whereHas('complaints'); 
-        }
+        } 
         $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
         $projectResource = ProjectResource::collection($projects);
         $paginationData = $this->paginationService->getPaginationData($projects);
