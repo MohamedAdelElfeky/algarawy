@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\Setting;
 use App\Domain\Services\UserService;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\NewPasswordEmail;
 use App\Mail\ResetPasswordMail;
 use App\Models\Otp;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +23,7 @@ class AuthController extends Controller
 
     public function __construct(UserService $userService)
     {
+        $this->middleware('auth:sanctum')->except('register', 'login');
         $this->userService = $userService;
     }
 
@@ -47,11 +50,11 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('authToken')->plainTextToken;
-//        dd($token);
-             return response()->json([
-                 'user' => new UserResource($user),
-                 'token' => $token,
-             ], 201);
+        //        dd($token);
+        return response()->json([
+            'user' => new UserResource($user),
+            'token' => $token,
+        ], 201);
     }
     // public function register(Request $request)
     // {
@@ -157,111 +160,127 @@ class AuthController extends Controller
     //     ], 201);
     // }
 
-    // public function logout(Request $request)
-    // {
-    //     $request->user()->currentAccessToken()->delete();
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
 
-    //     return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
-    // }
+        return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
+    }
 
-    // public function PasswordReset(Request $request)
-    // {
-    //     dd($request);
-    //     $request->validate([
-    //         'email' => ['required', 'email'],
-    //     ]);
+    public function PasswordReset(Request $request)
+    {
+        dd($request);
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
 
-    //     $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-    //     if (!$user) {
-    //         return response()->json([
-    //             'message' => 'User not found',
-    //         ], 404);
-    //     }
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 404);
+        }
 
-    //     $newPassword = Str::random(10); // Generate a random password
+        $newPassword = Str::random(10); // Generate a random password
 
-    //     $user->update([
-    //         'password' => Hash::make($newPassword), // Update the user's password
-    //     ]);
+        $user->update([
+            'password' => Hash::make($newPassword), // Update the user's password
+        ]);
 
-    //     // Send the new password to the user's email
-    //     Mail::to($user->email)->send(new NewPasswordEmail($newPassword));
+        // Send the new password to the user's email
+        Mail::to($user->email)->send(new NewPasswordEmail($newPassword));
 
-    //     return response()->json([
-    //         'message' => 'Password reset successful. Check your email for the new password.',
-    //     ], 200);
-    // }
+        return response()->json([
+            'message' => 'Password reset successful. Check your email for the new password.',
+        ], 200);
+    }
 
-    // public function sendOTP(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'email' => 'required|email|exists:users',
-    //     ]);
+    public function sendOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         return response()->json(['message' => 'عنوان البريد الإلكتروني غير صالح.'], 422);
-    //     }
+        if ($validator->fails()) {
+            return response()->json(['message' => 'عنوان البريد الإلكتروني غير صالح.'], 422);
+        }
 
-    //     $email = $request->input('email');
-    //     $otp = rand(1000, 9999);
+        $email = $request->input('email');
+        $otp = rand(1000, 9999);
 
-    //     Otp::updateOrCreate(
-    //         ['email' => $email],
-    //         ['otp' => $otp, 'expires_at' => now()->addMinutes(10), 'used' => false]
-    //     );
+        Otp::updateOrCreate(
+            ['email' => $email],
+            ['otp' => $otp, 'expires_at' => now()->addMinutes(10), 'used' => false]
+        );
 
-    //     Mail::to($email)->send(new ResetPasswordMail($otp));
+        Mail::to($email)->send(new ResetPasswordMail($otp));
 
-    //     return response()->json(['message' => 'تم إرسال كلمة المرور لمرة واحدة (OTP) بنجاح.'], 201);
-    // }
+        return response()->json(['message' => 'تم إرسال كلمة المرور لمرة واحدة (OTP) بنجاح.'], 201);
+    }
 
-    // public function resetPassword(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'email' => 'required|email|exists:users',
-    //         'otp' => 'required|string',
-    //         'password' => 'required|string|min:6|confirmed',
-    //     ]);
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users',
+            'otp' => 'required|string',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         return response()->json(['message' => 'خطئ في التحقق.'], 422);
-    //     }
+        if ($validator->fails()) {
+            return response()->json(['message' => 'خطئ في التحقق.'], 422);
+        }
 
-    //     $email = $request->input('email');
-    //     $otp = $request->input('otp');
-    //     $password = $request->input('password');
+        $email = $request->input('email');
+        $otp = $request->input('otp');
+        $password = $request->input('password');
 
-    //     $reset = Otp::where('email', $email)
-    //         ->where('otp', $otp)
-    //         ->where('used', false)
-    //         ->where('expires_at', '>=', now())
-    //         ->first();
+        $reset = Otp::where('email', $email)
+            ->where('otp', $otp)
+            ->where('used', false)
+            ->where('expires_at', '>=', now())
+            ->first();
 
-    //     if (!$reset) {
-    //         return response()->json(['message' => 'كلمة المرور لمرة واحدة غير صالحة.'], 422);
-    //     }
+        if (!$reset) {
+            return response()->json(['message' => 'كلمة المرور لمرة واحدة غير صالحة.'], 422);
+        }
 
-    //     // Update the user's password
-    //     $user = User::where('email', $email)->first();
-    //     $user->update(['password' => bcrypt($password)]);
+        // Update the user's password
+        $user = User::where('email', $email)->first();
+        $user->update(['password' => bcrypt($password)]);
 
-    //     // Mark the OTP as used
-    //     $reset->update(['used' => true]);
+        // Mark the OTP as used
+        $reset->update(['used' => true]);
 
-    //     return response()->json(['message' => 'تم تغيير الرقم السري بنجاح.'], 201);
-    // }
+        return response()->json(['message' => 'تم تغيير الرقم السري بنجاح.'], 201);
+    }
 
-    // public function toggleShowNoComplaintedPosts()
-    // {
-    //     $user = Auth::user();
+    public function toggleShowNoComplaintedPosts()
+    {
+        $user = Auth::user();
 
-    //     $user->update([
-    //         'show_no_complainted_posts' => $user->show_no_complainted_posts == 1 ? 0 : 1,
-    //     ]);
-    //     return response()->json([
-    //         'message' => 'show No Complainted Posts Toggled Successfully.',
-    //         'user' => $user,
-    //     ]);
-    // }
+        $setting = Setting::where('key', 'show_no_complaints_posts')->first();
+
+        if (!$setting) {
+            return response()->json(['success' => false, 'message' => 'Setting not found'], 404);
+        }
+
+        $userSetting = $user->userSettings()->where('setting_id', $setting->id)->first();
+        // dd($userSetting);
+        if ($userSetting) {
+            $newValue = !$userSetting->value;
+            $userSetting->update(['value' => $newValue]);
+        } else {
+            $user->userSettings()->create([
+                'setting_id' => $setting->id,
+                'value' => true,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Show No Complaints Posts setting toggled successfully.',
+            'value' => isset($newValue) ? $newValue : true,
+        ]);
+    }
 }

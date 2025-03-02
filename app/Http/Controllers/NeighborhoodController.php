@@ -17,7 +17,7 @@ class NeighborhoodController extends Controller
     {
         $regions = Region::all();
         $cities = City::all();
-        $neighborhoods = Neighborhood::all();
+        $neighborhoods = Neighborhood::paginate(25);
         return view('pages.dashboards.neighborhoods.index', compact('cities', 'regions', 'neighborhoods'));
     }
 
