@@ -29,6 +29,7 @@ class Job extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
@@ -38,6 +39,7 @@ class Job extends Model
     {
         return $this->morphMany(FilePdf::class, 'pdfable');
     }
+    
     public function favorites()
     {
         return $this->morphMany(Favorite::class, 'favoritable');

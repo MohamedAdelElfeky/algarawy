@@ -29,4 +29,12 @@ class PostApproval extends Model
     {
         return $query->where('status', 'rejected');
     }
+
+    public static function updateApprovalStatus($approvable, $status, $approvedBy, $notes = null)
+    {
+        return self::updateOrCreate(
+            ['approvable_id' => $approvable->id, 'approvable_type' => get_class($approvable)],
+            ['status' => $status, 'approved_by' => $approvedBy, 'notes' => $notes]
+        );
+    }
 }

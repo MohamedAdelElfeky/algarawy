@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
+use App\Domain\Models\Project;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -57,5 +57,15 @@ class ProjectController extends Controller
         $project->update(['status' => $request->status]);
 
         return back()->with('status', 'Project status updated successfully!');
+    }
+
+    public function changeStatusApproval(Request $request, $id)
+    {
+        $project = Project::findOrFail($id);
+        $status = $request->input('approval_status');
+        // \dd($request);
+        $project->ApprovalStatus($status);
+
+        return back()->with('status', 'Project approval status updated successfully.');
     }
 }

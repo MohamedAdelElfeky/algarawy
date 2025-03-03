@@ -21,30 +21,23 @@
                             @foreach ($projects as $project)
                                 <tr>
                                     <td>{{ $project->user->first_name . ' ' . $project->user->last_name }} </td>
-
                                     <td>
                                         {{ substr($project->description, 0, 100) }}
                                         @if (strlen($project->description) > 100)
                                             <a href="#" data-bs-toggle="modal"
                                                 data-bs-target="#projectModal{{ $project->id }}">....</a>
                                         @endif
-                                        <!-- Modal -->
                                         <div class="modal fade" id="projectModal{{ $project->id }}" tabindex="-1"
                                             role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="projectModalLabel">
-                                                            عرض الوصف </h5>
+                                                        <h5 class="modal-title" id="projectModalLabel">عرض الوصف</h5>
                                                         <button type="button"
                                                             class="btn btn-sm btn-icon btn-active-color-primary"
-                                                            data-bs-dismiss="modal">
-                                                            X
-                                                        </button>
+                                                            data-bs-dismiss="modal">X</button>
                                                     </div>
-                                                    <div class="modal-body">
-                                                        {{ $project->description }}
-                                                    </div>
+                                                    <div class="modal-body">{{ $project->description }}</div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">الغاء</button>
@@ -53,13 +46,8 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        {{ $project->likes()->count() }}
-                                    </td>
-                                    <td>
-                                        {{ $project->favorites()->count() }}
-                                    </td>
-
+                                    <td>{{ $project->likes()->count() }}</td>
+                                    <td>{{ $project->favorites()->count() }}</td>
                                     <td>
                                         <button
                                             class="delete-project-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"
@@ -71,10 +59,11 @@
                                             </i>
                                         </button>
                                         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#statusModal{{ $project->id }}"> Change Status </button>
+                                            data-bs-target="#statusModal{{ $project->id }}">Change Status</button>
+                                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                            data-bs-target="#approvalModal{{ $project->id }}">Approval Status</button>
                                     </td>
                                 </tr>
-                                <!-- Modal -->
                                 <div class="modal fade" id="statusModal{{ $project->id }}" tabindex="-1"
                                     aria-labelledby="statusModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -84,28 +73,66 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
-                                            {{-- <form id="statusForm{{ $project->id }}" method="POST"
-                                                action="{{ route('projects.changeStatus', $project->id) }}"> @csrf
+                                            <form method="POST"
+                                                action="{{ route('projects.changeStatus', $project->id) }}">
+                                                @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
-                                                    <div class="form-group"> <label for="status">Status</label>
+                                                    <div class="form-group">
+                                                        <label for="status">Status</label>
                                                         <select id="status" name="status" class="form-control">
                                                             <option value="private"
                                                                 {{ $project->status == 'private' ? 'selected' : '' }}>
                                                                 Private</option>
                                                             <option value="public"
                                                                 {{ $project->status == 'public' ? 'selected' : '' }}>
-                                                                Public
-                                                            </option>
+                                                                Public</option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
-
                                                     <button type="submit" class="btn btn-primary">تعديل الحاله</button>
                                                 </div>
-
-                                            </form> --}}
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="approvalModal{{ $project->id }}" tabindex="-1"
+                                    aria-labelledby="approvalModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="approvalModalLabel">Change Approval Status
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <form method="POST"
+                                                action="{{ route('projects.changeApproval', $project->id) }}">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label for="approval_status">Approval Status</label>
+                                                        <select id="approval_status" name="approval_status"
+                                                            class="form-control">
+                                                            <option value="pending"
+                                                                {{ optional($project->postApproval)->status == 'pending' ? 'selected' : '' }}>
+                                                                Pending</option>
+                                                            <option value="approved"
+                                                                {{ optional($project->postApproval)->status == 'approved' ? 'selected' : '' }}>
+                                                                Approved</option>
+                                                            <option value="rejected"
+                                                                {{ optional($project->postApproval)->status == 'rejected' ? 'selected' : '' }}>
+                                                                Rejected</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Update
+                                                        Status</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -152,6 +179,65 @@
                                 error: function(xhr) {
                                     console.error(xhr.statusText);
                                 }
+                            });
+                        }
+                    });
+                });
+            });
+            $(document).ready(function() {
+                // Handle Project Status Update
+                $('form[id^="statusForm"]').submit(function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let actionUrl = form.attr('action');
+
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'PUT',
+                        data: form.serialize(),
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Success',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Something went wrong!',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                });
+
+                // Handle Approval Status Update
+                $('form[id^="approvalForm"]').submit(function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let actionUrl = form.attr('action');
+
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'PUT',
+                        data: form.serialize(),
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Success',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Something went wrong!',
+                                icon: 'error'
                             });
                         }
                     });

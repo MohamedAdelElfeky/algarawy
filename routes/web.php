@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
     Route::put('/courses/{course}/change-status', [CourseController::class, 'changeStatus'])->name('courses.changeStatus');
     Route::put('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.changeStatus');
+    Route::put('/projects/{project}/change-status-approval', [ProjectController::class, 'changeStatusApproval'])->name('projects.changeApproval');
 
     Route::get('/import', [ImportController::class, 'showForm'])->name('user.import.form');
     Route::post('/import', [ImportController::class, 'import'])->name('import');

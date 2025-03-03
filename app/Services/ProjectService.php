@@ -43,7 +43,7 @@ class ProjectService
                 $query->where('user_id', $user->id)
                     ->orWhereDoesntHave('complaints');
             });
-        } 
+        }
         $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
         $projectResource = ProjectResource::collection($projects);
         $paginationData = $this->paginationService->getPaginationData($projects);
@@ -94,6 +94,11 @@ class ProjectService
             ], 422);
         }
         $project = Project::create($data);
+
+        $project->postApproval()->create([
+            'status' => 'pending'
+        ]);
+
         // Handle images/videos
         if (request()->hasFile('images_or_video')) {
             foreach (request()->file('images_or_video') as $key => $item) {

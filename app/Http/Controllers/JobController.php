@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\Job;
 use App\Http\Resources\JobResource;
-use App\Models\Job;
 use App\Services\JobService;
 use Illuminate\Http\Request;
 
@@ -22,9 +22,7 @@ class JobController extends Controller
             'region',
             'city',
             'neighborhood',
-            'companyRegion',
-            'companyCity',
-            'companyNeighborhood',
+            'JobCompanies',            
             'user',
             'images',
             'pdfs',

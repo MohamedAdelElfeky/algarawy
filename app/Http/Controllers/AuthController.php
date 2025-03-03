@@ -23,7 +23,7 @@ class AuthController extends Controller
 
     public function __construct(UserService $userService)
     {
-        $this->middleware('auth:sanctum')->except('register', 'login','sendOTP','resetPassword');
+        $this->middleware('auth:sanctum')->except('register', 'login', 'sendOTP', 'resetPassword');
         $this->userService = $userService;
     }
 
@@ -214,9 +214,9 @@ class AuthController extends Controller
             ['otp' => $otp, 'expires_at' => now()->addMinutes(10), 'used' => false]
         );
 
-        Mail::to($email)->send(new ResetPasswordMail($otp));
+        // Mail::to($email)->send(new ResetPasswordMail($otp));
 
-        return response()->json(['message' => 'تم إرسال كلمة المرور لمرة واحدة (OTP) بنجاح.'], 201);
+        return response()->json(['message' => 'تم إرسال كلمة المرور لمرة واحدة (OTP) بنجاح. ' . $otp], 201);
     }
 
     public function resetPassword(Request $request)
