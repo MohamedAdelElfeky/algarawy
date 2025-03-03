@@ -4,17 +4,35 @@ namespace App\Domain\Models;
 
 use App\Models\Image;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Service extends Model
 {
     protected $fillable = ['user_id', 'description', 'location'];
 
-    public function images(): HasMany
+    public function images(): MorphMany
     {
-        return $this->hasMany(Image::class);
+        return $this->morphMany(Image::class, 'imageable');
     }
 
+    public function pdfs(): MorphMany
+    {
+        return $this->morphMany(FilePdf::class, 'pdfable');
+    }
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likable');
+    }
+
+    public function complaints()
+    {
+        return $this->morphMany(Complaint::class, 'complaintable');
+    }
     public function approval()
     {
         return $this->morphOne(PostApproval::class, 'approvable');
@@ -23,11 +41,11 @@ class Service extends Model
     public function scopeApprovalStatus($query, $status = 'pending')
     {
         $allowedStatuses = ['pending', 'approved', 'rejected'];
-    
+
         if (!in_array($status, $allowedStatuses)) {
             $status = 'pending';
         }
-    
+
         return $query->whereHas('postApproval', function ($query) use ($status) {
             $query->where('status', $status);
         });
@@ -37,7 +55,7 @@ class Service extends Model
     {
         return $this->morphOne(Visibility::class, 'visible');
     }
-    
+
     public function scopeVisibilityStatus($query, $status = 'public')
     {
         $allowedStatuses = ['public', 'private'];
