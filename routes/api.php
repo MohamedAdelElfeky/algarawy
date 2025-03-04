@@ -24,6 +24,9 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
+use Aloha\Twilio\Twilio;
+use Illuminate\Support\Facades\Config;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,6 +37,22 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/send-sms', function () {
+    try {
+        $twilio = new Twilio(
+            Config::get('services.twilio.sid'),
+            Config::get('services.twilio.token'),
+            Config::get('services.twilio.from')
+        );
+        // dd($twilio);
+        $twilio->message('+201010152694', 'Hello from Laravel using Twilio!');
+
+        return response()->json(['message' => 'SMS Sent Successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()]);
+    }
+});
 
 Route::POST('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
