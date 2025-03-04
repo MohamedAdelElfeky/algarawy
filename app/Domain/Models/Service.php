@@ -3,12 +3,18 @@
 namespace App\Domain\Models;
 
 use App\Models\Image;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Service extends Model
 {
     protected $fillable = ['user_id', 'description', 'location'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function images(): MorphMany
     {
