@@ -125,7 +125,7 @@ class ServiceService
 
     public function getAllServices($perPage = 10, $page = 1)
     {
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
