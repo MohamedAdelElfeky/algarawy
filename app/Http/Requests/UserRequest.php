@@ -55,8 +55,7 @@ class UserRequest extends FormRequest
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
             // Array of additional images
-            'card_images' => 'nullable|array',
-            'card_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'card_images' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 

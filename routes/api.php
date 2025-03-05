@@ -25,6 +25,7 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 use Aloha\Twilio\Twilio;
+use App\Http\Controllers\TwilioVerifyController;
 use Illuminate\Support\Facades\Config;
 
 /*
@@ -38,21 +39,8 @@ use Illuminate\Support\Facades\Config;
 |
 */
 
-Route::get('/send-sms', function () {
-    try {
-        $twilio = new Twilio(
-            Config::get('services.twilio.sid'),
-            Config::get('services.twilio.token'),
-            Config::get('services.twilio.from')
-        );
-        // dd($twilio);
-        $twilio->message('+201010152694', 'Hello from Laravel using Twilio!');
-
-        return response()->json(['message' => 'SMS Sent Successfully']);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()]);
-    }
-});
+Route::post('/send-otp', [TwilioVerifyController::class, 'sendOtp']);
+Route::post('/verify-otp', [TwilioVerifyController::class, 'verifyOtp']);
 
 Route::POST('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

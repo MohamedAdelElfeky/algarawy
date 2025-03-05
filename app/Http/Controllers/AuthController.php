@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Models\Setting;
+use App\Domain\Models\UserDetail;
 use App\Domain\Services\UserService;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
@@ -16,6 +17,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -27,15 +29,25 @@ class AuthController extends Controller
         $this->userService = $userService;
     }
 
-    public function register(UserRequest $request)
-    {
-        $user = $this->userService->registerUser($request->validated());
+    // public function register(UserRequest $request)
+    // {
+    //     try {
+    //         $user = $this->userService->registerUser($request->validated());
 
-        return response()->json([
-            'message' => 'تم التسجيل بنجاح',
-            'user' => $user
-        ], 201);
-    }
+    //         return response()->json([
+    //             'message' => 'تم التسجيل بنجاح',
+    //             'user' => $user
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         \Log::error('User registration failed: ' . $e->getMessage());
+
+    //         return response()->json([
+    //             'message' => 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
 
     public function login(Request $request)
     {
@@ -282,5 +294,88 @@ class AuthController extends Controller
             'message' => 'Show No Complaints Posts setting toggled successfully.',
             'value' => isset($newValue) ? $newValue : true,
         ]);
+    }
+
+
+    public function register(UserRequest $request)
+    {
+        try {
+            // Retrieve validated data
+            $validatedData = $request->validated();
+
+            // Handle file uploads
+            $imagePathAvatar = "";
+            if ($request->hasFile('avatar')) {
+                $imageAvatar = $request->file('avatar');
+                $file_name_avatar = time() . rand(0, 9999999999999) . '_avatar.' . $imageAvatar->getClientOriginalExtension();
+                $imageAvatar->move(public_path('user/'), $file_name_avatar);
+                $imagePathAvatar = "user/" . $file_name_avatar;
+            }
+
+            $imagePathFront = "";
+            if ($request->hasFile('national_card_image_front')) {
+                $imageFront = $request->file('national_card_image_front');
+                $file_name_front = time() . rand(0, 9999999999999) . '_front.' . $imageFront->getClientOriginalExtension();
+                $imageFront->move(public_path('user/'), $file_name_front);
+                $imagePathFront = "user/" . $file_name_front;
+            }
+
+            $imagePathBack = "";
+            if ($request->hasFile('national_card_image_back')) {
+                $imageBack = $request->file('national_card_image_back');
+                $file_name_back = time() . rand(0, 9999999999999) . '_back.' . $imageBack->getClientOriginalExtension();
+                $imageBack->move(public_path('user/'), $file_name_back);
+                $imagePathBack = "user/" . $file_name_back;
+            }
+
+            // Create or update user
+            $user = User::updateOrCreate(
+                ['email' => $validatedData['email']], // Unique field for update
+                [
+                    'first_name' => $validatedData['first_name'],
+                    'last_name' => $validatedData['last_name'],
+                    'email' => $validatedData['email'],
+                    'phone' => $validatedData['phone'],
+                    'password' => bcrypt($validatedData['password']),
+                    'national_id' => $validatedData['national_id'],
+                ]
+            );
+
+            // Store user details
+            $userDetail = UserDetail::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'birthdate' => $validatedData['birth_date'] ?? null,
+                    'region_id' => $validatedData['region_id'] ?? null,
+                    'city_id' => $validatedData['city_id'] ?? null,
+                    'neighborhood_id' => $validatedData['neighborhood_id'] ?? null,
+                ]
+            );
+
+            // Store images
+            $imageFields = [
+                'national_card_image_front' => $imagePathFront,
+                'national_card_image_back'  => $imagePathBack,
+                'avatar' => $imagePathAvatar,
+            ];
+
+            foreach ($imageFields as $field => $imagePath) {
+                if (!empty($imagePath)) {
+                    $userDetail->images()->create([
+                        'url' => $imagePath,
+                        'imageable_type' => UserDetail::class,
+                        'imageable_id' => $userDetail->id,
+                        'type' => $field,
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'message' => 'تم التسجيل بنجاح',
+                'user' => $user
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'حدث خطأ أثناء التسجيل', 'details' => $e->getMessage()], 500);
+        }
     }
 }

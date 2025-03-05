@@ -3,7 +3,7 @@
 namespace App\Domain\Services;
 
 use App\Domain\Aggregates\UserAggregate;
-use App\Domain\Models\User;
+use App\Models\User;
 use App\Domain\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 
@@ -56,8 +56,7 @@ class UserService
 
     public function registerUser(array $data)
     {
-//        dd($data);
-        // Hash the password
+
         $data['password'] = Hash::make($data['password']);
 
         // Create User
@@ -72,27 +71,16 @@ class UserService
 
         // Save User Details
         if (isset($data['location']) || isset($data['birthdate']) || isset($data['region_id']) || isset($data['city_id']) || isset($data['neighborhood_id'])) {
-            $user->details()->create([
+            $userDetail = $user->details()->create([
                 'location' => $data['location'] ?? null,
                 'birthdate' => $data['birthdate'] ?? null,
                 'region_id' => $data['region_id'] ?? null,
                 'city_id' => $data['city_id'] ?? null,
                 'neighborhood_id' => $data['neighborhood_id'] ?? null,
             ]);
-        }
-        if (isset($data['card_images']) && is_array($data['card_images'])) {
-            foreach ($data['card_images'] as $image) {
-                $imagePath = $this->handleImageUpload($image);
-
-                // Save image path in related table (assuming UserDetail has images relationship)
-                $user->details->images()->create([
-                    'path' => $imagePath,
-                    'type' => 'card_image', // Example field to store image type
-                ]);
-            }
+            $this->saveUserImages($userDetail, $data);
         }
         // Save Images
-        $this->saveUserImages($user, $data);
 
         return $user;
     }
@@ -104,8 +92,9 @@ class UserService
     {
         $imageFields = [
             'avatar' => 'avatar',
-            'national_card_image_front' => 'national_card_front',
-            'national_card_image_back' => 'national_card_back'
+            'national_card_image_front' => 'national_card_image_front',
+            'national_card_image_back' => 'national_card_image_back',
+            'card_image' => 'card_image'
         ];
 
         foreach ($imageFields as $field => $typeName) {
@@ -131,10 +120,10 @@ class UserService
         return 'storage/' . $path;
     }
 
-//    public function findUserByNationalId(string $nationalId)
-//    {
-//        return User::where('national_id', $nationalId)->first();
-//    }
+    //    public function findUserByNationalId(string $nationalId)
+    //    {
+    //        return User::where('national_id', $nationalId)->first();
+    //    }
 
     public function loginUser(array $credentials)
     {
