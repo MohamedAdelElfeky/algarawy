@@ -2,41 +2,48 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card shadow-lg">
-                    <!-- Optimized Header -->
-                    <div class="card-header bg-primary text-white text-center">
-                        <h4 class="mb-0">📂 Import Data</h4>
-                        <small class="text-light">Upload an Excel file (.xlsx, .xls, .csv) to import data</small>
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-gradient text-white text-center rounded-top-4"
+                        style="background: linear-gradient(135deg, #0078D7, #00A4EF);">
+                        <h4 class="mb-1"><i class="fas fa-file-import"></i> استيراد البيانات</h4>
+                        <small class="text-primary">قم برفع ملف Excel (.xlsx, .xls, .csv) لاستيراد البيانات</small>
                     </div>
 
-                    <div class="card-body">
-                        {{-- id, first_name, last_name, email, phone, national_id, password, birth_date, location, region_id, city_id, neighborhood_id, created_at, updated_at, national_card_image_front, national_card_image_back, avatar, card_images --}}
-
-                     
+                    <div class="card-body p-4">
                         <form action="{{ route('import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
-                            <!-- File Input -->
-                            <div class="mb-3">
-                                <label for="file" class="form-label fw-bold">Select Excel File:</label>
-                                <a href="{{ route('download.example') }}" class="btn btn-info btn-sm">⬇️ Download Example File</a>
+                            <div class="mb-4">
+                                <label for="file" class="form-label fw-bold text-dark"><i
+                                        class="fas fa-file-excel text-success"></i> اختر ملف Excel:</label>
 
-                                <input type="file" name="file" id="file"
-                                    class="form-control @error('file') is-invalid @enderror" accept=".xlsx, .xls, .csv"
-                                    required>
-                                <small class="text-muted">Supported formats: .xlsx, .xls, .csv</small>
+                                <div class="input-group">
+                                    <input type="file" name="file" id="file"
+                                        class="form-control @error('file') is-invalid @enderror"
+                                        accept=".xlsx, .xls, .csv" required>
+                                    <button class="btn btn-secondary" type="button"
+                                        onclick="window.location.href='{{ route('download.example') }}'">
+                                        ⬇️ تحميل ملف مثال
+                                    </button>
+                                </div>
+                                <small class="text-muted">الصيغ المدعومة: .xlsx, .xls, .csv</small>
 
-                                <!-- Validation Error Message -->
                                 @error('file')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <!-- Submit Button -->
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-success">📥 Upload & Import</button>
+                                <button type="submit" class="btn btn-primary shadow-sm"
+                                    style="background: #0078D7; border: none; transition: 0.3s;">
+                                    📥 رفع واستيراد
+                                </button>
                             </div>
                         </form>
+                    </div>
+
+                    <div class="card-footer bg-light text-center py-2 rounded-bottom-4">
+                        <small class="text-muted">تأكد من صحة البيانات قبل رفع الملف</small>
                     </div>
                 </div>
             </div>

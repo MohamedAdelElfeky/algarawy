@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PostApproval extends Model
 {
     use HasFactory;
-    protected $fillable = ['status', 'approved_by', 'notes'];
+    protected $fillable = ['approvable_id', 'approvable_type', 'status', 'approved_by', 'notes'];
 
     public function approvable()
     {
@@ -32,6 +32,10 @@ class PostApproval extends Model
 
     public static function updateApprovalStatus($approvable, $status, $approvedBy, $notes = null)
     {
+        if (!$approvable) {
+            throw new \Exception('Approvable model not found.');
+        }
+
         return self::updateOrCreate(
             ['approvable_id' => $approvable->id, 'approvable_type' => get_class($approvable)],
             ['status' => $status, 'approved_by' => $approvedBy, 'notes' => $notes]

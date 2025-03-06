@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\Meeting;
 use App\Http\Resources\MeetingResource;
-use App\Models\Meeting;
 use App\Services\MeetingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,19 +17,17 @@ class MeetingController extends Controller
     {
         $this->meetingService = $meetingService;
     }
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $meetings = $this->meetingService->getAllMeetings();
-        // return MeetingResource::collection($meetings);
-        return response()->json([
-            'message' => 'Meetings retrieved successfully',
-            'data' => $meetings,
-        ]);
+        $meetings = Meeting::with([
+            'user',
+            'images',
+            'pdfs',
+            'likes',
+            'favorites',
+        ])->orderBy('created_at', 'desc')->get();
+        return view('pages.dashboards.meeting.index', compact('meetings'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -97,7 +95,7 @@ class MeetingController extends Controller
             'message' => 'Meeting deleted successfully',
         ]);
     }
-    
+
     public function changeStatus(Request $request, Meeting $meeting)
     {
         $request->validate([

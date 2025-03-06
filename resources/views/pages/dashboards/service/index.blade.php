@@ -18,23 +18,23 @@
 
                         </thead>
                         <tbody>
-                            @foreach ($projects as $project)
+                            @foreach ($services as $service)
                                 <tr>
-                                    <td>{{ $project->user->first_name . ' ' . $project->user->last_name }} </td>
+                                    <td>{{ $service->user->first_name . ' ' . $service->user->last_name }} </td>
 
                                     <td>
-                                        {{ substr($project->description, 0, 100) }}
-                                        @if (strlen($project->description) > 100)
+                                        {{ substr($service->description, 0, 100) }}
+                                        @if (strlen($service->description) > 100)
                                             <a href="#" data-bs-toggle="modal"
-                                                data-bs-target="#projectModal{{ $project->id }}">....</a>
+                                                data-bs-target="#serviceModal{{ $service->id }}">....</a>
                                         @endif
                                         <!-- Modal -->
-                                        <div class="modal fade" id="projectModal{{ $project->id }}" tabindex="-1"
-                                            role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true">
+                                        <div class="modal fade" id="serviceModal{{ $service->id }}" tabindex="-1"
+                                            role="dialog" aria-labelledby="serviceModalLabel" aria-hidden="true">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="projectModalLabel">
+                                                        <h5 class="modal-title" id="serviceModalLabel">
                                                             عرض الوصف </h5>
                                                         <button type="button"
                                                             class="btn btn-sm btn-icon btn-active-color-primary"
@@ -43,7 +43,7 @@
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        {{ $project->description }}
+                                                        {{ $service->description }}
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
@@ -54,58 +54,98 @@
                                         </div>
                                     </td>
                                     <td>
-                                        {{ $project->likes()->count() }}
+                                        {{ $service->likes()->count() }}
                                     </td>
                                     <td>
-                                        {{ $project->favorites()->count() }}
+                                        {{ $service->favorites()->count() }}
                                     </td>
 
                                     <td>
                                         <button
-                                            class="delete-project-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"
-                                            data-project-id="{{ $project->id }}">
+                                            class="delete-service-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"
+                                            data-service-id="{{ $service->id }}">
                                             <i class="ki-duotone ki-tablet-delete">
                                                 <i class="path1"></i>
                                                 <i class="path2"></i>
                                                 <i class="path3"></i>
                                             </i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#statusModal{{ $project->id }}"> Change Status </button>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#statusModal{{ $service->id }}"> تغيير الحالة </button>
+
+                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                            data-bs-target="#approvalModal{{ $service->id }}">تغيير الموافقة</button>
                                     </td>
                                 </tr>
-                                <!-- Modal -->
-                                <div class="modal fade" id="statusModal{{ $project->id }}" tabindex="-1"
+                                <div class="modal fade" id="statusModal{{ $service->id }}" tabindex="-1"
                                     aria-labelledby="statusModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="statusModalLabel">Change project Status</h5>
+                                                <h5 class="modal-title" id="statusModalLabel"> تغيير الحالة </h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
-                                            <form id="statusForm{{ $project->id }}" method="POST"
-                                                action="{{ route('projects.changeStatus', $project->id) }}"> @csrf
+                                            <form id="statusForm{{ $service->id }}" method="POST"
+                                                action="{{ route('visibility.update', ['model' => 'service', 'id' => $service->id]) }}"
+                                                class="visibilityForm">
+                                                @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
-                                                    <div class="form-group"> <label for="status">Status</label>
+                                                    <div class="form-group"> <label for="status">الحالة</label>
                                                         <select id="status" name="status" class="form-control">
                                                             <option value="private"
-                                                                {{ $project->status == 'private' ? 'selected' : '' }}>
-                                                                Private</option>
+                                                                {{ optional($service->visibility)->status == 'private' ? 'selected' : '' }}>
+                                                                خاص </option>
                                                             <option value="public"
-                                                                {{ $project->status == 'public' ? 'selected' : '' }}>
-                                                                Public
+                                                                {{ optional($service->visibility)->status == 'public' ? 'selected' : '' }}>
+                                                                عام
                                                             </option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
 
-                                                    <button type="submit" class="btn btn-primary">Update
-                                                        Status</button>
+                                                    <button type="submit" class="btn btn-primary">تحديث الحالة</button>
                                                 </div>
 
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="approvalModal{{ $service->id }}" tabindex="-1"
+                                    aria-labelledby="approvalModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"> تغيير الحالة </h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="POST"
+                                                action="{{ route('approve.update', ['model' => 'service', 'id' => $service->id]) }}"
+                                                class="approvalForm">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="modal-body">
+                                                    <select name="status" class="form-control">
+                                                        <option value="pending"
+                                                            {{ optional($service->approval)->status == 'pending' ? 'selected' : '' }}>
+                                                            في انتظار الموافقة </option>
+                                                        <option value="approved"
+                                                            {{ optional($service->approval)->status == 'approved' ? 'selected' : '' }}>
+                                                            موافقة </option>
+                                                        <option value="rejected"
+                                                            {{ optional($service->approval)->status == 'rejected' ? 'selected' : '' }}>
+                                                            مرفوض </option>
+                                                    </select>
+                                                    <textarea name="notes" class="form-control mt-2" placeholder="Notes (optional)">{{ optional($service->approval)->notes }}</textarea>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary"> تحديث الحالة
+                                                    </button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
@@ -120,11 +160,11 @@
     @section('script')
         <script>
             $(document).ready(function() {
-                $('.delete-project-btn').click(function() {
-                    const projectId = $(this).data('project-id');
+                $('.delete-service-btn').click(function() {
+                    const serviceId = $(this).data('service-id');
                     Swal.fire({
                         title: 'تأكيد الحذف',
-                        text: 'هل أنت متأكد أنك تريد حذف هذا المشروع؟',
+                        text: 'هل أنت متأكد أنك تريد حذف هذا الخدمة',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#3085d6',
@@ -134,7 +174,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: 'projects/' + projectId,
+                                url: 'services/' + serviceId,
                                 type: 'DELETE',
                                 dataType: 'json',
                                 headers: {
@@ -144,7 +184,7 @@
                                     console.log(response.message);
                                     Swal.fire({
                                         title: 'تم الحذف',
-                                        text: 'تم حذف المشروع.',
+                                        text: 'تم حذف الخدمه.',
                                         icon: 'success'
                                     }).then(() => {
                                         window.location.reload();
@@ -153,6 +193,64 @@
                                 error: function(xhr) {
                                     console.error(xhr.statusText);
                                 }
+                            });
+                        }
+                    });
+                });
+            });
+            $(document).ready(function() {
+                $('.visibilityForm').submit(function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let actionUrl = form.attr('action');
+
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'PUT',
+                        data: form.serialize(),
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'تم بنجاح',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Something went wrong!',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                });
+            });
+            $(document).ready(function() {
+                $('.approvalForm').submit(function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let actionUrl = form.attr('action');
+
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'PUT',
+                        data: form.serialize(),
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'تم بنجاح',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Something went wrong!',
+                                icon: 'error'
                             });
                         }
                     });

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Service;
+use App\Domain\Models\Service;
 use App\Services\ServiceService;
 use Illuminate\Http\Request;
 
@@ -17,8 +17,14 @@ class ServiceController extends Controller
 
     public function index()
     {
-        $services = $this->serviceService->getAllServices();
-        return view('services.index', compact('services'));
+        $services = Service::with([
+            'user',
+            'images',
+            'pdfs',
+            'likes',
+            'favorites',
+        ])->orderBy('created_at', 'desc')->get();
+        return view('pages.dashboards.service.index', compact('services'));
     }
 
     public function show($id)

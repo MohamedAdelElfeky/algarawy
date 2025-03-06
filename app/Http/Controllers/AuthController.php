@@ -181,7 +181,6 @@ class AuthController extends Controller
 
     public function PasswordReset(Request $request)
     {
-        dd($request);
         $request->validate([
             'email' => ['required', 'email'],
         ]);
@@ -228,7 +227,7 @@ class AuthController extends Controller
 
         // Mail::to($email)->send(new ResetPasswordMail($otp));
 
-        return response()->json(['message' => 'تم إرسال كلمة المرور لمرة واحدة (OTP) بنجاح. ' . $otp], 201);
+        return response()->json(['message' => 'تم إرسال كلمة المرور لمرة واحدة (OTP) بنجاح. '], 201);
     }
 
     public function resetPassword(Request $request)

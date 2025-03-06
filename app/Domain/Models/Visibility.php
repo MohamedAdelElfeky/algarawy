@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Visibility extends Model
 {
     use HasFactory;
-    protected $fillable = ['status'];
+    protected $fillable = ['visible_id', 'visible_type', 'status'];
 
     public function visible()
     {
@@ -23,5 +23,13 @@ class Visibility extends Model
     public function scopePrivate($query)
     {
         return $query->where('status', 'private');
+    }
+
+    public static function updateVisibilityStatus($visible, $status)
+    {
+        return self::updateOrCreate(
+            ['visible_id' => $visible->id, 'visible_type' => get_class($visible)],
+            ['status' => $status]
+        );
     }
 }

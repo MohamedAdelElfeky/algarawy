@@ -94,6 +94,24 @@
                     </a>
                 </div>
                 <div class="menu-item">
+
+                    <a class="menu-link" href="{{ route('meetings.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title"> الاجتماعات  </span>
+                    </a>
+                </div>
+                <div class="menu-item">
+
+                    <a class="menu-link" href="{{ route('services.index') }}">
+                        <span class="menu-bullet">
+                            <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                        </span>
+                        <span class="menu-title"> الخدمات  </span>
+                    </a>
+                </div>
+                <div class="menu-item">
                     <a class="menu-link" href="{{ route('discounts.index') }}">
                         <span class="menu-bullet">
                             <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>

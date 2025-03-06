@@ -44,7 +44,8 @@ return [
     ],
     'twilio' => [
         'sid' => env('TWILIO_SID'),
-        'token' => env('TWILIO_TOKEN'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
         'from' => env('TWILIO_FROM'),
+        'verify_sid' => env('TWILIO_VERIFY_SID'),
     ],
 ];

@@ -89,41 +89,83 @@
                                                 <i class="path3"></i>
                                             </i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#statusModal{{ $job->id }}"> Change Status </button>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#statusModal{{ $job->id }}"> تغيير الحالة </button>
+
+                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                            data-bs-target="#approvalModal{{ $job->id }}">تغيير الموافقة</button>
+                                    </td>
                                     </td>
                                 </tr>
-                                <!-- Modal -->
+
                                 <div class="modal fade" id="statusModal{{ $job->id }}" tabindex="-1"
                                     aria-labelledby="statusModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="statusModalLabel">Change Job Status</h5>
+                                                <h5 class="modal-title" id="statusModalLabel"> تغيير الحالة </h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
                                             <form id="statusForm{{ $job->id }}" method="POST"
-                                                action="{{ route('jobs.changeStatus', $job->id) }}"> @csrf
+                                                action="{{ route('visibility.update', ['model' => 'job', 'id' => $job->id]) }}"
+                                                class="visibilityForm">
+                                                @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
-                                                    <div class="form-group"> <label for="status">Status</label>
+                                                    <div class="form-group"> <label for="status">الحالة</label>
                                                         <select id="status" name="status" class="form-control">
                                                             <option value="private"
-                                                                {{ $job->status == 'private' ? 'selected' : '' }}>
-                                                                Private</option>
+                                                                {{ optional($job->visibility)->status == 'private' ? 'selected' : '' }}>
+                                                                خاص </option>
                                                             <option value="public"
-                                                                {{ $job->status == 'public' ? 'selected' : '' }}>Public
+                                                                {{ optional($job->visibility)->status == 'public' ? 'selected' : '' }}>
+                                                                عام
                                                             </option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
 
-                                                    <button type="submit" class="btn btn-primary">Update
-                                                        Status</button>
+                                                    <button type="submit" class="btn btn-primary">تحديث الحالة</button>
                                                 </div>
 
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="approvalModal{{ $job->id }}" tabindex="-1"
+                                    aria-labelledby="approvalModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"> تغيير الحالة  </h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="POST"
+                                                action="{{ route('approve.update', ['model' => 'job', 'id' => $job->id]) }}"
+                                                class="approvalForm">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="modal-body">
+                                                    <select name="status" class="form-control">
+                                                        <option value="pending"
+                                                            {{ optional($job->approval)->status == 'pending' ? 'selected' : '' }}>
+                                                            في انتظار الموافقة </option>
+                                                        <option value="approved"
+                                                            {{ optional($job->approval)->status == 'approved' ? 'selected' : '' }}>
+                                                            موافقة </option>
+                                                        <option value="rejected"
+                                                            {{ optional($job->approval)->status == 'rejected' ? 'selected' : '' }}>
+                                                            مرفوض </option>
+                                                    </select>
+                                                    <textarea name="notes" class="form-control mt-2" placeholder="Notes (optional)">{{ optional($job->approval)->notes }}</textarea>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary"> تحديث الحالة </button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
@@ -172,6 +214,64 @@
                                 error: function(xhr) {
                                     console.error(xhr.statusText);
                                 }
+                            });
+                        }
+                    });
+                });
+            });
+            $(document).ready(function() {
+                $('.visibilityForm').submit(function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let actionUrl = form.attr('action');
+
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'PUT',
+                        data: form.serialize(),
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'تم بنجاح',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Something went wrong!',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                });
+            });
+            $(document).ready(function() {
+                $('.approvalForm').submit(function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let actionUrl = form.attr('action');
+
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'PUT',
+                        data: form.serialize(),
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'تم بنجاح',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Something went wrong!',
+                                icon: 'error'
                             });
                         }
                     });

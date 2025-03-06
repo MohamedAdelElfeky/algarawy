@@ -85,11 +85,7 @@ class Job extends Model
         return $this->hasOne(JobCompanies::class);
     }
 
-    public function approval()
-    {
-        return $this->morphOne(PostApproval::class, 'approvable');
-    }
-
+    
     public function scopeApprovalStatus($query, $status = 'pending')
     {
         $allowedStatuses = ['pending', 'approved', 'rejected'];
@@ -102,10 +98,20 @@ class Job extends Model
             $query->where('status', $status);
         });
     }
+    
+    public function approval()
+    {
+        return $this->morphOne(PostApproval::class, 'approvable');
+    }
 
     public function visibility()
     {
         return $this->morphOne(Visibility::class, 'visible');
+    }
+
+    public function getStatusAttribute()
+    {
+        return optional($this->visibility)->status;
     }
     
     public function scopeVisibilityStatus($query, $status = 'public')

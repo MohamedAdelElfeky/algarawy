@@ -7,25 +7,27 @@ use Illuminate\Http\Request;
 
 class TwilioVerifyController extends Controller
 {
+
     public function sendOtp(Request $request)
     {
         $request->validate([
-            'phone' => 'required|numeric'
+            'phone' => 'required|regex:/^\+\d{10,15}$/'
         ]);
 
-        $twilio = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
+        $phone = preg_replace('/\s+/', '', $request->phone);
 
         try {
+            $twilio = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
+
             $twilio->verify->v2->services(env('TWILIO_VERIFY_SID'))
                 ->verifications
-                ->create($request->phone, "sms");
-
+                ->create($phone, "sms");
+            
             return response()->json(['message' => 'OTP sent successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
     // Verify OTP
     public function verifyOtp(Request $request)
     {

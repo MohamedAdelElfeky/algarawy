@@ -41,41 +41,41 @@ class Project extends Model
         return $this->morphMany(Complaint::class, 'complaintable');
     }
 
-    public function postApproval()
+    public function approval()
     {
         return $this->morphOne(PostApproval::class, 'approvable');
     }
 
-    public function postVisibility()
+    public function visibility()
     {
         return $this->morphOne(Visibility::class, 'visible');
     }
 
-    public function ApprovalStatus($status)
-    {
-        $allowedStatuses = ['pending', 'approved', 'rejected'];
-        // dd($status);
-        if (!in_array($status, $allowedStatuses)) {
-            $status = 'pending';
-        }
+    // public function ApprovalStatus($status)
+    // {
+    //     $allowedStatuses = ['pending', 'approved', 'rejected'];
+    //     // dd($status);
+    //     if (!in_array($status, $allowedStatuses)) {
+    //         $status = 'pending';
+    //     }
 
-        return $this->postApproval()->updateOrCreate(
-            ['approvable_id' => $this->id, 'approvable_type' => self::class],
-            ['status' => $status]
-        );
-    }
+    //     return $this->postApproval()->updateOrCreate(
+    //         ['approvable_id' => $this->id, 'approvable_type' => self::class],
+    //         ['status' => $status]
+    //     );
+    // }
 
-    public function VisibilityStatus($status)
-    {
-        $allowedStatuses = ['public', 'private'];
+    // public function VisibilityStatus($status)
+    // {
+    //     $allowedStatuses = ['public', 'private'];
 
-        if (!in_array($status, $allowedStatuses)) {
-            $status = 'pending';
-        }
+    //     if (!in_array($status, $allowedStatuses)) {
+    //         $status = 'pending';
+    //     }
 
-        return $this->postVisibility()->updateOrCreate(
-            ['visible_id' => $this->id, 'visible_type' => self::class],
-            ['status' => $status]
-        );
-    }
+    //     return $this->postVisibility()->updateOrCreate(
+    //         ['visible_id' => $this->id, 'visible_type' => self::class],
+    //         ['status' => $status]
+    //     );
+    // }
 }

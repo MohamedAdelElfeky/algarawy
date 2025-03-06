@@ -44,36 +44,16 @@ class Discount extends Model
         return $this->morphMany(Complaint::class, 'complaintable');
     }
 
-    public function scopeApprovalStatus($query, $status = 'pending')
+    public function approval()
     {
-        $allowedStatuses = ['pending', 'approved', 'rejected'];
-    
-        if (!in_array($status, $allowedStatuses)) {
-            $status = 'pending';
-        }
-    
-        return $query->whereHas('postApproval', function ($query) use ($status) {
-            $query->where('status', $status);
-        });
+        return $this->morphOne(PostApproval::class, 'approvable');
     }
 
     public function visibility()
     {
         return $this->morphOne(Visibility::class, 'visible');
-    }
+    }    
     
-    public function scopeVisibilityStatus($query, $status = 'public')
-    {
-        $allowedStatuses = ['public', 'private'];
-
-        if (!in_array($status, $allowedStatuses)) {
-            $status = 'public';
-        }
-
-        return $query->whereHas('visibility', function ($q) use ($status) {
-            $q->where('status', $status);
-        });
-    }
 
     public function memberships()
     {

@@ -4,7 +4,7 @@ namespace App\Domain\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Meeting extends Model
 {
@@ -22,6 +22,16 @@ class Meeting extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function pdfs(): MorphMany
+    {
+        return $this->morphMany(FilePdf::class, 'pdfable');
     }
 
     public function approval()

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\BankAccountController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VisibilityController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -76,6 +78,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('neighborhoods', NeighborhoodController::class);
     Route::put('addNeighborhoods', [NeighborhoodController::class, 'addNeighborhood'])->name('addNeighborhood');
+    
     Route::put('/jobs/{job}/change-status', [JobController::class, 'changeStatus'])->name('jobs.changeStatus');
     Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
     Route::put('/courses/{course}/change-status', [CourseController::class, 'changeStatus'])->name('courses.changeStatus');
@@ -87,6 +90,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/{id}/make-admin', [UserController::class, 'makeAdmin'])->name('user.makeAdmin');
     Route::get('/download-example',  [ImportController::class, 'users_example'])->name('download.example');
 
+    Route::put('/approve/{model}/{id}', [ApprovalController::class, 'updateApprovalStatus'])->name('approve.update');
+    Route::put('/visibility/{model}/{id}', [VisibilityController::class, 'updateVisibilityStatus'])->name('visibility.update');
 });
 
 Route::get('/error', function () {
