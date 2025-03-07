@@ -18,7 +18,6 @@ class UserRequest extends FormRequest
 
     public function rules()
     {
-        // Retrieve the user model from the route and load userDetails
         $user = $this->route('user');
         if ($user instanceof User) {
             $user->load('userDetails');
@@ -45,7 +44,6 @@ class UserRequest extends FormRequest
                 Rule::unique('users', 'national_id')->ignore($user->id ?? null),
             ],
             'password' => [$this->isMethod('post') ? 'required' : 'nullable', 'string', 'min:6'],
-
             'birthdate' => ['nullable', 'date'],
             'region_id' => ['nullable', 'integer', 'exists:regions,id'],
             'city_id' => ['nullable', 'integer', 'exists:cities,id'],
@@ -53,26 +51,18 @@ class UserRequest extends FormRequest
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-
-            // Array of additional images
             'card_images' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 
-    /**
-     * Handle a failed validation attempt.
-     *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
-     */
     protected function failedValidation(Validator $validator)
     {
-        $errors = (new ValidationException($validator))->errors();
-
+        $firstError = collect($validator->errors()->all())->first(); 
+    
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Validation failed',
-            'errors' => $errors
+            'message' => 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى',
+            'error' => $firstError, 
         ], 422));
     }
 
