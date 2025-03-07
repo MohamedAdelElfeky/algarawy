@@ -137,7 +137,7 @@ class ServiceService
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
-        $servicesQuery = Service::whereNotIn('user_id', $blockedUserIds)
+        $servicesQuery = Service::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {
@@ -158,7 +158,8 @@ class ServiceService
 
     public function getAllServicesPublic($perPage = 10, $page = 1)
     {
-        $servicesQuery = Service::where('status', 'public')->orderBy('created_at', 'desc');
+        $servicesQuery = Service::visibilityStatus('public')->ApprovalStatus('approved')
+            ->orderBy('created_at', 'desc');
         $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
         $serviceResource = ServiceResource::collection($services);
         $paginationData = $this->paginationService->getPaginationData($services);

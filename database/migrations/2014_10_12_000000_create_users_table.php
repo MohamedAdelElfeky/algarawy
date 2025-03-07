@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('national_id')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->boolean('registration_confirmed')->default(false);           
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

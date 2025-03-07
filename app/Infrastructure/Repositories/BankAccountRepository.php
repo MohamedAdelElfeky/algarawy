@@ -1,6 +1,7 @@
 <?php
 namespace App\Infrastructure\Repositories;
 
+use App\Domain\Models\BankAccount;
 use App\Domain\Repositories\BankAccountRepositoryInterface;
 
 class BankAccountRepository implements BankAccountRepositoryInterface

@@ -11,6 +11,7 @@ use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\NeighborhoodController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegionController;
@@ -79,11 +80,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('neighborhoods', NeighborhoodController::class);
     Route::put('addNeighborhoods', [NeighborhoodController::class, 'addNeighborhood'])->name('addNeighborhood');
     
-    Route::put('/jobs/{job}/change-status', [JobController::class, 'changeStatus'])->name('jobs.changeStatus');
-    Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
-    Route::put('/courses/{course}/change-status', [CourseController::class, 'changeStatus'])->name('courses.changeStatus');
-    Route::put('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.changeStatus');
-    Route::put('/projects/{project}/change-status-approval', [ProjectController::class, 'changeStatusApproval'])->name('projects.changeApproval');
+    Route::resource('memberships', MembershipController::class);
+
+
+    // Route::put('/jobs/{job}/change-status', [JobController::class, 'changeStatus'])->name('jobs.changeStatus');
+    // Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
+    // Route::put('/courses/{course}/change-status', [CourseController::class, 'changeStatus'])->name('courses.changeStatus');
+    // Route::put('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.changeStatus');
+    // Route::put('/projects/{project}/change-status-approval', [ProjectController::class, 'changeStatusApproval'])->name('projects.changeApproval');
 
     Route::get('/import', [ImportController::class, 'showForm'])->name('user.import.form');
     Route::post('/import', [ImportController::class, 'import'])->name('import');

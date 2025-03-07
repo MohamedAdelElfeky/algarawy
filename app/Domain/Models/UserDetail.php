@@ -3,6 +3,7 @@
 namespace App\Domain\Models;
 
 use App\Models\Image;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class UserDetail extends Model

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('bank_name', 100);
             $table->string('swift_number', 20);
             $table->enum('type', ['saving', 'charity', 'investment'])->default('saving');
-            $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->timestamps();
         });
     }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\BlockedUser;
+use App\Domain\Models\BlockedUser;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

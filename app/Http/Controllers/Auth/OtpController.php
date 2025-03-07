@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use App\Infrastructure\Services\TwilioService;
+use App\Models\User;
 
 class OtpController extends Controller
 {
@@ -22,14 +23,22 @@ class OtpController extends Controller
     public function sendOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'phone' => 'required|regex:/^\+\d{10,15}$/|exists:users,phone',
+            'phone' => 'required|regex:/^\+\d{2}\d{8,15}$/',
         ]);
+        // 'phone' => 'required|regex:/^\+\d{1,3}\d{8,15}$/',
 
         if ($validator->fails()) {
             return response()->json(['message' => 'رقم الهاتف غير صالح.'], 422);
         }
 
         try {
+            $localPhone = $this->stripCountryCode($request->phone);
+            $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
+            // dd($localPhone);
+
+            if (!$user) {
+                return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
+            }
             $phone = new PhoneNumber($request->phone);
             $this->twilioService->sendOtp($phone);
             return response()->json(['message' => 'تم إرسال رمز OTP بنجاح.'], 201);
@@ -42,8 +51,9 @@ class OtpController extends Controller
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'phone' => 'required|regex:/^\+\d{10,15}$/',
+            'phone' => 'required|regex:/^\+\d{2}\d{9}$/',
             'otp' => 'required|digits:6',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -51,11 +61,18 @@ class OtpController extends Controller
         }
 
         try {
+            $localPhone = $this->stripCountryCode($request->phone);
+            $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
+            if (!$user) {
+                return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
+            }
             $phone = new PhoneNumber($request->phone);
             $otp = new OTP($request->otp);
             $isVerified = $this->twilioService->verifyOtp($phone, $otp);
             if ($isVerified) {
-                return response()->json(['message' => 'تم التحقق بنجاح.'], 200);
+                $user = User::where('phone', $phone)->first();
+                $user->update(['password' => bcrypt($request->input('password'))]);
+                return response()->json(['message' => 'تم تغيير الرقم السري بنجاح.'], 200);
             } else {
                 return response()->json(['message' => 'OTP غير صالح.'], 400);
             }
@@ -70,7 +87,7 @@ class OtpController extends Controller
     public function sendMessage(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'phone' => 'required|regex:/^\+\d{10,15}$/|exists:users,phone',
+            'phone' => 'required|regex:/^\+\d{2}\d{9}$/',
             'message' => 'required|string|max:255',
         ]);
 
@@ -79,6 +96,11 @@ class OtpController extends Controller
         }
 
         try {
+            $localPhone = $this->stripCountryCode($request->phone);
+            $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
+            if (!$user) {
+                return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
+            }
             $phone = new PhoneNumber($request->phone);
             $message = $request->message;
 
@@ -88,5 +110,10 @@ class OtpController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
+    }
+
+    private function stripCountryCode($phone)
+    {
+        return preg_replace('/^\+\d{1,3}/', '', $phone);
     }
 }

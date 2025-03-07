@@ -2,7 +2,7 @@
 
 namespace App\Domain\Aggregates;
 
-use App\Domain\Models\User;
+use App\Models\User;
 
 class UserAggregate
 {

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('link')->nullable();
             $table->integer('discount')->nullable();
             $table->decimal('price', 10, 2)->nullable();
-            $table->enum('status', ['public', 'private'])->default('private');
             $table->softDeletes();
             $table->timestamps();
 

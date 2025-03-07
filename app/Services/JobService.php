@@ -37,6 +37,7 @@ class JobService
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
         $jobQuery = Job::whereNotIn('user_id', $blockedUserIds)
+            ->ApprovalStatus('approved')
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {
@@ -59,7 +60,8 @@ class JobService
     public function getAllJobsPublic($perPage = 10, $page = 1)
     {
 
-        $jobQuery = Job::where('status', 'public')->orderBy('created_at', 'desc');
+        $jobQuery = Job::visibilityStatus('public')->ApprovalStatus('approved')
+            ->orderBy('created_at', 'desc');
         $jobs = $jobQuery->paginate($perPage, ['*'], 'page', $page);
         $jobCollection = JobResource::collection($jobs);
         $paginationData = $this->paginationService->getPaginationData($jobCollection);
@@ -210,9 +212,7 @@ class JobService
         foreach ($deletedImagesAndVideos as $imageId) {
             $image = Image::find($imageId);
             if ($image) {
-                // Delete from storage
                 Storage::delete($image->url);
-                // Delete from database
                 $image->delete();
             }
         }
@@ -221,13 +221,10 @@ class JobService
         foreach ($deletedFiles as $fileId) {
             $filePdf = FilePdf::find($fileId);
             if ($filePdf) {
-                // Delete from storage
                 Storage::delete($filePdf->url);
-                // Delete from database
                 $filePdf->delete();
             }
         }
-        // dd($data);
         if (!empty($data['deleted_company_logo'])) {
             $oldLogoPath = public_path($job->company_logo);
             if (file_exists($oldLogoPath)) {

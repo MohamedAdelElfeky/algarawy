@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Domain\Models\BankAccount;
 use App\Http\Resources\BankAccountResource;
-use App\Models\BankAccount;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;

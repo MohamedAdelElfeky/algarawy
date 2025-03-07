@@ -35,20 +35,20 @@ class JobController extends Controller
         return response()->json($jobs, 200);
     }
 
-    public function getAuthenticatedJob(Request $request)
-    {
-        $perPage = $request->query('perPage', 10);
-        $page = $request->query('page', 1);
+    // public function getAuthenticatedJob(Request $request)
+    // {
+    //     $perPage = $request->query('perPage', 10);
+    //     $page = $request->query('page', 1);
 
-        $user = Auth::user();
+    //     $user = Auth::user();
 
-        if ($user) {
-            $jobs = $this->jobService->getAllJobs($perPage, $page);
-            return response()->json($jobs, 200);
-        } else {
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
-    }
+    //     if ($user) {
+    //         $jobs = $this->jobService->getAllJobs($perPage, $page);
+    //         return response()->json($jobs, 200);
+    //     } else {
+    //         return response()->json(['error' => 'User not authenticated'], 401);
+    //     }
+    // }
 
     public function show($id)
     {
@@ -64,6 +64,7 @@ class JobController extends Controller
         $job = $this->jobService->createJob($data, $request);
         return response()->json($job, 201);
     }
+
     public function update(Request $request, $id)
     {
         $job = Job::find($id);
@@ -73,6 +74,7 @@ class JobController extends Controller
         $updatedJob = $this->jobService->updateJob($job, $request->all());
         return response()->json($updatedJob);
     }
+
     public function destroy($id)
     {
         $job = Job::find($id);
@@ -94,29 +96,29 @@ class JobController extends Controller
         return response()->json(['data' => $results]);
     }
 
-    public function ChangeStatus(Request $request)
-    {
-        $job = Job::find($request->id);
-        if (!$job) {
-            return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
-        }
-        $validator = Validator::make($request->all(), [
-            'job_status' => 'nullable|boolean',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-        $status = $request->input('job_status');
-        $data['job_status'] = $status;
-        $job->update($data);
-        return response()->json([
-            'message' => 'تم تحديث حاله الوظيفية',
-            'data' => new JobResource($job),
-        ], 201);
-    }
+    // public function ChangeStatus(Request $request)
+    // {
+    //     $job = Job::find($request->id);
+    //     if (!$job) {
+    //         return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
+    //     }
+    //     $validator = Validator::make($request->all(), [
+    //         'job_status' => 'nullable|boolean',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Validation error',
+    //             'errors' => $validator->errors(),
+    //         ], 422);
+    //     }
+    //     $status = $request->input('job_status');
+    //     $data['job_status'] = $status;
+    //     $job->update($data);
+    //     return response()->json([
+    //         'message' => 'تم تحديث حاله الوظيفية',
+    //         'data' => new JobResource($job),
+    //     ], 201);
+    // }
 
     public function getJobs(Request $request)
     {

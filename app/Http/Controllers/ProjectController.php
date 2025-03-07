@@ -20,7 +20,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::with(['images', 'pdfs', 'favorites', 'likes'])
-            ->get();
+            ->paginate(25);
         return view('pages.dashboards.project.index', compact('projects'));
     }
 

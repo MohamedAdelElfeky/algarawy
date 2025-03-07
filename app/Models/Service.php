@@ -18,7 +18,7 @@ class Service extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Domain\Models\User::class);
+        return $this->belongsTo(User::class);
     }
     public function images(): MorphMany
     {

@@ -141,7 +141,7 @@ class MeetingService
             ->value('value') ?? false;
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
-        $meetingQuery = Meeting::whereNotIn('user_id', $blockedUserIds)
+        $meetingQuery = Meeting::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
             ->orderBy('created_at', 'desc');
         if ($showNoComplaintedPosts) {
             $meetingQuery->where(function ($query) use ($user) {
@@ -161,7 +161,8 @@ class MeetingService
 
     public function getAllMeetingsPublic($perPage = 10, $page = 1)
     {
-        $meetingQuery = Meeting::where('status', 'public')->orderBy('created_at', 'desc');
+        $meetingQuery = Meeting::visibilityStatus('public')->ApprovalStatus('approved')
+            ->orderBy('created_at', 'desc');
         $meetings = $meetingQuery->paginate($perPage, ['*'], 'page', $page);
         $meetingResource =  MeetingResource::collection($meetings);
         $paginationData = $this->paginationService->getPaginationData($meetings);

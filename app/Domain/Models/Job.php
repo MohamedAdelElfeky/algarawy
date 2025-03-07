@@ -94,7 +94,7 @@ class Job extends Model
             $status = 'pending';
         }
     
-        return $query->whereHas('postApproval', function ($query) use ($status) {
+        return $query->whereHas('approval', function ($query) use ($status) {
             $query->where('status', $status);
         });
     }

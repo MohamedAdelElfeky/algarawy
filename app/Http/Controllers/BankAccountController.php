@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\BankAccount;
 use App\Http\Resources\BankAccountResource;
-use App\Models\BankAccount;
 use App\Services\BankAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

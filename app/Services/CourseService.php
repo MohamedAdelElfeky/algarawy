@@ -186,7 +186,7 @@ class CourseService
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
-        $courseQuery = Course::whereNotIn('user_id', $blockedUserIds)
+        $courseQuery = Course::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {
@@ -205,7 +205,8 @@ class CourseService
 
     public function getAllCoursesPublic($perPage = 10, $page = 1)
     {
-        $courseQuery = Course::where('status', 'public')->orderBy('created_at', 'desc');
+        $courseQuery = Course::visibilityStatus('public')->ApprovalStatus('approved')
+            ->orderBy('created_at', 'desc');
         $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
         $courseResource = CourseResource::collection($courses);
         $paginationData = $this->paginationService->getPaginationData($courses);

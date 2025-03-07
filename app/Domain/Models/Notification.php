@@ -2,6 +2,7 @@
 
 namespace App\Domain\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,6 +27,6 @@ class Notification extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Domain\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 }

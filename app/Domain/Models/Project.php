@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Project extends Model
 {
-    protected $fillable = ['description', 'location', 'status', 'user_id'];
+    protected $fillable = ['description', 'location', 'user_id'];
 
 
     public function user()

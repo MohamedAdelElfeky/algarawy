@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('discount')->nullable();
             $table->string('link')->nullable();
             $table->json('images_and_videos')->nullable();
-            $table->enum('status', ['public', 'private'])->default('private');
             $table->softDeletes();
             $table->timestamps();
         });

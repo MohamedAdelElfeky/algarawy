@@ -21,7 +21,6 @@ return new class extends Migration
             $table->datetime('start_time')->nullable();
             $table->datetime('end_time')->nullable();
             $table->string('type')->nullable();
-            $table->enum('status', ['public', 'private'])->default('private');
             $table->softDeletes();
             $table->timestamps();
         });

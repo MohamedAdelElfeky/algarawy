@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\BankAccount;
 use App\Domain\Models\Course;
 use App\Domain\Models\Discount;
 use App\Domain\Models\Job;
@@ -9,7 +10,6 @@ use App\Domain\Models\Project;
 use App\Domain\Models\Setting;
 use App\Models\User;
 
-use App\Models\BankAccount;
 use App\Services\MeetingService;
 
 class DashboardController extends Controller

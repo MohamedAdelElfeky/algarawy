@@ -39,7 +39,7 @@ class Job extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Domain\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
     public function images(): MorphMany
     {

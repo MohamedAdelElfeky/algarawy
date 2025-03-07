@@ -142,6 +142,57 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div
+                        class="card-footer flex flex-col md:flex-row gap-5 justify-center md:justify-between text-gray-600 text-sm font-medium">
+                        @if ($projects->hasPages())
+                            <nav role="navigation" aria-label="Pagination Navigation"
+                                class="flex items-center justify-between w-full">
+                                {{-- Small screens: Previous & Next buttons --}}
+                                <div class="flex justify-between flex-1 sm:hidden">
+                                    <a href="{{ $projects->previousPageUrl() }}"
+                                        class="pagination-btn {{ $projects->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                        « Previous
+                                    </a>
+                                    <a href="{{ $projects->nextPageUrl() }}"
+                                        class="pagination-btn {{ $projects->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
+                                        Next »
+                                    </a>
+                                </div>
+
+                                {{-- Large screens: Pagination details and numbered links --}}
+                                <div class="hidden sm:flex sm:items-center sm:justify-between w-full">
+                                    <p class="text-sm text-gray-700">
+                                        Showing <span class="font-medium">{{ $projects->firstItem() }}</span>
+                                        to <span class="font-medium">{{ $projects->lastItem() }}</span>
+                                        of <span class="font-medium">{{ $projects->total() }}</span> results
+                                    </p>
+
+                                    {{-- Pagination controls --}}
+                                    <div class="inline-flex rtl:flex-row-reverse shadow-sm rounded-md">
+                                        {{-- Previous button --}}
+                                        <a href="{{ $projects->previousPageUrl() }}"
+                                            class="pagination-btn {{ $projects->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                            «
+                                        </a>
+
+                                        {{-- Page numbers --}}
+                                        @foreach ($projects->links()->elements[0] as $page => $url)
+                                            <a href="{{ $url }}"
+                                                class="pagination-btn {{ $page == $projects->currentPage() ? 'bg-gray-200 text-gray-500 cursor-default' : '' }}">
+                                                {{ $page }}
+                                            </a>
+                                        @endforeach
+
+                                        {{-- Next button --}}
+                                        <a href="{{ $projects->nextPageUrl() }}"
+                                            class="pagination-btn {{ $projects->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
+                                            »
+                                        </a>
+                                    </div>
+                                </div>
+                            </nav>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

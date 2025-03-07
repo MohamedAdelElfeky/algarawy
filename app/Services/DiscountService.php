@@ -33,7 +33,7 @@ class DiscountService
             ->value('value') ?? false;
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
-        $discountQuery = Discount::whereNotIn('user_id', $blockedUserIds)
+        $discountQuery = Discount::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
             ->orderBy('created_at', 'desc');
         if ($showNoComplaintedPosts) {
             $discountQuery->where(function ($query) use ($user) {
@@ -52,7 +52,8 @@ class DiscountService
 
     public function getAllDiscountsPublic($perPage = 10, $page = 1)
     {
-        $discountQuery = Discount::where('status', 'public')->orderBy('created_at', 'desc');
+        $discountQuery = Discount::visibilityStatus('public')->ApprovalStatus('approved')
+            ->orderBy('created_at', 'desc');
         $discounts = $discountQuery->paginate($perPage, ['*'], 'page', $page);
         $discountResource = DiscountResource::collection($discounts);
         $paginationData = $this->paginationService->getPaginationData($discounts);

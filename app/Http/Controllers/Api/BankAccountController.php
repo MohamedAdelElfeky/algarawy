@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\BankAccount;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BankAccountResource;
-use App\Models\BankAccount;
 use App\Services\BankAccountService;
 use Illuminate\Http\Request;
 

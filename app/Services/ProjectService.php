@@ -35,7 +35,7 @@ class ProjectService
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
-        $projectQuery = Project::whereNotIn('user_id', $blockedUserIds)
+        $projectQuery = Project::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {
@@ -55,7 +55,8 @@ class ProjectService
     }
     public function getAllProjectsPublic($perPage = 10, $page = 1)
     {
-        $projectQuery = Project::where('status', 'public')->orderBy('created_at', 'desc');
+        $projectQuery = Project::visibilityStatus('public')->ApprovalStatus('approved')
+            ->orderBy('created_at', 'desc');
         $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
         $projectResource = ProjectResource::collection($projects);
         $paginationData = $this->paginationService->getPaginationData($projects);

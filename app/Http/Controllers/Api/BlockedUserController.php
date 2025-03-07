@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\BlockedUser;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
-use App\Models\BlockedUser;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class BlockedUserController extends Controller
 {
@@ -15,54 +15,68 @@ class BlockedUserController extends Controller
     {
         $this->middleware('auth:sanctum');
     }
+
+    /**
+     * Toggle block/unblock user.
+     */
     public function toggleBlock(Request $request)
     {
-        $user = Auth::user();
-        $request->validate([
-            'blocked_user_id' => 'required|exists:users,id',
-        ]);
+        $this->validateRequest($request);
 
-        $userBlock = User::find($request->input('blocked_user_id'));
-        $existingRecord = BlockedUser::where([
-            'user_id' => $user->id,
-            'blocked_user_id' => $request->input('blocked_user_id'),
-        ])->first();
+        $user = Auth::id();
+        $blockedUserId = $request->blocked_user_id;
+
+        $existingRecord = BlockedUser::where(['user_id' => $user, 'blocked_user_id' => $blockedUserId])->first();
 
         if ($existingRecord) {
-            // Record exists, so delete it (unblock user)
             $existingRecord->delete();
-            $message = 'User unblocked successfully';
-            $isBlocked = false;
-            $statusCode = 200;
-        } else {
-            // Record doesn't exist, so create it (block user)
-            BlockedUser::create([
-                'user_id' => $user->id,
-                'blocked_user_id' => $request->input('blocked_user_id'),
-            ]);
-            $message = 'User blocked successfully';
-            $isBlocked = true;
-            $statusCode = 201;
+            return $this->responseMessage('تم إلغاء حظر المستخدم بنجاح', false, 200);
         }
 
+        BlockedUser::create(['user_id' => $user, 'blocked_user_id' => $blockedUserId]);
+
+        return $this->responseMessage('تم حظر المستخدم بنجاح', true, 201);
+    }
+
+    /**
+     * Get all blocked users for authenticated user.
+     */
+    public function getBlockedUsers()
+    {
+        $user = Auth::user();
+        $blockedUsers = $user->blockedUsers()->get();
+        return response()->json(['data' => UserResource::collection($blockedUsers)]);
+    }
+
+    /**
+     * Validate block user request.
+     */
+    private function validateRequest(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'blocked_user_id' => 'required|exists:users,id',
+        ], [
+            'blocked_user_id.required' => 'معرف المستخدم المحظور مطلوب.',
+            'blocked_user_id.exists' => 'المستخدم المحدد غير موجود.',
+        ]);
+
+        if ($validator->fails()) {
+            response()->json([
+                'message' => 'خطأ في التحقق من البيانات',
+                'error' => $validator->errors()->first(),
+            ], 422)->send();
+            exit;
+        }
+    }
+
+    /**
+     * Return a JSON response message.
+     */
+    private function responseMessage(string $message, bool $isBlocked, int $statusCode)
+    {
         return response()->json([
             'message' => $message,
             'is_blocked' => $isBlocked,
         ], $statusCode);
-    }
-
-
-    public function getBlockedUsers()
-    {
-        $user = Auth::user();
-
-        $blockedUsers = BlockedUser::where('user_id', $user->id)->get();
-
-        // Assuming BlockedUser has a relationship with User to fetch the blocked user details
-        $blockedUsersDetails = $blockedUsers->map(function ($blockedUser) {
-            return $blockedUser->blockedUser; // Adjust this based on your relationship naming
-        });
-
-        return response()->json(['data' => UserResource::collection($blockedUsersDetails)]);
     }
 }

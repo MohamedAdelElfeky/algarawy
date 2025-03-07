@@ -23,11 +23,8 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
-
-use Aloha\Twilio\Twilio;
 use App\Http\Controllers\Auth\OtpController;
-use App\Http\Controllers\TwilioVerifyController;
-use Illuminate\Support\Facades\Config;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -40,8 +37,8 @@ use Illuminate\Support\Facades\Config;
 |
 */
 
-Route::post('/p-forgot-password', [OtpController::class, 'sendOtp']);
-Route::post('/forgot-password/verify-otp', [OtpController::class, 'verifyOtp']);
+Route::post('/p-send-otp', [OtpController::class, 'sendOtp']);
+Route::post('/p-reset-password', [OtpController::class, 'verifyOtp']);
 Route::post('/send-message', [OtpController::class, 'sendMessage']);
 
 Route::POST('/register', [AuthController::class, 'register']);
@@ -58,14 +55,14 @@ Route::get('p-discounts', [DiscountController::class, 'index']);
 Route::get('p-services', [ServiceController::class, 'index']);
 Route::get('/terms-and-conditions/last', [TermsAndConditionController::class, 'getLastTermsAndCondition']);
 
-// Route::post('p-forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
+Route::post('p-forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('pt-forgot-password', [PasswordResetLinkController::class, 'store']);
 
 Route::post('forgot-password/send-otp', [ForgotPasswordController::class, 'sendOtp']);
-// Route::post('forgot-password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
+Route::post('forgot-password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
 Route::post('forgot-password/reset-password', [ForgotPasswordController::class, 'resetPassword']);
-Route::post('p-send-otp', [AuthController::class, 'sendOTP']);
-Route::post('p-reset-password', [AuthController::class, 'resetPassword']);
+// Route::post('p-send-otp', [AuthController::class, 'sendOTP']);
+// Route::post('p-reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/regions', [RegionController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);

@@ -21,7 +21,6 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->nullable();
             $table->boolean('job_status')->default(false);        
             $table->boolean('is_training')->nullable();        
-            $table->enum('status', ['public', 'private'])->default('private');
             $table->foreignId('region_id')->nullable()->constrained();
             $table->foreignId('city_id')->nullable()->constrained();
             $table->foreignId('neighborhood_id')->nullable()->constrained();

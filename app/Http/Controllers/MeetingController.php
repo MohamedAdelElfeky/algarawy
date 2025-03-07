@@ -25,7 +25,7 @@ class MeetingController extends Controller
             'pdfs',
             'likes',
             'favorites',
-        ])->orderBy('created_at', 'desc')->get();
+        ])->orderBy('created_at', 'desc')->paginate(25);
         return view('pages.dashboards.meeting.index', compact('meetings'));
     }
     /**

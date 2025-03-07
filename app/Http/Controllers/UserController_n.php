@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\User;
 use App\Http\Requests\UserRequest;
 use App\Domain\Services\UserService;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
