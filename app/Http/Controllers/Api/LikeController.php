@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\Like;
 use App\Http\Controllers\Controller;
-use App\Models\Like;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +20,7 @@ class LikeController extends Controller
         if (!in_array($type, $validModels)) {
             return response()->json(['message' => 'نوع النموذج غير صالح'], 400);
         }
-        $modelClass = 'App\Models\\' . ucfirst($type);
+        $modelClass = 'App\Domain\Models\\' . ucfirst($type);
         $model = $modelClass::find($id);
         if (!$model) {
             return response()->json(['message' => 'النموذج غير موجود'], 404);
@@ -37,44 +37,5 @@ class LikeController extends Controller
         $like->likable_type = $modelClass;
         $user->likes()->save($like);
         return response()->json(['message' => 'تم الإعجاب', 'liked' => true], 200);
-    }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

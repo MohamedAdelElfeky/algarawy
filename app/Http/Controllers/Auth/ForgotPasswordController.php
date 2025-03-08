@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Domain\Models\Otp;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Password;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtpMail;
-use App\Models\Otp;
 use App\Models\User;
 use Carbon\Carbon;
 

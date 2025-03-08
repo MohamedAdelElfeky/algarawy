@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
+use App\Domain\Models\Image;
 use App\Domain\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ServiceResource;
-use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
 
 class ServiceService

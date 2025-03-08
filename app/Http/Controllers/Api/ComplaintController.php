@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\Complaint;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ComplaintResource;
-use App\Models\Complaint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

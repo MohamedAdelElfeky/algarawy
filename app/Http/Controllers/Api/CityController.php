@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\City;
+use App\Domain\Models\Region;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CityResource;
-use App\Models\City;
-use App\Models\Region;
 
 class CityController extends Controller
 {

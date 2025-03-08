@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\Region;
 use App\Http\Resources\RegionResource;
-use App\Models\Region;
 use Illuminate\Http\Request;
 
 class RegionController extends Controller

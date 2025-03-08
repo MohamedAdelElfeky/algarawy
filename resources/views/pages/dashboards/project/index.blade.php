@@ -3,24 +3,42 @@
         <div class="card mb-5 mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bold fs-3 mb-1">المشاريع</span>
+                    <span class="card-label fw-bold fs-3 mb-1">
+                        <i class="fas fa-tasks me-2"></i> {{ __('lang.projects') }}
+                    </span>
                 </h3>
             </div>
             <div class="card-body py-3">
                 <div class="table-responsive">
                     <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
                         <thead>
-                            <th> مستخدم تم انشاء </th>
-                            <th> وصف </th>
-                            <th> عدد الاعجاب </th>
-                            <th> عدد المفضل </th>
-                            <th> الادارة </th>
+                            <th> {{ __('lang.created_by') }}</th>
+                            <th> {{ __('lang.created_at') }}</th>
+                            <th> {{ __('lang.location') }}</th>
+                            <th> {{ __('lang.description') }} </th>
+                            <th>{{ __('lang.count_likes') }}</th>
+                            <th> {{ __('lang.count_favorite') }}</th>
+                            <th> {{ __('lang.count_complaints') }}</th>
+                            <th>{{ __('lang.change_approval') }}</th>
+                            <th> {{ __('lang.change_visibility') }}</th>
+                            <th> {{ __('lang.delete') }} </th>
 
                         </thead>
                         <tbody>
                             @foreach ($projects as $project)
                                 <tr>
                                     <td>{{ $project->user->first_name . ' ' . $project->user->last_name }} </td>
+                                    <td>{{ $project->created_at->format('Y-m-d') }}</td>
+                                    <td>
+                                        @if ($project->google_maps_link)
+                                            <a class="btn btn-color-light btn-bg-info me-1"
+                                                href="{{ $project->google_maps_link }}" target="_blank">
+                                                {{ __('lang.view_on_map') }}
+                                            </a>
+                                        @else
+                                            {{ __('lang.no_location_available') }}
+                                        @endif
+                                    </td>
                                     <td>
                                         {{ substr($project->description, 0, 100) }}
                                         @if (strlen($project->description) > 100)
@@ -48,21 +66,61 @@
                                     </td>
                                     <td>{{ $project->likes()->count() }}</td>
                                     <td>{{ $project->favorites()->count() }}</td>
+                                    <td>{{ $project->complaints()->count() }}</td>
+
+                                    <td class="text-center">
+                                        @php
+                                            $approvalColors = [
+                                                'pending' => 'btn-warning text-dark',
+                                                'approved' => 'btn-success',
+                                                'rejected' => 'btn-danger',
+                                            ];
+                                            $approvalNames = [
+                                                'pending' => __('lang.pending'),
+                                                'approved' => __('lang.approved'),
+                                                'rejected' => __('lang.rejected'),
+                                            ];
+                                            $approvalClass =
+                                                $approvalColors[optional($project->approval)->status] ??
+                                                'btn-warning text-dark';
+                                            $approvalText =
+                                                $approvalNames[optional($project->approval)->status] ??
+                                                __('lang.pending');
+                                        @endphp
+                                        <button type="button" class="btn {{ $approvalClass }} w-100"
+                                            data-bs-toggle="modal" data-bs-target="#approvalModal{{ $project->id }}">
+                                            {{ $approvalText }}
+                                        </button>
+                                    </td>
+                                    <td class="text-center">
+                                        @php
+                                            $statusColors = [
+                                                'private' => 'btn-secondary',
+                                                'public' => 'btn-success',
+                                            ];
+                                            $statusNames = [
+                                                'private' => __('lang.private'),
+                                                'public' => __('lang.public'),
+                                            ];
+                                            $statusClass =
+                                                $statusColors[optional($project->visibility)->status] ??
+                                                'btn-secondary';
+                                            $statusText =
+                                                $statusNames[optional($project->visibility)->status] ??
+                                                __('lang.private');
+                                        @endphp
+                                        <button type="button" class="btn {{ $statusClass }} w-100"
+                                            data-bs-toggle="modal" data-bs-target="#statusModal{{ $project->id }}">
+                                            {{ $statusText }}
+                                        </button>
+                                    </td>
+
                                     <td>
                                         <button
                                             class="delete-project-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"
                                             data-project-id="{{ $project->id }}">
-                                            <i class="ki-duotone ki-tablet-delete">
-                                                <i class="path1"></i>
-                                                <i class="path2"></i>
-                                                <i class="path3"></i>
-                                            </i>
+                                            {{ __('lang.delete') }}
                                         </button>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#statusModal{{ $project->id }}"> تغيير الحالة </button>
-
-                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                            data-bs-target="#approvalModal{{ $project->id }}">تغيير الموافقة</button>
                                     </td>
                                 </tr>
 
@@ -71,7 +129,8 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="statusModalLabel"> تغيير الحالة </h5>
+                                                <h5 class="modal-title" id="statusModalLabel">
+                                                    {{ __('lang.change_visibility') }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
@@ -81,21 +140,23 @@
                                                 @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
-                                                    <div class="form-group"> <label for="status">الحالة</label>
+                                                    <div class="form-group"> <label
+                                                            for="status">{{ __('lang.status') }}</label>
                                                         <select id="status" name="status" class="form-control">
                                                             <option value="private"
                                                                 {{ optional($project->visibility)->status == 'private' ? 'selected' : '' }}>
-                                                                خاص </option>
+                                                                {{ __('lang.private') }} </option>
                                                             <option value="public"
                                                                 {{ optional($project->visibility)->status == 'public' ? 'selected' : '' }}>
-                                                                عام
+                                                                {{ __('lang.public') }}
                                                             </option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
 
-                                                    <button type="submit" class="btn btn-primary">تحديث الحالة</button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        {{ __('lang.update') }} </button>
                                                 </div>
 
                                             </form>
@@ -108,7 +169,7 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title"> تغيير الحالة </h5>
+                                                <h5 class="modal-title">{{ __('lang.change_approval') }}</h5>
                                                 <button type="button" class="btn-close"
                                                     data-bs-dismiss="modal"></button>
                                             </div>
@@ -121,18 +182,19 @@
                                                     <select name="status" class="form-control">
                                                         <option value="pending"
                                                             {{ optional($project->approval)->status == 'pending' ? 'selected' : '' }}>
-                                                            في انتظار الموافقة </option>
+                                                            {{ __('lang.pending') }} </option>
                                                         <option value="approved"
                                                             {{ optional($project->approval)->status == 'approved' ? 'selected' : '' }}>
-                                                            موافقة </option>
+                                                            {{ __('lang.approved') }} </option>
                                                         <option value="rejected"
                                                             {{ optional($project->approval)->status == 'rejected' ? 'selected' : '' }}>
-                                                            مرفوض </option>
+                                                            {{ __('lang.rejected') }} </option>
                                                     </select>
                                                     <textarea name="notes" class="form-control mt-2" placeholder="Notes (optional)">{{ optional($project->approval)->notes }}</textarea>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary"> تحديث الحالة
+                                                    <button type="submit" class="btn btn-primary">
+                                                        {{ __('lang.update') }}
                                                     </button>
                                                 </div>
                                             </form>
@@ -147,24 +209,26 @@
                         @if ($projects->hasPages())
                             <nav role="navigation" aria-label="Pagination Navigation"
                                 class="flex items-center justify-between w-full">
-                                {{-- Small screens: Previous & Next buttons --}}
                                 <div class="flex justify-between flex-1 sm:hidden">
                                     <a href="{{ $projects->previousPageUrl() }}"
                                         class="pagination-btn {{ $projects->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                        « Previous
+                                        « {{ __('lang.previous') }}
                                     </a>
                                     <a href="{{ $projects->nextPageUrl() }}"
                                         class="pagination-btn {{ $projects->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
-                                        Next »
+                                        {{ __('lang.next') }} »
                                     </a>
                                 </div>
 
                                 {{-- Large screens: Pagination details and numbered links --}}
                                 <div class="hidden sm:flex sm:items-center sm:justify-between w-full">
                                     <p class="text-sm text-gray-700">
-                                        Showing <span class="font-medium">{{ $projects->firstItem() }}</span>
-                                        to <span class="font-medium">{{ $projects->lastItem() }}</span>
-                                        of <span class="font-medium">{{ $projects->total() }}</span> results
+                                        {{ __('lang.show') }} <span
+                                            class="font-medium">{{ $projects->firstItem() }}</span>
+                                        {{ __('lang.to') }} <span
+                                            class="font-medium">{{ $projects->lastItem() }}</span>
+                                        {{ __('lang.of') }} <span class="font-medium">{{ $projects->total() }}</span>
+                                        {{ __('lang.results') }}
                                     </p>
 
                                     {{-- Pagination controls --}}

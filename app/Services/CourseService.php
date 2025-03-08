@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Domain\Models\Course;
+use App\Domain\Models\FilePdf;
+use App\Domain\Models\Image;
 use App\Http\Resources\CourseResource;
-use App\Models\FilePdf;
-use App\Models\Image;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -186,7 +186,7 @@ class CourseService
 
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
-        $courseQuery = Course::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
+        $courseQuery = Course::whereNotIn('user_id', $blockedUserIds)->approvalStatus('approved')
             ->orderBy('created_at', 'desc');
 
         if ($showNoComplaintedPosts) {

@@ -22,6 +22,7 @@ class Course extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
@@ -31,7 +32,8 @@ class Course extends Model
     {
         return $this->morphMany(FilePdf::class, 'pdfable');
     }
-    public function favorites()
+
+    public function favorites(): MorphMany
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
@@ -40,9 +42,20 @@ class Course extends Model
     {
         return $this->morphMany(Like::class, 'likable');
     }
-    public function complaints()
+    public function complaints(): MorphMany
     {
         return $this->morphMany(Complaint::class, 'complaintable');
+    }
+
+    public function approval()
+    {
+        return $this->morphOne(PostApproval::class, 'approvable');
+    }
+
+
+    public function visibility()
+    {
+        return $this->morphOne(Visibility::class, 'visible');
     }
 
     public function scopeApprovalStatus($query, $status = 'pending')
@@ -53,14 +66,9 @@ class Course extends Model
             $status = 'pending';
         }
 
-        return $query->whereHas('postApproval', function ($query) use ($status) {
+        return $query->whereHas('approval', function ($query) use ($status) {
             $query->where('status', $status);
         });
-    }
-
-    public function visibility()
-    {
-        return $this->morphOne(Visibility::class, 'visible');
     }
 
     public function scopeVisibilityStatus($query, $status = 'public')
@@ -79,5 +87,24 @@ class Course extends Model
     public function memberships()
     {
         return $this->morphMany(MembershipAssignment::class, 'assignable');
+    }
+
+    public function getGoogleMapsLinkAttribute()
+    {
+        if (empty($this->location)) {
+            return null;
+        }
+        $locationParts = explode(',', $this->location);
+
+        if (count($locationParts) < 2) {
+            return null;
+        }
+        [$latitude, $longitude] = $locationParts;
+
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            return null;
+        }
+
+        return "https://www.google.com/maps?q={$latitude},{$longitude}";
     }
 }

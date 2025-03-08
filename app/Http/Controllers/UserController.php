@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\Course;
+use App\Domain\Models\Meeting;
+use App\Domain\Models\Project;
 use App\Domain\Models\Setting;
 use App\Domain\Models\UserDetail;
 use App\Domain\Models\UserSetting;
 use App\Http\Resources\CourseResource;
-use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\UserResource;
-use App\Models\Course;
-use App\Models\Meeting;
-use App\Models\Project;
 use App\Models\support;
 use App\Models\User;
 use App\Services\PaginationService;

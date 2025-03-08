@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\Favorite;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourseResource;
@@ -10,7 +11,6 @@ use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\ServiceResource;
-use App\Models\Favorite;
 use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
@@ -21,12 +21,12 @@ class FavoriteController extends Controller
     }
     public function toggleFavorite(Request $request, $type, $id)
     {
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
         $validModels = ['course', 'job', 'discount', 'meeting', 'project', 'service'];
         if (!in_array($type, $validModels)) {
             return response()->json(['message' => 'نوع النموذج غير صالح'], 400);
         }
-        $modelClass = 'App\Models\\' . ucfirst($type);
+        $modelClass = 'App\Domain\Models\\' . ucfirst($type);
         $model = $modelClass::find($id);
         if (!$model) {
             return response()->json(['message' => 'النموذج غير موجود'], 404);
@@ -47,36 +47,36 @@ class FavoriteController extends Controller
 
     public function getUserFavorites()
     {
-        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user();
         $favorites = $user->favorites;
         $formattedFavorites = $favorites->map(function ($favorite) {
             switch ($favorite->favoritable_type) {
-                case 'App\Models\Course':
+                case 'App\Domain\Models\Course':
                     return [
                         'type' => 'Course',
                         'data' => new CourseResource($favorite->favoritable)
                     ];
-                case 'App\Models\Job':
+                case 'App\Domain\Models\Job':
                     return [
                         'type' => 'Job',
                         'data' => new JobResource($favorite->favoritable)
                     ];
-                case 'App\Models\Discount':
+                case 'App\Domain\Models\Discount':
                     return [
                         'type' => 'Discount',
                         'data' => new DiscountResource($favorite->favoritable)
                     ];
-                case 'App\Models\Meeting':
+                case 'App\Domain\Models\Meeting':
                     return [
                         'type' => 'Meeting',
                         'data' => new MeetingResource($favorite->favoritable)
                     ];
-                case 'App\Models\Project':
+                case 'App\Domain\Models\Project':
                     return [
                         'type' => 'Project',
                         'data' => new ProjectResource($favorite->favoritable)
                     ];
-                case 'App\Models\Service':
+                case 'App\Domain\Models\Service':
                     return [
                         'type' => 'Service',
                         'data' => new ServiceResource($favorite->favoritable)

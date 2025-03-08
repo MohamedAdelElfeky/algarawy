@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Models\Favorite;
 use App\Domain\Models\Membership;
 use App\Domain\Models\MembershipAssignment;
 use App\Domain\Models\Setting;

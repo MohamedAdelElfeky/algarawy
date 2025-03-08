@@ -3,7 +3,8 @@
         <div class="card mb-5 mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bold fs-3 mb-1"> 📋 قائمة العضويات </span>
+                    <span class="card-label fw-bold fs-3 mb-1"> 
+                        <i class="fas fa-id-card me-2"></i> قائمة العضويات </span>
                 </h3>
                 <div class="card-toolbar" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover">
                     <a href="#" class="btn btn-sm btn-light btn-active-primary" data-bs-toggle="modal"

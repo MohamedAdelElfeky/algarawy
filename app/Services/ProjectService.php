@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
+use App\Domain\Models\FilePdf;
+use App\Domain\Models\Image;
 use App\Domain\Models\Project;
 use App\Http\Resources\ProjectResource;
-use App\Models\FilePdf;
-use App\Models\Image;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectService

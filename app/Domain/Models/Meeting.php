@@ -18,12 +18,17 @@ class Meeting extends Model
         'description',
         'type',
     ];
-
+    
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
+    
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
@@ -42,21 +47,21 @@ class Meeting extends Model
     public function scopeApprovalStatus($query, $status = 'pending')
     {
         $allowedStatuses = ['pending', 'approved', 'rejected'];
-    
+
         if (!in_array($status, $allowedStatuses)) {
             $status = 'pending';
         }
-    
-        return $query->whereHas('postApproval', function ($query) use ($status) {
+
+        return $query->whereHas('approval', function ($query) use ($status) {
             $query->where('status', $status);
         });
     }
-    
+
     public function visibility()
     {
         return $this->morphOne(Visibility::class, 'visible');
     }
-    
+
     public function scopeVisibilityStatus($query, $status = 'public')
     {
         $allowedStatuses = ['public', 'private'];

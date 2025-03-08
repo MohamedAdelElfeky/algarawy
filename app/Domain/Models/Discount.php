@@ -52,11 +52,55 @@ class Discount extends Model
     public function visibility()
     {
         return $this->morphOne(Visibility::class, 'visible');
-    }    
-    
+    }
+
+    public function scopeApprovalStatus($query, $status = 'pending')
+    {
+        $allowedStatuses = ['pending', 'approved', 'rejected'];
+
+        if (!in_array($status, $allowedStatuses)) {
+            $status = 'pending';
+        }
+
+        return $query->whereHas('approval', function ($query) use ($status) {
+            $query->where('status', $status);
+        });
+    }
+
+    public function scopeVisibilityStatus($query, $status = 'public')
+    {
+        $allowedStatuses = ['public', 'private'];
+
+        if (!in_array($status, $allowedStatuses)) {
+            $status = 'public';
+        }
+
+        return $query->whereHas('visibility', function ($q) use ($status) {
+            $q->where('status', $status);
+        });
+    }
 
     public function memberships()
     {
         return $this->morphMany(MembershipAssignment::class, 'assignable');
+    }
+
+    public function getGoogleMapsLinkAttribute()
+    {
+        if (empty($this->location)) {
+            return null;
+        }
+        $locationParts = explode(',', $this->location);
+
+        if (count($locationParts) < 2) {
+            return null;
+        }
+        [$latitude, $longitude] = $locationParts;
+
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            return null;
+        }
+
+        return "https://www.google.com/maps?q={$latitude},{$longitude}";
     }
 }

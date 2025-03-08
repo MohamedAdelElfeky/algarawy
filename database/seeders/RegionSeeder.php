@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Region;
+use App\Domain\Models\Region;
 use Illuminate\Database\Seeder;
 
 class RegionSeeder extends Seeder

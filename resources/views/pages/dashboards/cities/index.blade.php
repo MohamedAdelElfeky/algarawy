@@ -3,12 +3,15 @@
         <div class="card mb-5 mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bold fs-3 mb-1">المدينة</span>
+                    <span class="card-label fw-bold fs-3 mb-1">
+                        <i class="fas fa-city me-2"></i> <span> المدينة </span>
+                    </span>
+
                 </h3>
                 <div class="card-toolbar" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover">
                     <a href="#" class="btn btn-sm btn-light btn-active-primary" data-bs-toggle="modal"
                         data-bs-target="#kt_modal_city">
-                        <i class="ki-duotone ki-plus fs-2"></i>أضافة</a>
+                        <i class="ki-duotone ki-plus fs-2"></i>{{ __('lang.add') }}</a>
                 </div>
             </div>
             <div class="card-body py-3">
@@ -17,7 +20,7 @@
                         <thead>
                             <th>الاسم </th>
                             <th>المنطقة </th>
-                            <th>الادره </th>
+                            <th>{{ __('lang.actions') }} </th>
                         </thead>
                         <tbody>
                             @foreach ($cities as $city)
@@ -44,24 +47,23 @@
                         @if ($cities->hasPages())
                             <nav role="navigation" aria-label="Pagination Navigation"
                                 class="flex items-center justify-between w-full">
-                                {{-- Small screens: Previous & Next buttons --}}
                                 <div class="flex justify-between flex-1 sm:hidden">
                                     <a href="{{ $cities->previousPageUrl() }}"
                                         class="pagination-btn {{ $cities->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                        « Previous
+                                        « {{ __('lang.previous') }}
                                     </a>
                                     <a href="{{ $cities->nextPageUrl() }}"
                                         class="pagination-btn {{ $cities->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
-                                        Next »
+                                        {{ __('lang.next') }} »
                                     </a>
                                 </div>
 
                                 {{-- Large screens: Pagination details and numbered links --}}
                                 <div class="hidden sm:flex sm:items-center sm:justify-between w-full">
                                     <p class="text-sm text-gray-700">
-                                        Showing <span class="font-medium">{{ $cities->firstItem() }}</span>
-                                        to <span class="font-medium">{{ $cities->lastItem() }}</span>
-                                        of <span class="font-medium">{{ $cities->total() }}</span> results
+                                        {{ __('lang.show') }} <span class="font-medium">{{ $cities->firstItem() }}</span>
+                                        {{ __('lang.to') }} <span class="font-medium">{{ $cities->lastItem() }}</span>
+                                        {{ __('lang.of') }} <span class="font-medium">{{ $cities->total() }}</span> {{ __('lang.results') }}
                                     </p>
 
                                     {{-- Pagination controls --}}

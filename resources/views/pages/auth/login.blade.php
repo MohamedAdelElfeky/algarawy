@@ -82,7 +82,7 @@
         <!--begin::Submit button-->
         <div class="d-grid mb-10">
             <button type="submit" id="kt_sign_in_submit" class="btn btn-primary">
-                @include('partials/general/_button-indicator', ['label' => 'Sign In'])
+                @include('partials/general/_button-indicator', ['label' => 'تسجيل الدخول'])
             </button>
         </div>
         <!--end::Submit button-->

@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\Course;
+use App\Domain\Models\Discount;
+use App\Domain\Models\Job;
+use App\Domain\Models\Meeting;
+use App\Domain\Models\Project;
+use App\Domain\Models\Service;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourseResource;
 use App\Http\Resources\DiscountResource;
@@ -9,12 +15,7 @@ use App\Http\Resources\JobResource;
 use App\Http\Resources\MeetingResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\ServiceResource;
-use App\Models\Course;
-use App\Models\Discount;
-use App\Models\Job;
-use App\Models\Meeting;
-use App\Models\Project;
-use App\Models\Service;
+
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -50,12 +51,12 @@ class DashboardController extends Controller
     private function getPublicData()
     {
         // Fetch data with public status
-        $jobs = JobResource::collection(Job::where('status', 'public')->paginate(5));
-        $courses = CourseResource::collection(Course::where('status', 'public')->paginate(5));
-        $projects = ProjectResource::collection(Project::where('status', 'public')->paginate(5));
-        $meetings = MeetingResource::collection(Meeting::where('status', 'public')->paginate(5));
-        $discounts = DiscountResource::collection(Discount::where('status', 'public')->paginate(5));
-        $services = ServiceResource::collection(Service::where('status', 'public')->paginate(5));
+        $jobs = JobResource::collection(Job::visibilityStatus('public')->ApprovalStatus('approved')->paginate(5));
+        $courses = CourseResource::collection(Course::visibilityStatus('public')->ApprovalStatus('approved')->paginate(5));
+        $projects = ProjectResource::collection(Project::visibilityStatus('public')->ApprovalStatus('approved')->paginate(5));
+        $meetings = MeetingResource::collection(Meeting::visibilityStatus('public')->ApprovalStatus('approved')->paginate(5));
+        $discounts = DiscountResource::collection(Discount::visibilityStatus('public')->ApprovalStatus('approved')->paginate(5));
+        $services = ServiceResource::collection(Service::visibilityStatus('public')->ApprovalStatus('approved')->paginate(5));
 
         $oneRowArray = [
             'Job' => $jobs,
@@ -84,18 +85,22 @@ class DashboardController extends Controller
 
     private function getData()
     {
-        $user = Auth::user();
-        // Get the user's preference for showing posts without complaints
-        $showNoComplaintedPosts = $user->show_no_complainted_posts == 1;
+        $user = Auth::guard('sanctum')->user();
+
+        $showNoComplaintedPosts = $user->userSettings()
+            ->whereHas('setting', function ($query) {
+                $query->where('key', 'show_no_complaints_posts');
+            })
+            ->value('value') ?? false;
         $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
 
         // Prepare queries for each model
         $jobsQuery = Job::whereNotIn('user_id', $blockedUserIds);
-        $coursesQuery = Course::whereNotIn('user_id', $blockedUserIds);
-        $projectsQuery = Project::whereNotIn('user_id', $blockedUserIds);
-        $meetingsQuery = Meeting::whereNotIn('user_id', $blockedUserIds);
-        $discountsQuery = Discount::whereNotIn('user_id', $blockedUserIds);
-        $servicesQuery = Service::whereNotIn('user_id', $blockedUserIds);
+        $coursesQuery = Course::ApprovalStatus('approved')->whereNotIn('user_id', $blockedUserIds);
+        $projectsQuery = Project::ApprovalStatus('approved')->whereNotIn('user_id', $blockedUserIds);
+        $meetingsQuery = Meeting::ApprovalStatus('approved')->whereNotIn('user_id', $blockedUserIds);
+        $discountsQuery = Discount::ApprovalStatus('approved')->whereNotIn('user_id', $blockedUserIds);
+        $servicesQuery = Service::ApprovalStatus('approved')->whereNotIn('user_id', $blockedUserIds);
 
         // Apply complaint filter to each query
         $this->applyComplaintFilter($jobsQuery, $showNoComplaintedPosts, $user);
@@ -138,13 +143,6 @@ class DashboardController extends Controller
         return $result;
     }
 
-    /**
-     * Apply the complaint filter to the query based on user preferences.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param bool $showNoComplaintedPosts
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     private function applyComplaintFilter($query, $showNoComplaintedPosts, $user)
     {
         if ($showNoComplaintedPosts) {
@@ -152,13 +150,7 @@ class DashboardController extends Controller
                 $query->where('user_id', $user->id)
                     ->orWhereDoesntHave('complaints');
             });
-            // $query->whereDoesntHave('complaints', function ($query) use ($user) {
-            //     $query->where('user_id', '=', $user->id); // Exclude user complaints
-            // });
-        } else {
-            $query;
         }
-
         return $query;
     }
 }

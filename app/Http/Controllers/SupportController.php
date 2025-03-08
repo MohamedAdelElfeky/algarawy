@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\support;
+use App\Domain\Models\support;
 use Illuminate\Http\Request;
 
 class SupportController extends Controller
@@ -10,7 +10,7 @@ class SupportController extends Controller
 
     public function index()
     {
-        $supportRecord = Support::first();
+        $supportRecord = support::first();
         $number = $supportRecord ? $supportRecord->number : null;
         $email = $supportRecord ? $supportRecord->email : null;
         return view('pages.dashboards.support.index', compact('number', 'email'));

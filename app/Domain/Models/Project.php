@@ -50,32 +50,48 @@ class Project extends Model
     {
         return $this->morphOne(Visibility::class, 'visible');
     }
+    public function scopeApprovalStatus($query, $status = 'pending')
+    {
+        $allowedStatuses = ['pending', 'approved', 'rejected'];
 
-    // public function ApprovalStatus($status)
-    // {
-    //     $allowedStatuses = ['pending', 'approved', 'rejected'];
-    //     // dd($status);
-    //     if (!in_array($status, $allowedStatuses)) {
-    //         $status = 'pending';
-    //     }
+        if (!in_array($status, $allowedStatuses)) {
+            $status = 'pending';
+        }
 
-    //     return $this->postApproval()->updateOrCreate(
-    //         ['approvable_id' => $this->id, 'approvable_type' => self::class],
-    //         ['status' => $status]
-    //     );
-    // }
+        return $query->whereHas('approval', function ($query) use ($status) {
+            $query->where('status', $status);
+        });
+    }
 
-    // public function VisibilityStatus($status)
-    // {
-    //     $allowedStatuses = ['public', 'private'];
+    public function scopeVisibilityStatus($query, $status = 'public')
+    {
+        $allowedStatuses = ['public', 'private'];
 
-    //     if (!in_array($status, $allowedStatuses)) {
-    //         $status = 'pending';
-    //     }
+        if (!in_array($status, $allowedStatuses)) {
+            $status = 'public';
+        }
 
-    //     return $this->postVisibility()->updateOrCreate(
-    //         ['visible_id' => $this->id, 'visible_type' => self::class],
-    //         ['status' => $status]
-    //     );
-    // }
+        return $query->whereHas('visibility', function ($q) use ($status) {
+            $q->where('status', $status);
+        });
+    }
+
+    public function getGoogleMapsLinkAttribute()
+    {
+        if (empty($this->location)) {
+            return null;
+        }
+        $locationParts = explode(',', $this->location);
+
+        if (count($locationParts) < 2) {
+            return null;
+        }
+        [$latitude, $longitude] = $locationParts;
+
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            return null;
+        }
+
+        return "https://www.google.com/maps?q={$latitude},{$longitude}";
+    }
 }

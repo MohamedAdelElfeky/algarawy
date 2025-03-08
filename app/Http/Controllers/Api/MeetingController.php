@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\Meeting;
 use App\Http\Controllers\Controller;
-use App\Models\Meeting;
 use App\Services\MeetingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Models\Otp;
 use App\Domain\Models\Setting;
 use App\Domain\Models\UserDetail;
 use App\Domain\Services\UserService;
@@ -11,13 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\NewPasswordEmail;
-use App\Mail\ResetPasswordMail;
-use App\Models\Otp;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {

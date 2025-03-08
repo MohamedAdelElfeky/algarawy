@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
+use App\Domain\Models\FilePdf;
+use App\Domain\Models\Job;
+use App\Domain\Models\JobApplication;
 use App\Http\Resources\JobApplication2Resource;
 use App\Http\Resources\JobApplicationResource;
 use App\Http\Resources\JobResource;
-use App\Models\FilePdf;
-use App\Models\Job;
-use App\Models\JobApplication;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 

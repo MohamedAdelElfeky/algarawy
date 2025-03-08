@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\NeighborhoodResource;
-use App\Models\City;
-use App\Models\Neighborhood;
-use App\Models\Region;
+use App\Domain\Models\City;
+use App\Domain\Models\Neighborhood;
+use App\Domain\Models\Region;
 use Illuminate\Http\Request;
 
 class NeighborhoodController extends Controller

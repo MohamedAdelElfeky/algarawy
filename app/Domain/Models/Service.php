@@ -2,7 +2,6 @@
 
 namespace App\Domain\Models;
 
-use App\Models\Image;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -52,7 +51,7 @@ class Service extends Model
             $status = 'pending';
         }
 
-        return $query->whereHas('postApproval', function ($query) use ($status) {
+        return $query->whereHas('approval', function ($query) use ($status) {
             $query->where('status', $status);
         });
     }
@@ -78,5 +77,24 @@ class Service extends Model
     public function memberships()
     {
         return $this->morphMany(MembershipAssignment::class, 'assignable');
+    }
+
+    public function getGoogleMapsLinkAttribute()
+    {
+        if (empty($this->location)) {
+            return null;
+        }
+        $locationParts = explode(',', $this->location);
+
+        if (count($locationParts) < 2) {
+            return null;
+        }
+        [$latitude, $longitude] = $locationParts;
+
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            return null;
+        }
+
+        return "https://www.google.com/maps?q={$latitude},{$longitude}";
     }
 }

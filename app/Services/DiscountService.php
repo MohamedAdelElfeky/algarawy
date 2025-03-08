@@ -6,8 +6,6 @@ use App\Domain\Models\Discount;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\DiscountResource;
-use App\Models\FilePdf;
-use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
 
 class DiscountService

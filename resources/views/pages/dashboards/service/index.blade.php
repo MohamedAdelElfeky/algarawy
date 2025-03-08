@@ -3,25 +3,41 @@
         <div class="card mb-5 mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bold fs-3 mb-1">المشاريع</span>
+                    <span class="card-label fw-bold fs-3 mb-1">
+                        <i class="fas fa-cogs me-2"></i> {{ __('lang.services') }}
+                    </span>
                 </h3>
             </div>
             <div class="card-body py-3">
                 <div class="table-responsive">
                     <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
                         <thead>
-                            <th> مستخدم تم انشاء </th>
-                            <th> وصف </th>
-                            <th> عدد الاعجاب </th>
-                            <th> عدد المفضل </th>
-                            <th> الادارة </th>
-
+                            <th> {{ __('lang.created_by') }}</th>
+                            <th> {{ __('lang.created_at') }}</th>
+                            <th> {{ __('lang.location') }}</th>
+                            <th> {{ __('lang.description') }} </th>
+                            <th>{{ __('lang.count_likes') }}</th>
+                            <th> {{ __('lang.count_favorite') }}</th>
+                            <th> {{ __('lang.count_complaints') }}</th>
+                            <th>{{ __('lang.change_approval') }}</th>
+                            <th> {{ __('lang.change_visibility') }}</th>
+                            <th> {{ __('lang.delete') }} </th>
                         </thead>
                         <tbody>
                             @foreach ($services as $service)
                                 <tr>
                                     <td>{{ $service->user->first_name . ' ' . $service->user->last_name }} </td>
-
+                                    <td>{{ $service->created_at->format('Y-m-d') }}</td>
+                                    <td>
+                                        @if ($service->google_maps_link)
+                                            <a class="btn btn-color-light btn-bg-info me-1"
+                                                href="{{ $service->google_maps_link }}" target="_blank">
+                                                {{ __('lang.view_on_map') }}
+                                            </a>
+                                        @else
+                                            {{ __('lang.no_location_available') }}
+                                        @endif
+                                    </td>
                                     <td>
                                         {{ substr($service->description, 0, 100) }}
                                         @if (strlen($service->description) > 100)
@@ -53,36 +69,73 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        {{ $service->likes()->count() }}
+                                    <td>{{ $service->likes()->count() }}</td>
+                                    <td>{{ $service->favorites()->count() }}</td>
+                                    <td>{{ $service->complaints()->count() }}</td>
+
+                                    <td class="text-center">
+                                        @php
+                                            $approvalColors = [
+                                                'pending' => 'btn-warning text-dark',
+                                                'approved' => 'btn-success',
+                                                'rejected' => 'btn-danger',
+                                            ];
+                                            $approvalNames = [
+                                                'pending' => __('lang.pending'),
+                                                'approved' => __('lang.approved'),
+                                                'rejected' => __('lang.rejected'),
+                                            ];
+                                            $approvalClass =
+                                                $approvalColors[optional($service->approval)->status] ??
+                                                'btn-warning text-dark';
+                                            $approvalText =
+                                                $approvalNames[optional($service->approval)->status] ??
+                                                __('lang.pending');
+                                        @endphp
+                                        <button type="button" class="btn {{ $approvalClass }} w-100"
+                                            data-bs-toggle="modal" data-bs-target="#approvalModal{{ $service->id }}">
+                                            {{ $approvalText }}
+                                        </button>
                                     </td>
-                                    <td>
-                                        {{ $service->favorites()->count() }}
+                                    <td class="text-center">
+                                        @php
+                                            $statusColors = [
+                                                'private' => 'btn-secondary',
+                                                'public' => 'btn-success',
+                                            ];
+                                            $statusNames = [
+                                                'private' => __('lang.private'),
+                                                'public' => __('lang.public'),
+                                            ];
+                                            $statusClass =
+                                                $statusColors[optional($service->visibility)->status] ??
+                                                'btn-secondary';
+                                            $statusText =
+                                                $statusNames[optional($service->visibility)->status] ??
+                                                __('lang.private');
+                                        @endphp
+                                        <button type="button" class="btn {{ $statusClass }} w-100"
+                                            data-bs-toggle="modal" data-bs-target="#statusModal{{ $service->id }}">
+                                            {{ $statusText }}
+                                        </button>
                                     </td>
 
                                     <td>
                                         <button
                                             class="delete-service-btn btn btn-icon btn-color-light btn-bg-danger btn-active-color-dark me-1"
                                             data-service-id="{{ $service->id }}">
-                                            <i class="ki-duotone ki-tablet-delete">
-                                                <i class="path1"></i>
-                                                <i class="path2"></i>
-                                                <i class="path3"></i>
-                                            </i>
+                                            {{ __('lang.delete') }}
                                         </button>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#statusModal{{ $service->id }}"> تغيير الحالة </button>
-
-                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                            data-bs-target="#approvalModal{{ $service->id }}">تغيير الموافقة</button>
                                     </td>
                                 </tr>
+
                                 <div class="modal fade" id="statusModal{{ $service->id }}" tabindex="-1"
                                     aria-labelledby="statusModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="statusModalLabel"> تغيير الحالة </h5>
+                                                <h5 class="modal-title" id="statusModalLabel">
+                                                    {{ __('lang.change_visibility') }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
@@ -92,21 +145,23 @@
                                                 @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
-                                                    <div class="form-group"> <label for="status">الحالة</label>
+                                                    <div class="form-group"> <label
+                                                            for="status">{{ __('lang.status') }}</label>
                                                         <select id="status" name="status" class="form-control">
                                                             <option value="private"
                                                                 {{ optional($service->visibility)->status == 'private' ? 'selected' : '' }}>
-                                                                خاص </option>
+                                                                {{ __('lang.private') }} </option>
                                                             <option value="public"
                                                                 {{ optional($service->visibility)->status == 'public' ? 'selected' : '' }}>
-                                                                عام
+                                                                {{ __('lang.public') }}
                                                             </option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
 
-                                                    <button type="submit" class="btn btn-primary">تحديث الحالة</button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        {{ __('lang.update') }} </button>
                                                 </div>
 
                                             </form>
@@ -119,7 +174,7 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title"> تغيير الحالة </h5>
+                                                <h5 class="modal-title">{{ __('lang.change_approval') }}</h5>
                                                 <button type="button" class="btn-close"
                                                     data-bs-dismiss="modal"></button>
                                             </div>
@@ -132,18 +187,19 @@
                                                     <select name="status" class="form-control">
                                                         <option value="pending"
                                                             {{ optional($service->approval)->status == 'pending' ? 'selected' : '' }}>
-                                                            في انتظار الموافقة </option>
+                                                            {{ __('lang.pending') }} </option>
                                                         <option value="approved"
                                                             {{ optional($service->approval)->status == 'approved' ? 'selected' : '' }}>
-                                                            موافقة </option>
+                                                            {{ __('lang.approved') }} </option>
                                                         <option value="rejected"
                                                             {{ optional($service->approval)->status == 'rejected' ? 'selected' : '' }}>
-                                                            مرفوض </option>
+                                                            {{ __('lang.rejected') }} </option>
                                                     </select>
                                                     <textarea name="notes" class="form-control mt-2" placeholder="Notes (optional)">{{ optional($service->approval)->notes }}</textarea>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary"> تحديث الحالة
+                                                    <button type="submit" class="btn btn-primary">
+                                                        {{ __('lang.update') }}
                                                     </button>
                                                 </div>
                                             </form>
@@ -153,29 +209,32 @@
                             @endforeach
                         </tbody>
                     </table>
+
                     <div
                         class="card-footer flex flex-col md:flex-row gap-5 justify-center md:justify-between text-gray-600 text-sm font-medium">
                         @if ($services->hasPages())
                             <nav role="navigation" aria-label="Pagination Navigation"
                                 class="flex items-center justify-between w-full">
-                                {{-- Small screens: Previous & Next buttons --}}
                                 <div class="flex justify-between flex-1 sm:hidden">
                                     <a href="{{ $services->previousPageUrl() }}"
                                         class="pagination-btn {{ $services->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                        « Previous
+                                        « {{ __('lang.previous') }}
                                     </a>
                                     <a href="{{ $services->nextPageUrl() }}"
                                         class="pagination-btn {{ $services->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
-                                        Next »
+                                        {{ __('lang.next') }} »
                                     </a>
                                 </div>
 
                                 {{-- Large screens: Pagination details and numbered links --}}
                                 <div class="hidden sm:flex sm:items-center sm:justify-between w-full">
                                     <p class="text-sm text-gray-700">
-                                        Showing <span class="font-medium">{{ $services->firstItem() }}</span>
-                                        to <span class="font-medium">{{ $services->lastItem() }}</span>
-                                        of <span class="font-medium">{{ $services->total() }}</span> results
+                                        {{ __('lang.show') }} <span
+                                            class="font-medium">{{ $services->firstItem() }}</span>
+                                        {{ __('lang.to') }} <span
+                                            class="font-medium">{{ $services->lastItem() }}</span>
+                                        {{ __('lang.of') }} <span class="font-medium">{{ $services->total() }}</span>
+                                        {{ __('lang.results') }}
                                     </p>
 
                                     {{-- Pagination controls --}}

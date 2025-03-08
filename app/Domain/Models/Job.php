@@ -86,19 +86,7 @@ class Job extends Model
     }
 
     
-    public function scopeApprovalStatus($query, $status = 'pending')
-    {
-        $allowedStatuses = ['pending', 'approved', 'rejected'];
-    
-        if (!in_array($status, $allowedStatuses)) {
-            $status = 'pending';
-        }
-    
-        return $query->whereHas('approval', function ($query) use ($status) {
-            $query->where('status', $status);
-        });
-    }
-    
+   
     public function approval()
     {
         return $this->morphOne(PostApproval::class, 'approvable');
@@ -113,6 +101,20 @@ class Job extends Model
     {
         return optional($this->visibility)->status;
     }
+    
+    public function scopeApprovalStatus($query, $status = 'pending')
+    {
+        $allowedStatuses = ['pending', 'approved', 'rejected'];
+    
+        if (!in_array($status, $allowedStatuses)) {
+            $status = 'pending';
+        }
+    
+        return $query->whereHas('approval', function ($query) use ($status) {
+            $query->where('status', $status);
+        });
+    }
+    
     
     public function scopeVisibilityStatus($query, $status = 'public')
     {

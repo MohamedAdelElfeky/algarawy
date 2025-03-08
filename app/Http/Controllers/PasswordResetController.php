@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Otp;
+use App\Domain\Models\Otp;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 
