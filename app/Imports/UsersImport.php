@@ -2,9 +2,11 @@
 
 namespace App\Imports;
 
+use App\Domain\Entities\PhoneNumber;
 use App\Domain\Models\Setting;
 use App\Domain\Models\UserDetail;
 use App\Domain\Models\UserSetting;
+use App\Infrastructure\Services\TwilioService;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -14,11 +16,13 @@ use Carbon\Carbon;
 
 class UsersImport implements ToModel, WithHeadingRow
 {
-    /**
-     * @param array $row
-     *
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
+    protected TwilioService $twilioService;
+
+    public function __construct(TwilioService $twilioService)
+    {
+        $this->twilioService = $twilioService;
+    }
+
     public function model(array $row)
     {
         $user = User::firstOrCreate(
@@ -28,14 +32,13 @@ class UsersImport implements ToModel, WithHeadingRow
                 'national_id' => $row['national_id']
             ],
             [
-                'first_name'       => $row['first_name'],
-                'last_name'        => $row['last_name'],
-                'password'         => Hash::make($row['password'])?? Hash::make('123456'),
+                'first_name'        => $row['first_name'],
+                'last_name'         => $row['last_name'],
+                'password'          => !empty($row['password']) ? Hash::make($row['password']) : Hash::make('123456'),
                 'email_verified_at' => now(),
-                'remember_token'   => $row['remember_token'] ?? null,
+                'remember_token'    => $row['remember_token'] ?? null,
             ]
         );
-
 
         // Assign Role
         $roleName = $row['role'] ?? 'user';
@@ -54,7 +57,6 @@ class UsersImport implements ToModel, WithHeadingRow
             ]
         );
 
-        // User Settings
         $settings = [
             'mobile_number_visibility' => true,
             'birthdate_visibility'     => true,
@@ -68,6 +70,18 @@ class UsersImport implements ToModel, WithHeadingRow
                 ['user_id' => $user->id, 'setting_id' => $this->getSettingIdByName($settingName)],
                 ['value' => $value]
             );
+        }
+
+        if (!empty($row['phone'])) {
+            $phone = new PhoneNumber($row['phone']);
+            $message = "مرحبًا {$row['first_name']}! 
+                تم تسجيلك بنجاح في نظامنا. 
+                🔹  رقم التسجيل : {$row['national_id']}
+                🔹 كلمة المرور: {$row['password']}
+                يرجى الاحتفاظ بهذه المعلومات وتغيير كلمة المرور بعد تسجيل الدخول لأول مرة. 
+                شكراً لك!";
+
+            $this->twilioService->sendMessage($phone, $message);
         }
 
         return $user;
