@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">تغيير كلمة المرور</h5>
+                <h5 class="modal-title"> {{ __('lang.change_password') }} </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -10,14 +10,14 @@
                     @csrf
                     <input type="hidden" id="user-id" name="user_id">
                     <div class="mb-3">
-                        <label class="form-label">كلمة المرور الجديدة</label>
+                        <label class="form-label"> {{ __('lang.new_password') }} </label>
                         <input type="password" class="form-control" name="password" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">تأكيد كلمة المرور</label>
+                        <label class="form-label"> {{ __('lang.confirm_password') }} </label>
                         <input type="password" class="form-control" name="password_confirmation" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">تحديث</button>
+                    <button type="submit" class="btn btn-primary">{{ __('lang.save') }}</button>
                 </form>
             </div>
         </div>

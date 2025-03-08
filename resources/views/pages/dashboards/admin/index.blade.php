@@ -3,36 +3,35 @@
         <div class="card mb-5 mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bold fs-3 mb-1">المستخدمين</span>
+                    <span class="card-label fw-bold fs-3 mb-1">
+                        <i class="fas fa-user-shield me-2"></i> {{ __('lang.admins') }}
+                    </span>
                 </h3>
                 <div class="card-toolbar" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover">
                     <a href="#" class="btn btn-sm btn-light btn-active-primary" data-bs-toggle="modal"
                         data-bs-target="#kt_modal_admin">
-                        <i class="ki-duotone ki-plus fs-2"></i>أضافة</a>
+                        <i class="ki-duotone ki-plus fs-2"></i>{{ __('lang.add') }}</a>
                 </div>
             </div>
             <div class="card-body py-3">
                 <div class="table-responsive">
                     <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
                         <thead>
-                            <th>الاسم الأول</th>
-                            <th>الاسم الأخير</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>الهاتف</th>
-                            <th>الموقع</th>
-                            <th>الصورة الرمزية</th>
-                            <th>صورة البطاقة الأمامية</th>
-                            <th>صورة البطاقة الخلفية</th>
-                            <th>تاريخ الميلاد</th>
-                            <th>الهوية الوطنية</th>
-                            <th> تغير كلمه المرور </th>
+                            <th> {{ __('lang.name') }}</th>
+                            <th> {{ __('lang.email') }}</th>
+                            <th> {{ __('lang.phone') }}</th>
+                            <th> {{ __('lang.address') }}</th>
+                            <th> {{ __('lang.image_profile') }}</th>
+                            <th> {{ __('lang.image_card_from') }}</th>
+                            <th> {{ __('lang.image_card_back') }}</th>
+                            <th> {{ __('lang.national_id') }}</th>
+                            <th> {{ __('lang.action') }}</th>
 
                         </thead>
                         <tbody>
                             @foreach ($users as $user)
                                 <tr>
-                                    <td>{{ $user->first_name }}</td>
-                                    <td>{{ $user->last_name }}</td>
+                                    <td>{{ $user->first_name . ' ' . $user->last_name }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->phone }}</td>
                                     <td>
@@ -74,37 +73,38 @@
                                         <button class="btn btn-sm btn-primary change-password-btn"
                                             data-user-id="{{ $user->id }}" data-bs-toggle="modal"
                                             data-bs-target="#kt_modal_password">
-                                            تغيير كلمة المرور
+                                            {{ __('lang.change_password') }}
                                         </button>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    
+
                     <div
                         class="card-footer flex flex-col md:flex-row gap-5 justify-center md:justify-between text-gray-600 text-sm font-medium">
                         @if ($users->hasPages())
                             <nav role="navigation" aria-label="Pagination Navigation"
                                 class="flex items-center justify-between w-full">
-                                {{-- Small screens: Previous & Next buttons --}}
                                 <div class="flex justify-between flex-1 sm:hidden">
                                     <a href="{{ $users->previousPageUrl() }}"
                                         class="pagination-btn {{ $users->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                        « Previous
+                                        « {{ __('lang.previous') }}
                                     </a>
                                     <a href="{{ $users->nextPageUrl() }}"
                                         class="pagination-btn {{ $users->hasMorePages() ? '' : 'opacity-50 cursor-not-allowed' }}">
-                                        Next »
+                                        {{ __('lang.next') }} »
                                     </a>
                                 </div>
 
                                 {{-- Large screens: Pagination details and numbered links --}}
                                 <div class="hidden sm:flex sm:items-center sm:justify-between w-full">
                                     <p class="text-sm text-gray-700">
-                                        Showing <span class="font-medium">{{ $users->firstItem() }}</span>
-                                        to <span class="font-medium">{{ $users->lastItem() }}</span>
-                                        of <span class="font-medium">{{ $users->total() }}</span> results
+                                        {{ __('lang.show') }} <span
+                                            class="font-medium">{{ $users->firstItem() }}</span>
+                                        {{ __('lang.to') }} <span class="font-medium">{{ $users->lastItem() }}</span>
+                                        {{ __('lang.of') }} <span class="font-medium">{{ $users->total() }}</span>
+                                        {{ __('lang.results') }}
                                     </p>
 
                                     {{-- Pagination controls --}}
@@ -133,7 +133,6 @@
                             </nav>
                         @endif
                     </div>
-
                 </div>
             </div>
         </div>
@@ -142,11 +141,11 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                    <h5 class="modal-title" id="imageModalLabel">{{ __('lang.preview_image') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="modalImage" src="" class="img-fluid" alt="Preview Image">
+                    <img id="modalImage" src="" class="img-fluid" alt="{{ __('lang.preview_image') }}">
                 </div>
             </div>
         </div>
