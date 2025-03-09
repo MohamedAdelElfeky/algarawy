@@ -61,6 +61,8 @@ class TwilioService implements TwilioVerificationService
                 $phone->getValue(),
                 [
                     'from' => $this->twilioPhoneNumber, 
+                    // 'from' => env('TWILIO_MESSAGE_SID'),
+                    'messagingServiceSid' => env('TWILIO_MESSAGE_SID'),
                     'body' => $message 
                 ]
             );

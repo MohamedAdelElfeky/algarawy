@@ -16,13 +16,6 @@ use Carbon\Carbon;
 
 class UsersImport implements ToModel, WithHeadingRow
 {
-    protected TwilioService $twilioService;
-
-    public function __construct(TwilioService $twilioService)
-    {
-        $this->twilioService = $twilioService;
-    }
-
     public function model(array $row)
     {
         $user = User::firstOrCreate(
@@ -73,15 +66,15 @@ class UsersImport implements ToModel, WithHeadingRow
         }
 
         if (!empty($row['phone'])) {
-            $phone = new PhoneNumber($row['phone']);
+            $phone = new PhoneNumber('+966' . $row['phone']);
             $message = "مرحبًا {$row['first_name']}! 
                 تم تسجيلك بنجاح في نظامنا. 
                 🔹  رقم التسجيل : {$row['national_id']}
                 🔹 كلمة المرور: {$row['password']}
                 يرجى الاحتفاظ بهذه المعلومات وتغيير كلمة المرور بعد تسجيل الدخول لأول مرة. 
                 شكراً لك!";
-
-            $this->twilioService->sendMessage($phone, $message);
+            $twilioService = new TwilioService();
+            $twilioService->sendMessage($phone, $message);
         }
 
         return $user;
