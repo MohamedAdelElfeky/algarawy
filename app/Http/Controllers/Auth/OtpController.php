@@ -32,13 +32,12 @@ class OtpController extends Controller
         }
 
         try {
-            // $localPhone = $this->stripCountryCode($request->phone);
-            // $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
-            // dd($localPhone);
+            $localPhone = $this->stripCountryCode($request->phone);
+            $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
 
-            // if (!$user) {
-            //     return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
-            // }
+            if (!$user) {
+                return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
+            }
             $phone = new PhoneNumber($request->phone);
             $this->twilioService->sendOtp($phone);
             return response()->json(['message' => 'تم إرسال رمز OTP بنجاح.'], 201);
@@ -62,17 +61,17 @@ class OtpController extends Controller
         }
 
         try {
-            // $localPhone = $this->stripCountryCode($request->phone);
-            // $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
-            // if (!$user) {
-            //     return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
-            // }
+            $localPhone = $this->stripCountryCode($request->phone);
+            $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
+            if (!$user) {
+                return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
+            }
             $phone = new PhoneNumber($request->phone);
             $otp = new OTP($request->otp);
             $isVerified = $this->twilioService->verifyOtp($phone, $otp);
             if ($isVerified) {
                 // $user = User::where('phone', $request->phone)->first();
-                // $user->update(['password' => bcrypt($request->input('password'))]);
+                $user->update(['password' => bcrypt($request->input('password'))]);
                 return response()->json(['message' => 'تم تغيير الرقم السري بنجاح.'], 200);
             } else {
                 return response()->json(['message' => 'OTP غير صالح.'], 400);
@@ -97,11 +96,11 @@ class OtpController extends Controller
         }
 
         try {
-            // $localPhone = $this->stripCountryCode($request->phone);
-            // $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
-            // if (!$user) {
-            //     return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
-            // }
+            $localPhone = $this->stripCountryCode($request->phone);
+            $user = User::whereRaw("REPLACE(phone, ' ', '') = ?", [$localPhone])->first();
+            if (!$user) {
+                return response()->json(['message' => 'رقم الهاتف غير مسجل.'], 404);
+            }
             $phone = new PhoneNumber($request->phone);
             $message = $request->message;
 
