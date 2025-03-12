@@ -98,4 +98,10 @@ class Meeting extends Model
     {
         return $this->morphMany(Complaint::class, 'complaintable');
     }
+
+    public function isOwnedBy($user = null)
+    {
+        $user = $user ?? auth()->user();
+        return $this->user_id === $user->id;
+    }
 }

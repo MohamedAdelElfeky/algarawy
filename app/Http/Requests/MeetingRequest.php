@@ -28,16 +28,17 @@ class MeetingRequest extends FormRequest
 
     public function messages()
     {
-        return [
-            'name.required'       => 'اسم الاجتماع مطلوب.',
-            'name.max'            => 'يجب ألا يزيد اسم الاجتماع عن 255 حرفًا.',
-            'datetime.date_format'=> 'صيغة التاريخ غير صحيحة.',
-            'start_time.date_format' => 'صيغة وقت البدء غير صحيحة.',
-            'end_time.date_format'   => 'صيغة وقت الانتهاء غير صحيحة.',
-            'end_time.after_or_equal' => 'يجب أن يكون وقت الانتهاء بعد أو يساوي وقت البدء.',
-            'type.required'       => 'نوع الاجتماع مطلوب.',
-            'type.in'             => 'نوع الاجتماع يجب أن يكون إما remotely أو normal.',
-            'status.in'           => 'حالة الاجتماع يجب أن تكون إما public أو private.',
-        ];
+        return [];
+    }
+
+    /**
+     * Handle validation failures and return JSON response.
+     */
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        throw new \Illuminate\Validation\ValidationException($validator, response()->json([
+            'message' => 'خطأ في التحقق من البيانات',
+            'errors' => $validator->errors()->first(),
+        ], 422));
     }
 }

@@ -4,35 +4,40 @@ namespace App\Http\Controllers\Api;
 
 use App\Domain\Models\Meeting;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MeetingRequest;
 use App\Services\MeetingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MeetingController extends Controller
 {
-    protected $meetingService;
 
-    public function __construct(MeetingService $meetingService)
+    public function __construct(private MeetingService $meetingService)
     {
         $this->middleware('optional.auth')->only('index');
         $this->middleware('auth:sanctum')->except('index');
-        $this->meetingService = $meetingService;
+    }
+    public function index(Request $request)
+    {
+        $perPage = $request->header('per_page', 10);
+        $page = $request->header('page', 1);
+        $meetings =  $this->meetingService->getMeetings($perPage, $page);
+        return response()->json($meetings, 200);
     }
 
-    public function store(Request $request)
+    public function store(MeetingRequest $request)
     {
-        $meeting = $this->meetingService->createMeeting($request->all());
-
+        $meeting = $this->meetingService->createMeeting($request);
         return response()->json($meeting, 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(MeetingRequest $request, $id)
     {
         $meeting = Meeting::findOrFail($id);
         if (!$meeting) {
             return response()->json(['message' => 'الاجتماع غير موجودة'], 404);
         }
-        $updatedMeeting = $this->meetingService->updateMeeting($meeting, $request->all());
+        $updatedMeeting = $this->meetingService->updateMeeting($meeting, $request);
 
         return response()->json($updatedMeeting);
     }
@@ -46,19 +51,7 @@ class MeetingController extends Controller
         return response()->json(['message' => 'تم حذف الاجتماع بنجاح'], 200);
     }
 
-    public function index(Request $request)
-    {
-        $perPage = $request->header('per_page', 10);
-        $page = $request->header('page', 1);
-
-        $user = Auth::guard('sanctum')->user();
-
-        $meetings = $user
-            ? $this->meetingService->getAllMeetings($perPage, $page)
-            : $this->meetingService->getAllMeetingsPublic($perPage, $page);
-        return response()->json($meetings, 200);
-    }
-
+  
     public function getAuthenticatedMeetings(Request $request)
     {
         $perPage = $request->query('perPage', 10);

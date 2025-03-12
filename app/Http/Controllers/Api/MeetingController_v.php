@@ -19,7 +19,13 @@ class MeetingController extends Controller
         $this->middleware('auth:sanctum')->except('index');
         $this->meetingService = $meetingService;
     }
-
+    public function index(Request $request)
+    {
+        $perPage = $request->query('per_page', 10);
+        $page = $request->query('page', 1);
+        $meetings = $this->meetingService->getMeetings($perPage, $page);
+        return response()->json($meetings, 200);
+    }
     public function store(MeetingRequest $request)
     {
         $meeting = $this->meetingService->createMeeting($request->validated());
@@ -44,13 +50,6 @@ class MeetingController extends Controller
         return response()->json($meeting);
     }
 
-    public function index(Request $request)
-    {
-        $user = $request->auth_user;
-        $perPage = $request->query('per_page', 10);
-        $page = $request->query('page', 1);
-        $meetings = $this->meetingService->getAllMeetings($perPage, $page);
-        return response()->json($meetings, 200);
-    }
+ 
     
 }
