@@ -103,4 +103,10 @@ class Discount extends Model
 
         return "https://www.google.com/maps?q={$latitude},{$longitude}";
     }
+
+    public function isOwnedBy($user = null)
+    {
+        $user = $user ?? auth()->user();
+        return $this->user_id === $user->id;
+    }
 }

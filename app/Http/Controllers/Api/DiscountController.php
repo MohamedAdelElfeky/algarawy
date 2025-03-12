@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DiscountRequest;
 use App\Services\DiscountService;
 use Illuminate\Http\Request;
 use App\Http\Resources\DiscountResource;
@@ -24,12 +25,7 @@ class DiscountController extends Controller
     {
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
-        $user = $request->auth_user; 
-
-        $discounts = $user
-            ? $this->discountService->getAllDiscounts($perPage, $page)  
-            : $this->discountService->getAllDiscountsPublic($perPage, $page);
-
+        $discounts = $this->discountService->getDiscounts($perPage, $page);
         return response()->json($discounts, 200);
     }
 
@@ -69,13 +65,13 @@ class DiscountController extends Controller
         return new DiscountResource($discount);
     }
 
-    public function store(Request $request)
+    public function store(DiscountRequest $request)
     {
-        $result = $this->discountService->createDiscount($request->all());
+        $result = $this->discountService->createDiscount($request);
         return new DiscountResource($result['data']);
     }
 
-    public function update(Request $request, $id)
+    public function update(DiscountRequest $request, $id)
     {
         $discount = $this->discountService->getDiscountById($id);
 
@@ -83,7 +79,7 @@ class DiscountController extends Controller
             return response()->json(['message' => 'الخصم غير موجود'], 404);
         }
 
-        $result = $this->discountService->updateDiscount($discount, $request->all());
+        $result = $this->discountService->updateDiscount($discount, $request);
 
         return new DiscountResource($result['data']);
     }
