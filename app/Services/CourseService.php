@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Domain\Models\Course;
 use App\Domain\Models\FilePdf;
 use App\Domain\Models\Image;
+use App\Http\Requests\CourseRequest;
 use App\Http\Resources\CourseResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,69 +13,22 @@ use Illuminate\Support\Facades\Validator;
 
 class CourseService
 {
-    protected $paginationService;
 
-    public function __construct(PaginationService $paginationService)
+
+    public function __construct(private PaginationService $paginationService, private FileHandlerService $fileHandler) {}
+
+
+    public function createCourse(CourseRequest $request)
     {
-        $this->paginationService = $paginationService;
-    }
+        $validatedData = $request->validated();
+        $validatedData['user_id'] = auth()->id();
 
-    public function createCourse(array $data)
-    {
-        $validator = Validator::make($data, [
-            'description' => 'required',
-            'files.*' => 'nullable|file',
-            'location' => 'nullable|string|location',
-            'discount' => 'nullable',
-            'link' => 'nullable|url',
-            'images_and_videos.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
-            'status' => 'nullable',
+        // Create the course
+        $course = Course::create($validatedData);
 
-        ]);
-        $data['user_id'] = Auth::id();
-
-        if ($validator->fails()) {
-            return [
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ];
-        }
-        // return $data;
-        $course = Course::create($data);
-        // Handle images/videos
-        if (request()->hasFile('images_or_video')) {
-            foreach (request()->file('images_or_video') as $key => $item) {
-                $image = $data['images_or_video'][$key];
-                $imageType = $image->getClientOriginalExtension();
-                $mimeType = $image->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_course.' . $image->getClientOriginalExtension();
-                $image->move(public_path('course/images/'), $file_name);
-                $imagePath = "course/images/" . $file_name;
-                $imageObject = new Image([
-                    'url' => $imagePath,
-                    'mime' => $mimeType,
-                    'image_type' => $imageType,
-                ]);
-                $course->images()->save($imageObject);
-            }
-        }
-        if (request()->hasFile('files')) {
-            foreach (request()->file('files') as $key => $item) {
-                $pdf = $data['files'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_course.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('course/files/'), $file_name);
-                $pdfPath = "course/files/" . $file_name;
-                $pdfObject = new FilePdf([
-                    'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
-                ]);
-                $course->pdfs()->save($pdfObject);
-            }
-        }
-
+        // Handle file uploads
+        $this->fileHandler->attachImages($request, $course, 'courses', 'course_');
+        $this->fileHandler->attachPdfs($request, $course, 'courses/pdf', 'pdf_');
 
         return [
             'message' => 'تم إنشاء الدورة التدريبية بنجاح',
@@ -82,140 +36,64 @@ class CourseService
         ];
     }
 
-    public function updateCourse(Course $course, array $data)
+    public function updateCourse(Course $course, CourseRequest $request)
     {
-        if ($course->user_id != Auth::id()) {
+        if (!$course->isOwnedBy(auth()->user())) {
             return response()->json([
                 'message' => 'هذا الدورة ليس من إنشائك',
-            ], 200);
+            ], 403);
         }
-        $validator = Validator::make($data, [
-            'description' => 'required',
-            'files.*' => 'nullable|file',
-            'location' => 'nullable|string|location',
-            'discount' => 'nullable',
-            'link' => 'nullable|url',
-            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'deleted_images_and_videos' => 'nullable',
-            'deleted_files' => 'nullable',
-            'status' => 'nullable',
 
-        ]);
+        $validatedData = $request->validated();
+        if ($request->filled('deleted_images_and_videos')) {
+            $this->fileHandler->deleteFiles($request->deleted_images_and_videos, 'image');
+        }
+        if ($request->filled('deleted_files')) {
+            $this->fileHandler->deleteFiles($request->deleted_files, 'pdf');
+        }
+        $course->update($validatedData);
+        $this->fileHandler->attachImages($request, $course, 'courses', 'course_');
+        $this->fileHandler->attachPdfs($request, $course, 'courses/pdf', 'pdf_');
 
-        $data['user_id'] = Auth::id();
-
-        if ($validator->fails()) {
-            return [
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ];
-        }
-        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
-        foreach ($deletedImagesAndVideos as $imageId) {
-            $image = Image::find($imageId);
-            if ($image) {
-                // Delete from storage
-                Storage::delete($image->url);
-                // Delete from database
-                $image->delete();
-            }
-        }
-        // Handle deleted files
-        $deletedFiles = $data['deleted_files'] ?? [];
-        foreach ($deletedFiles as $fileId) {
-            $filePdf = FilePdf::find($fileId);
-            if ($filePdf) {
-                // Delete from storage
-                Storage::delete($filePdf->url);
-                // Delete from database
-                $filePdf->delete();
-            }
-        }
-        $course->update($data);
-        // Handle images/videos
-        if (request()->hasFile('images_or_video')) {
-            foreach (request()->file('images_or_video') as $key => $item) {
-                $image = $data['images_or_video'][$key];
-                $imageType = $image->getClientOriginalExtension();
-                $mimeType = $image->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_course.' . $image->getClientOriginalExtension();
-                $image->move(public_path('course/images/'), $file_name);
-                $imagePath = "course/images/" . $file_name;
-                $imageObject = new Image([
-                    'url' => $imagePath,
-                    'mime' => $mimeType,
-                    'image_type' => $imageType,
-                ]);
-                $course->images()->save($imageObject);
-            }
-        }
-        if (request()->hasFile('files')) {
-            foreach (request()->file('files') as $key => $item) {
-                $pdf = $data['files'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_course.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('course/files/'), $file_name);
-                $pdfPath = "course/files/" . $file_name;
-                $pdfObject = new FilePdf([
-                    'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
-                ]);
-                $course->pdfs()->save($pdfObject);
-            }
-        }
         return [
+            'message' => 'تم تحديث الدورة التدريبية بنجاح',
             'data' => new CourseResource($course),
         ];
     }
 
-    public function getAllCourses($perPage = 10, $page = 1)
+    public function getCourses($perPage = 10, $page = 1)
     {
         $user = Auth::guard('sanctum')->user();
 
-        if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+        $courseQuery = Course::query()->approvalStatus('approved')->orderByDesc('created_at');
+
+        if ($user) {
+            $showNoComplaintedPosts = $user->userSettings()
+                ->whereHas('setting', fn($query) => $query->where('key', 'show_no_complaints_posts'))
+                ->value('value') ?? false;
+
+            $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id');
+
+            $courseQuery->whereNotIn('user_id', $blockedUserIds);
+
+            if ($showNoComplaintedPosts) {
+                $courseQuery->where(
+                    fn($query) =>
+                    $query->where('user_id', $user->id)
+                        ->orWhereDoesntHave('complaints')
+                );
+            }
+        } else {
+            $courseQuery->visibilityStatus();
         }
 
-        $showNoComplaintedPosts = $user->userSettings()
-            ->whereHas('setting', function ($query) {
-                $query->where('key', 'show_no_complaints_posts');
-            })
-            ->value('value') ?? false;
-
-        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
-
-        $courseQuery = Course::whereNotIn('user_id', $blockedUserIds)->approvalStatus('approved')
-            ->orderBy('created_at', 'desc');
-
-        if ($showNoComplaintedPosts) {
-            $courseQuery->where(function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->orWhereDoesntHave('complaints');
-            });
-        }
         $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
+
 
         return [
             'data' => CourseResource::collection($courses),
             'metadata' => $this->paginationService->getPaginationData($courses),
         ];
-    }
-
-    public function getAllCoursesPublic($perPage = 10, $page = 1)
-    {
-        $courseQuery = Course::visibilityStatus('public')->ApprovalStatus('approved')
-            ->orderBy('created_at', 'desc');
-        $courses = $courseQuery->paginate($perPage, ['*'], 'page', $page);
-        $courseResource = CourseResource::collection($courses);
-        $paginationData = $this->paginationService->getPaginationData($courses);
-
-        return [
-            'data' => $courseResource,
-            'metadata' => $paginationData,
-        ];
-        return;
     }
 
     public function getCourseById($id)
@@ -234,15 +112,16 @@ class CourseService
         if (!$course) {
             return ['message' => 'الدورة غير موجودة'];
         }
-        if ($course->user_id != Auth::id()) {
+        if (!$course->isOwnedBy(auth()->user())) {
             return response()->json([
                 'message' => 'هذا الدورة ليس من إنشائك',
-            ], 200);
+            ], 403);
         }
         $course->delete();
 
         return ['message' => 'تم حذف الدورة بنجاح'];
     }
+    
     public function searchCourse($searchTerm)
     {
         $courses = Course::where(function ($query) use ($searchTerm) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Services\CourseService;
 use Illuminate\Http\JsonResponse;
@@ -24,63 +25,26 @@ class CourseController extends Controller
     {
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
-
-        $user = Auth::guard('sanctum')->user();
-
-        $courses = $user
-        ? $this->courseService->getAllCourses($perPage, $page)  
-        : $this->courseService->getAllCoursesPublic($perPage, $page);
-
+        $courses = $this->courseService->getCourses($perPage, $page);
         return response()->json($courses, 200);
     }
 
-    public function getAuthenticatedCourses(Request $request)
-    {
-        $perPage = $request->query('perPage', 10);
-        $page = $request->query('page', 1);
-
-        $user = Auth::user();
-
-        if ($user) {
-            $courses = $this->courseService->getAllCourses($perPage, $page);
-            return response()->json($courses, 200);
-        } else {
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
-    }
-
-    // public function index(Request $request)
-    // {
-    //     $perPage = $request->header('per_page');
-    //     $page = $request->header('page');
-    //     $courses = $this->courseService->getAllCourses($perPage, $page);
-    //     return response()->json($courses, 200);
-    // }
-
-    public function getCourses(Request $request)
-    {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $courses = $this->courseService->getAllCoursesPublic($perPage, $page);
-        return response()->json($courses, 200);
-    }
     public function show($id)
     {
         $course = new CourseResource($this->courseService->getCourseById($id));
         return response()->json(['data' => $course], 200);
     }
 
-    public function store(Request $request)
+    public function store(CourseRequest $request)
     {
-        // return $request->file('files');
-        $course = $this->courseService->createCourse($request->all());
+        $course = $this->courseService->createCourse($request);
         return response()->json($course);
     }
 
-    public function update(Request $request, $id)
+    public function update(CourseRequest $request, $id)
     {
         $course = $this->courseService->getCourseById($id);
-        $result = $this->courseService->updateCourse($course, $request->all());
+        $result = $this->courseService->updateCourse($course, $request);
         return response()->json($result);
     }
 
