@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Domain\Models\Image;
 use App\Domain\Models\Service;
+use App\Http\Requests\ServiceRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ServiceResource;
@@ -11,164 +12,75 @@ use Illuminate\Support\Facades\Storage;
 
 class ServiceService
 {
-    protected $paginationService;
 
-    public function __construct(PaginationService $paginationService)
+    public function __construct(private PaginationService $paginationService, private FileHandlerService $fileHandler) {}
+
+    public function createService(ServiceRequest $request)
     {
-        $this->paginationService = $paginationService;
-    }
-
-    public function createService(array $data): array
-    {
-        $validator = Validator::make($data, [
-            'description' => 'nullable|string',
-            'images_or_video' => 'nullable',
-            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'location' => 'nullable|string|location',
-            'status' => 'nullable',
-
-        ]);
-
-        if ($validator->fails()) {
-            return [
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ];
-        }
-
-        $data['user_id'] = Auth::id();
-        $service = Service::create($data);
-        // Handle images/videos
-        if (request()->hasFile('images_or_video')) {
-            foreach (request()->file('images_or_video') as $key => $item) {
-                $image = $data['images_or_video'][$key];
-                $imageType = $image->getClientOriginalExtension();
-                $mimeType = $image->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_service.' . $image->getClientOriginalExtension();
-                $image->move(public_path('service/images/'), $file_name);
-                $imagePath = "service/images/" . $file_name;
-                $imageObject = new Image([
-                    'url' => $imagePath,
-                    'mime' => $mimeType,
-                    'image_type' => $imageType,
-                ]);
-                $service->images()->save($imageObject);
-            }
-        }
-
+        $validatedData = $request->validated();
+        $validatedData['user_id'] = auth()->id();
+        $service = Service::create($validatedData);
+        $this->fileHandler->attachImages(request(), $service, 'service/images', 'project_');
         return [
             'message' => 'تم إنشاء الخدمة بنجاح',
             'data' => new ServiceResource($service),
         ];
     }
 
-    public function updateService(Service $service, array $data): array
+    public function updateService(Service $service, ServiceRequest $request)
     {
 
-        if ($service->user_id != Auth::id()) {
+        if (!$service->isOwnedBy(auth()->user())) {
             return response()->json([
                 'message' => 'هذا الخدمة ليس من إنشائك',
-            ], 200);
-        }
-        $validator = Validator::make($data, [
-            'description' => 'sometimes|nullable|string',
-            'images_or_video' => 'nullable',
-            'images_or_video.*' => 'file|mimes:jpeg,png,jpg,gif,mp4',
-            'location' => 'nullable|string|location',
-            'deleted_images_and_videos' => 'nullable',
-            'status' => 'nullable',
-
-        ]);
-
-        if ($validator->fails()) {
-            return [
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ];
-        }
-        $data['user_id'] = Auth::id();
-        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
-        foreach ($deletedImagesAndVideos as $imageId) {
-            $image = Image::find($imageId);
-            if ($image) {
-                // Delete from storage
-                Storage::delete($image->url);
-                // Delete from database
-                $image->delete();
-            }
+            ], 403);
         }
 
-        $service->update($data);
-        // Handle images/videos
-        if (request()->hasFile('images_or_video')) {
-            foreach (request()->file('images_or_video') as $key => $item) {
-                $image = $data['images_or_video'][$key];
-                $imageType = $image->getClientOriginalExtension();
-                $mimeType = $image->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_service.' . $image->getClientOriginalExtension();
-                $image->move(public_path('service/images/'), $file_name);
-                $imagePath = "service/images/" . $file_name;
-                $imageObject = new Image([
-                    'url' => $imagePath,
-                    'mime' => $mimeType,
-                    'image_type' => $imageType,
-                ]);
-                $service->images()->save($imageObject);
-            }
+        $validatedData = $request->validated();
+        if ($request->filled('deleted_images_and_videos')) {
+            $this->fileHandler->deleteFiles($request->deleted_images_and_videos, 'image');
         }
+        $service->update($validatedData);
+        $this->fileHandler->attachImages(request(), $service, 'service/images', 'project_');
         return [
             'message' => 'تم تحديث الخدمة بنجاح',
             'data' => new ServiceResource($service),
         ];
     }
-
-    public function getAllServices($perPage = 10, $page = 1)
+    public function getServices($perPage = 10, $page = 1)
     {
         $user = Auth::guard('sanctum')->user();
-        if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+
+        $serviceQuery = Service::query()->approvalStatus('approved')->orderByDesc('created_at');
+
+        if ($user) {
+            $showNoComplaintedPosts = $user->userSettings()
+                ->whereHas('setting', fn($query) => $query->where('key', 'show_no_complaints_posts'))
+                ->value('value') ?? false;
+
+            $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id');
+
+            $serviceQuery->whereNotIn('user_id', $blockedUserIds);
+
+            if ($showNoComplaintedPosts) {
+                $serviceQuery->where(
+                    fn($query) =>
+                    $query->where('user_id', $user->id)
+                        ->orWhereDoesntHave('complaints')
+                );
+            }
+        } else {
+            $serviceQuery->visibilityStatus();
         }
-        $showNoComplaintedPosts = $user->userSettings()
-            ->whereHas('setting', function ($query) {
-                $query->where('key', 'show_no_complaints_posts');
-            })
-            ->value('value') ?? false;
 
-        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
-
-        $servicesQuery = Service::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
-            ->orderBy('created_at', 'desc');
-
-        if ($showNoComplaintedPosts) {
-            $servicesQuery->where(function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->orWhereDoesntHave('complaints');
-            });
-        }
-        $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
-        $serviceResource = ServiceResource::collection($services);
-        $paginationData = $this->paginationService->getPaginationData($services);
+        $services = $serviceQuery->paginate($perPage, ['*'], 'page', $page);
 
         return [
-            'data' => $serviceResource,
-            'metadata' => $paginationData,
+            'data' => ServiceResource::collection($services),
+            'metadata' => $this->paginationService->getPaginationData($services),
         ];
     }
 
-    public function getAllServicesPublic($perPage = 10, $page = 1)
-    {
-        $servicesQuery = Service::visibilityStatus('public')->ApprovalStatus('approved')
-            ->orderBy('created_at', 'desc');
-        $services = $servicesQuery->paginate($perPage, ['*'], 'page', $page);
-        $serviceResource = ServiceResource::collection($services);
-        $paginationData = $this->paginationService->getPaginationData($services);
-
-        return [
-            'data' => $serviceResource,
-            'metadata' => $paginationData,
-        ];
-    }
 
     public function getServiceById($id): Service
     {
@@ -181,10 +93,10 @@ class ServiceService
 
     public function deleteService(Service $service)
     {
-        if ($service->user_id != Auth::id()) {
+        if (!$service->isOwnedBy(auth()->user())) {
             return response()->json([
                 'message' => 'هذا الخدمة ليس من إنشائك',
-            ], 200);
+            ], 403);
         }
         $service->delete();
 

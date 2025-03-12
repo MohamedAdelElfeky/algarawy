@@ -45,24 +45,18 @@ class JobRequest extends FormRequest
             'company_city_id' => 'nullable|exists:cities,id',
             'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'is_training' => 'nullable',
-            'status' => 'nullable',
+            'status'      => 'nullable|in:public,private',
         ];
     }
 
-    /**
-     * Handle a failed validation attempt.
-     *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+      /**
+     * Handle validation failures and return JSON response.
      */
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        $errors = (new ValidationException($validator))->errors();
-
-        throw new HttpResponseException(response()->json([
-            'success' => false,
-            'message' => 'Validation failed',
-            'errors' => $errors
+        throw new \Illuminate\Validation\ValidationException($validator, response()->json([
+            'message' => 'خطأ في التحقق من البيانات',
+            'errors' => $validator->errors()->first(),
         ], 422));
     }
 

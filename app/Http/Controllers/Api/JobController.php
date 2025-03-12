@@ -14,41 +14,19 @@ use Illuminate\Support\Facades\Validator;
 
 class JobController extends Controller
 {
-    protected $jobService;
-
-    public function __construct(JobService $jobService)
+    public function __construct(private JobService $jobService)
     {
         $this->middleware('optional.auth')->only('index');
         $this->middleware('auth:sanctum')->except('index');
-        $this->jobService = $jobService;
     }
 
     public function index(Request $request)
     {
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
-
-        $user = Auth::guard('sanctum')->user();
-        $jobs = $user
-            ? $this->jobService->getAllJobs($perPage, $page)
-            : $this->jobService->getAllJobsPublic($perPage, $page);
+        $jobs = $this->jobService->getJobs($perPage, $page);
         return response()->json($jobs, 200);
     }
-
-    // public function getAuthenticatedJob(Request $request)
-    // {
-    //     $perPage = $request->query('perPage', 10);
-    //     $page = $request->query('page', 1);
-
-    //     $user = Auth::user();
-
-    //     if ($user) {
-    //         $jobs = $this->jobService->getAllJobs($perPage, $page);
-    //         return response()->json($jobs, 200);
-    //     } else {
-    //         return response()->json(['error' => 'User not authenticated'], 401);
-    //     }
-    // }
 
     public function show($id)
     {
@@ -61,17 +39,17 @@ class JobController extends Controller
     public function store(JobRequest $request)
     {
         $data = $request->validated();
-        $job = $this->jobService->createJob($data, $request);
+        $job = $this->jobService->createJob($request);
         return response()->json($job, 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(JobRequest $request, $id)
     {
         $job = Job::find($id);
         if (!$job) {
             return response()->json(['message' => 'لم يتم العثور على الوظيفة'], 404);
         }
-        $updatedJob = $this->jobService->updateJob($job, $request->all());
+        $updatedJob = $this->jobService->updateJob($job, $request);
         return response()->json($updatedJob);
     }
 

@@ -6,35 +6,20 @@ use App\Domain\Models\FilePdf;
 use App\Domain\Models\Job;
 use App\Domain\Models\JobApplication;
 use App\Http\Resources\JobApplication2Resource;
-use App\Http\Resources\JobApplicationResource;
 use App\Http\Resources\JobResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class JobApplicationService
 {
+    public function __construct(private FileHandlerService $fileHandler, private FileHandlerService $fileHandler) {}
+
     public function createJobApplication(array $data)
-    {      
-        
+    {
+
         $data['user_id'] = Auth::id();
         $jobApplication = JobApplication::create($data);
-        // Handle images/videos
-        if (request()->hasFile('files')) {
-            foreach (request()->file('files') as $key => $item) {
-                $pdf = $data['files'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_jobApplication.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('jobApplication/files/'), $file_name);
-                $pdfPath = "jobApplication/files/" . $file_name;
-                $pdfObject = new FilePdf([
-                    'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
-                ]);
-                $jobApplication->pdfs()->save($pdfObject);
-            }
-        }
+        $this->fileHandler->attachPdfs(request(), $jobApplication, 'jobApplication/files', 'pdf_');
         return  new JobResource(Job::find($data['job_id']));
     }
 

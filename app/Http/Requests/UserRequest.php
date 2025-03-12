@@ -57,19 +57,17 @@ class UserRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
-        $firstError = collect($validator->errors()->all())->first(); 
-    
+        $firstError = collect($validator->errors()->all())->first();
+
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى',
-            'error' => $firstError, 
+            'error' => $firstError,
         ], 422));
     }
 
     public function messages()
     {
-        return [
-
-        ];
+        return [];
     }
 }

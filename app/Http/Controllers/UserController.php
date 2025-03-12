@@ -6,6 +6,7 @@ use App\Domain\Models\Course;
 use App\Domain\Models\Meeting;
 use App\Domain\Models\Project;
 use App\Domain\Models\Setting;
+use App\Domain\Models\support;
 use App\Domain\Models\UserDetail;
 use App\Domain\Models\UserSetting;
 use App\Http\Resources\CourseResource;
@@ -13,8 +14,8 @@ use App\Http\Resources\MeetingResource;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\UserResource;
-use App\Models\support;
 use App\Models\User;
+use App\Services\FileHandlerService;
 use App\Services\PaginationService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -24,12 +25,10 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    protected $paginationService;
 
-    public function __construct(PaginationService $paginationService)
+    public function __construct(private PaginationService $paginationService, private FileHandlerService $fileHandler)
     {
         $this->middleware('auth:sanctum');
-        $this->paginationService = $paginationService;
     }
 
     public function getMeetings()
@@ -375,20 +374,7 @@ class UserController extends Controller
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
-
-        $imagePaths = [];
-        $fileFields = ['avatar', 'national_card_image_front', 'national_card_image_back'];
-
-        foreach ($fileFields as $field) {
-            if ($request->hasFile($field)) {
-                $file = $request->file($field);
-                $fileName = time() . rand(1000, 9999) . "_{$field}." . $file->getClientOriginalExtension();
-                $path = $file->storeAs('users', $fileName, 'public');
-                $imagePaths[$field] = "storage/" . $path;
-            }
-        }
-
-        // Create or update the User
+        $imageFields = ['avatar', 'national_card_image_front', 'national_card_image_back'];
         $user = User::updateOrCreate(
             ['email' => $validatedData['email']],
             [
@@ -400,28 +386,18 @@ class UserController extends Controller
             ]
         );
 
-        // Create or update User Detail
         $userDetail = UserDetail::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'birthdate' => $validatedData['birth_date'],
             ]
         );
-        foreach ($imagePaths as $field => $imagePath) {
-            if (!empty($imagePath)) {
-                $userDetail->images()->create([
-                    'url'            => $imagePath,
-                    'imageable_type' => UserDetail::class,
-                    'imageable_id'   => $userDetail->id,
-                    'type'           => $field,
-                ]);
-            }
+        foreach ($imageFields as $field) {
+            $this->fileHandler->uploadSingleImage($request, $userDetail, 'users', 'user', 'image', $field);
         }
-        // Assign Admin Role
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $user->assignRole($adminRole);
 
-        // Assign User Settings
         $settings = [
             'mobile_number_visibility' => true,
             'birthdate_visibility' => true,
@@ -451,11 +427,9 @@ class UserController extends Controller
             'user_id' => 'required|exists:users,id',
             'password' => 'required|min:6|confirmed',
         ]);
-        // dd($request->all());
         $user = User::find($request->user_id);
         $user->password = Hash::make($request->password);
         $user->save();
-        // dd($user);
         return response()->json(['message' => 'تم تغيير كلمة المرور بنجاح']);
     }
 

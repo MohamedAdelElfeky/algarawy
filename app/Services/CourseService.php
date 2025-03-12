@@ -23,10 +23,13 @@ class CourseService
         $validatedData = $request->validated();
         $validatedData['user_id'] = auth()->id();
 
-        // Create the course
         $course = Course::create($validatedData);
-
-        // Handle file uploads
+        $course->Approval()->create([
+            'status' => 'pending'
+        ]);
+        $course->visibility()->create([
+            'status' => 'private'
+        ]);
         $this->fileHandler->attachImages($request, $course, 'courses/images', 'course_');
         $this->fileHandler->attachPdfs($request, $course, 'courses/pdf', 'pdf_');
 
@@ -52,7 +55,7 @@ class CourseService
             $this->fileHandler->deleteFiles($request->deleted_files, 'pdf');
         }
         $course->update($validatedData);
-        $this->fileHandler->attachImages($request, $course, 'courses', 'course_');
+        $this->fileHandler->attachImages($request, $course, 'courses/images', 'course_');
         $this->fileHandler->attachPdfs($request, $course, 'courses/pdf', 'pdf_');
 
         return [

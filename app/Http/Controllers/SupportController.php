@@ -20,11 +20,7 @@ class SupportController extends Controller
     {
         $number = $request->input('number');
         $email = $request->input('email');
-
-        // Delete all existing records to ensure only one record exists
         Support::truncate();
-
-        // Create a new record with the provided data
         Support::create([
             'number' => $number,
             'email' => $email,

@@ -61,8 +61,7 @@ class ProjectService
     {
         $validatedData = $request->validated();
         $validatedData['user_id'] = auth()->id();
-        $data['user_id'] = Auth::id();
-        $project = Project::create($data);
+        $project = Project::create($validatedData);
         $project->Approval()->create([
             'status' => 'pending'
         ]);

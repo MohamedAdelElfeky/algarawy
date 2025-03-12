@@ -8,11 +8,9 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    protected DashboardService $dashboardService;
 
-    public function __construct(DashboardService $dashboardService)
+    public function __construct(private DashboardService $dashboardService)
     {
-        $this->dashboardService = $dashboardService;
         $this->middleware('optional.auth')->only('getDataDashboard');
         $this->middleware('auth:sanctum')->except('getDataDashboard');
     }

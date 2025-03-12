@@ -85,45 +85,7 @@ class UserService
         return $user;
     }
 
-    /**
-     * Handle Image Upload and Save in Images Table
-     */
-    private function saveUserImages($userDetail, $data)
-    {
-        $imageFields = [
-            'avatar' => 'avatar',
-            'national_card_image_front' => 'national_card_image_front',
-            'national_card_image_back' => 'national_card_image_back',
-            'card_image' => 'card_image'
-        ];
 
-        foreach ($imageFields as $field => $typeName) {
-            if (isset($data[$field])) {
-                $imagePath = $this->handleImageUpload($data[$field]);
-
-                $userDetail->images()->create([
-                    'url' => $imagePath,
-                    'type_name' => $typeName
-                ]);
-            }
-        }
-    }
-
-
-    /**
-     * Upload Image and Return Path
-     */
-    private function handleImageUpload($image)
-    {
-        $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-        $path = $image->storeAs('users', $filename, 'public');
-        return 'storage/' . $path;
-    }
-
-    //    public function findUserByNationalId(string $nationalId)
-    //    {
-    //        return User::where('national_id', $nationalId)->first();
-    //    }
 
     public function loginUser(array $credentials)
     {

@@ -12,13 +12,10 @@ use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
-    protected $courseService;
-
-    public function __construct(CourseService $courseService)
+    public function __construct(private CourseService $courseService)
     {
         $this->middleware('optional.auth')->only('index');
         $this->middleware('auth:sanctum')->except('index');
-        $this->courseService = $courseService;
     }
 
     public function index(Request $request)

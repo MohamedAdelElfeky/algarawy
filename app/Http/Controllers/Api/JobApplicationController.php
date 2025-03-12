@@ -13,12 +13,9 @@ use Illuminate\Support\Facades\Auth;
 class JobApplicationController extends Controller
 {
 
-    private $jobApplicationService;
-
-    public function __construct(JobApplicationService $jobApplicationService)
+    public function __construct(private JobApplicationService $jobApplicationService)
     {
         $this->middleware('auth:sanctum');
-        $this->jobApplicationService = $jobApplicationService;
     }
 
     public function store(Request $request)

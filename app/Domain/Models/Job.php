@@ -133,4 +133,10 @@ class Job extends Model
     {
         return $this->morphMany(MembershipAssignment::class, 'assignable');
     }
+
+    public function isOwnedBy($user = null)
+    {
+        $user = $user ?? auth()->user();
+        return $this->user_id === $user->id;
+    }
 }

@@ -29,36 +29,6 @@ class DiscountController extends Controller
         return response()->json($discounts, 200);
     }
 
-    // public function getAuthenticatedDiscounts(Request $request)
-    // {
-    //     $perPage = $request->query('perPage', 10);
-    //     $page = $request->query('page', 1);
-
-    //     $user = Auth::user();
-
-    //     if ($user) {
-    //         $discounts = $this->discountService->getAllDiscounts($perPage, $page);
-    //         return response()->json($discounts, 200);
-    //     } else {
-    //         return response()->json(['error' => 'User not authenticated'], 401);
-    //     }
-    // }
-
-    // public function index(Request $request)
-    // {
-    //     $perPage = $request->header('per_page');
-    //     $page = $request->header('page');
-    //     return response()->json($discounts, 200);
-    // }
-
-    // public function getDiscounts(Request $request)
-    // {
-    //     $perPage = $request->header('per_page');
-    //     $page = $request->header('page');
-    //     $discounts = $this->discountService->getAllDiscountsPublic($perPage, $page);
-    //     return response()->json($discounts, 200);
-    // }
-
     public function show($id)
     {
         $discount = $this->discountService->getDiscountById($id);

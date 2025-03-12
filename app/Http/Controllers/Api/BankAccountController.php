@@ -10,13 +10,10 @@ use Illuminate\Http\Request;
 
 class BankAccountController extends Controller
 {
-    protected $bankAccountService;
 
-    public function __construct(BankAccountService $bankAccountService)
+    public function __construct(private BankAccountService $bankAccountService)
     {
-//        $this->middleware('optional.auth')->only('index');
         $this->middleware('auth:sanctum');
-        $this->bankAccountService = $bankAccountService;
     }
 
     public function index()

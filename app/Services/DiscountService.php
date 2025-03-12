@@ -54,6 +54,12 @@ class DiscountService
         $validatedData['user_id'] = auth()->id();
 
         $discount = Discount::create($validatedData);
+        $discount->Approval()->create([
+            'status' => 'pending'
+        ]);
+        $discount->visibility()->create([
+            'status' => 'private'
+        ]);
         $this->fileHandler->attachImages($request, $discount, 'discount/images', 'course_');
         $this->fileHandler->attachPdfs($request, $discount, 'discount/pdf', 'pdf_');
         return [
