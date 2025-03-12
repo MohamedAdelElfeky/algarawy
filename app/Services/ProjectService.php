@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Domain\Models\FilePdf;
 use App\Domain\Models\Image;
 use App\Domain\Models\Project;
+use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\ProjectResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -12,57 +13,38 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectService
 {
-    protected $paginationService;
 
-    public function __construct(PaginationService $paginationService)
+    public function __construct(private PaginationService $paginationService, private FileHandlerService $fileHandler) {}
+    public function getProjects($perPage = 10, $page = 1)
     {
-        $this->paginationService = $paginationService;
-    }
+        $user = Auth::guard('sanctum')->user();
+        $projectQuery = Project::query()->approvalStatus('approved')->orderByDesc('created_at');
 
+        if ($user) {
+            $showNoComplaintedPosts = $user->userSettings()
+                ->whereHas('setting', fn($query) => $query->where('key', 'show_no_complaints_posts'))
+                ->value('value') ?? false;
 
-    public function getAllProjects($perPage = 10, $page = 1)
-    {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id');
+
+            $projectQuery->whereNotIn('user_id', $blockedUserIds);
+
+            if ($showNoComplaintedPosts) {
+                $projectQuery->where(
+                    fn($query) =>
+                    $query->where('user_id', $user->id)
+                        ->orWhereDoesntHave('complaints')
+                );
+            }
+        } else {
+            $projectQuery->visibilityStatus();
         }
-        $showNoComplaintedPosts = $user->userSettings()
-            ->whereHas('setting', function ($query) {
-                $query->where('key', 'show_no_complaints_posts');
-            })
-            ->value('value') ?? false;
 
-        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
-
-        $projectQuery = Project::whereNotIn('user_id', $blockedUserIds)->ApprovalStatus('approved')
-            ->orderBy('created_at', 'desc');
-
-        if ($showNoComplaintedPosts) {
-            $projectQuery->where(function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->orWhereDoesntHave('complaints');
-            });
-        }
         $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
-        $projectResource = ProjectResource::collection($projects);
-        $paginationData = $this->paginationService->getPaginationData($projects);
 
         return [
-            'data' => $projectResource,
-            'metadata' => $paginationData,
-        ];
-    }
-    public function getAllProjectsPublic($perPage = 10, $page = 1)
-    {
-        $projectQuery = Project::visibilityStatus('public')->ApprovalStatus('approved')
-            ->orderBy('created_at', 'desc');
-        $projects = $projectQuery->paginate($perPage, ['*'], 'page', $page);
-        $projectResource = ProjectResource::collection($projects);
-        $paginationData = $this->paginationService->getPaginationData($projects);
-
-        return [
-            'data' => $projectResource,
-            'metadata' => $paginationData,
+            'data' => ProjectResource::collection($projects),
+            'metadata' => $this->paginationService->getPaginationData($projects),
         ];
     }
 
@@ -75,65 +57,20 @@ class ProjectService
         return $project;
     }
 
-    public function createProject(array $data)
+    public function createProject(ProjectRequest $request)
     {
-        $validator = Validator::make($data, [
-            'description' => 'nullable|string',
-            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files*' => 'nullable|file',
-            'location' => 'nullable|string|location',
-            'status' => 'nullable',
-
-        ]);
+        $validatedData = $request->validated();
+        $validatedData['user_id'] = auth()->id();
         $data['user_id'] = Auth::id();
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
         $project = Project::create($data);
-
-        $project->postApproval()->create([
+        $project->Approval()->create([
             'status' => 'pending'
         ]);
-
-        // Handle images/videos
-        if (request()->hasFile('images_or_video')) {
-            foreach (request()->file('images_or_video') as $key => $item) {
-                $image = $data['images_or_video'][$key];
-                $imageType = $image->getClientOriginalExtension();
-                $mimeType = $image->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_project.' . $image->getClientOriginalExtension();
-                $image->move(public_path('project/images/'), $file_name);
-                $imagePath = "project/images/" . $file_name;
-                $imageObject = new Image([
-                    'url' => $imagePath,
-                    'mime' => $mimeType,
-                    'image_type' => $imageType,
-                ]);
-                $project->images()->save($imageObject);
-            }
-        }
-
-        // Handle images/videos
-        if (request()->hasFile('files')) {
-            foreach (request()->file('files') as $key => $item) {
-                $pdf = $data['files'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_project.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('project/files/'), $file_name);
-                $pdfPath = "project/files/" . $file_name;
-                $pdfObject = new FilePdf([
-                    'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
-                ]);
-                $project->pdfs()->save($pdfObject);
-            }
-        }
+        $project->visibility()->create([
+            'status' => 'private'
+        ]);
+        $this->fileHandler->attachImages(request(), $project, 'project/images', 'project_');
+        $this->fileHandler->attachPdfs(request(), $project, 'project/pdf', 'pdf_');
 
         return [
             'message' => 'تم إنشاء المشروع بنجاح',
@@ -141,102 +78,43 @@ class ProjectService
         ];
     }
 
-    public function updateProject(Project $project, array $data)
+    public function updateProject(Project $project, ProjectRequest $request)
     {
-        if ($project->user_id != Auth::id()) {
+        if (!$project->isOwnedBy(auth()->user())) {
             return response()->json([
                 'message' => 'هذا المشروع ليس من إنشائك',
-            ], 200);
+            ], 403);
         }
-        $validator = Validator::make($data, [
-            'description' => 'nullable|string',
-            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4',
-            'files*' => 'nullable|file',
-            'location' => 'nullable|string|location',
-            'deleted_images_and_videos' => 'nullable',
-            'deleted_files' => 'nullable',
-            'status' => 'nullable',
-
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
+    
+        $validatedData = $request->validated();
+    
+        if ($request->filled('deleted_images_and_videos')) {
+            $this->fileHandler->deleteFiles($request->deleted_images_and_videos, 'image');
         }
-        $deletedImagesAndVideos = $data['deleted_images_and_videos'] ?? [];
-        foreach ($deletedImagesAndVideos as $imageId) {
-            $image = Image::find($imageId);
-            if ($image) {
-                // Delete from storage
-                Storage::delete($image->url);
-                // Delete from database
-                $image->delete();
-            }
+        if ($request->filled('deleted_files')) {
+            $this->fileHandler->deleteFiles($request->deleted_files, 'pdf');
         }
-        // Handle deleted files
-        $deletedFiles = $data['delete_files'] ?? [];
-        foreach ($deletedFiles as $fileId) {
-            $filePdf = FilePdf::find($fileId);
-            if ($filePdf) {
-                // Delete from storage
-                Storage::delete($filePdf->url);
-                // Delete from database
-                $filePdf->delete();
-            }
-        }
-        $project->update($data);
-        // Handle images/videos
-        if (request()->hasFile('images_or_video')) {
-            foreach (request()->file('images_or_video') as $key => $item) {
-                $image = $data['images_or_video'][$key];
-                $imageType = $image->getClientOriginalExtension();
-                $mimeType = $image->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_project.' . $image->getClientOriginalExtension();
-                $image->move(public_path('project/images/'), $file_name);
-                $imagePath = "project/images/" . $file_name;
-                $imageObject = new Image([
-                    'url' => $imagePath,
-                    'mime' => $mimeType,
-                    'image_type' => $imageType,
-                ]);
-                $project->images()->save($imageObject);
-            }
-        }
-
-        // Handle images/videos
-        if (request()->hasFile('files')) {
-            foreach (request()->file('files') as $key => $item) {
-                $pdf = $data['files'][$key];
-                $pdfType = $pdf->getClientOriginalExtension();
-                $mimeType = $pdf->getMimeType();
-                $file_name = time() . rand(0, 9999999999999) . '_project.' . $pdf->getClientOriginalExtension();
-                $pdf->move(public_path('project/files/'), $file_name);
-                $pdfPath = "project/files/" . $file_name;
-                $pdfObject = new FilePdf([
-                    'url' => $pdfPath,
-                    'mime' => $mimeType,
-                    'type' => $pdfType,
-                ]);
-                $project->pdfs()->save($pdfObject);
-            }
-        }
-        return [
+    
+        $project->update($validatedData);
+      
+        $this->fileHandler->attachImages($request, $project, 'project/images', 'project_');
+        $this->fileHandler->attachPdfs($request, $project, 'project/pdf', 'pdf_');
+    
+        return response()->json([
             'message' => 'تم تحديث المشروع بنجاح',
             'data' => new ProjectResource($project),
-        ];
-        return new ProjectResource($project);
+        ]);
     }
+    
 
     public function deleteProject($id)
     {
         $project = $this->getProjectById($id);
 
-        if ($project->user_id != Auth::id()) {
+        if (!$project->isOwnedBy(auth()->user())) {
             return response()->json([
                 'message' => 'هذا المشروع ليس من إنشائك',
-            ], 200);
+            ], 403);
         }
 
         $project->delete();

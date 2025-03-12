@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
@@ -10,78 +11,35 @@ use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
-    protected $projectService;
-
-    public function __construct(ProjectService $projectService)
+    public function __construct(private ProjectService $projectService)
     {
         $this->middleware('optional.auth')->only('index');
         $this->middleware('auth:sanctum')->except('index');
-        $this->projectService = $projectService;
     }
 
     public function index(Request $request)
     {
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
-
-        $user = Auth::guard('sanctum')->user();
-
-        if ($user) {
-            return redirect()->route('projects.authenticated', ['perPage' => $perPage, 'page' => $page]);
-        } else {
-            $projects = $this->projectService->getAllProjectsPublic($perPage, $page);
-        }
-
+        $projects = $this->projectService->getProjects($perPage, $page);        
         return response()->json($projects, 200);
     }
-
-    public function getAuthenticatedProjects(Request $request)
-    {
-        $perPage = $request->query('perPage', 10);
-        $page = $request->query('page', 1);
-
-        $user = Auth::user();
-
-        if ($user) {
-            $projects = $this->projectService->getAllProjects($perPage, $page);
-            return response()->json($projects, 200);
-        } else {
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
-    }
-
-    // public function index(Request $request)
-    // {
-    //     $perPage = $request->header('per_page');
-    //     $page = $request->header('page');
-    //     $projects = $this->projectService->getAllProjects($perPage, $page);
-    //     return response()->json($projects, 200);
-    // }
-
-    public function getProjects(Request $request)
-    {
-        $perPage = $request->header('per_page');
-        $page = $request->header('page');
-        $projects = $this->projectService->getAllProjectsPublic($perPage, $page);
-        return response()->json($projects, 200);
-    }
-
+  
     public function show($id)
     {
         return new ProjectResource($this->projectService->getProjectById($id));
     }
 
-    public function store(Request $request)
+    public function store(ProjectRequest $request)
     {
-        $data = $request->all();
-        $project = $this->projectService->createProject($data);
+        $project = $this->projectService->createProject($request);
         return response()->json($project, 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(ProjectRequest $request, $id)
     {
         $project = $this->projectService->getProjectById($id);
-        $updatedProject = $this->projectService->updateProject($project, $request->all());
+        $updatedProject = $this->projectService->updateProject($project, $request);
         return response()->json($updatedProject);
     }
 
