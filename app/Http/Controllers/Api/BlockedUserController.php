@@ -2,77 +2,37 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Domain\Models\BlockedUser;
+use App\Domain\Services\BlockedUserService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BlockUserRequest;
 use App\Http\Resources\UserResource;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class BlockedUserController extends Controller
 {
-    public function __construct()
+    public function __construct(private BlockedUserService $blockedUserService)
     {
         $this->middleware('auth:sanctum');
     }
 
-    /**
-     * Toggle block/unblock user.
-     */
-    public function toggleBlock(Request $request)
+    public function toggleBlock(BlockUserRequest $request): JsonResponse
     {
-        $this->validateRequest($request);
-
-        $user = Auth::id();
-        $blockedUserId = $request->blocked_user_id;
-
-        $existingRecord = BlockedUser::where(['user_id' => $user, 'blocked_user_id' => $blockedUserId])->first();
-
-        if ($existingRecord) {
-            $existingRecord->delete();
-            return $this->responseMessage('تم إلغاء حظر المستخدم بنجاح', false, 200);
-        }
-
-        BlockedUser::create(['user_id' => $user, 'blocked_user_id' => $blockedUserId]);
-
-        return $this->responseMessage('تم حظر المستخدم بنجاح', true, 201);
+        $isBlocked = $this->blockedUserService->toggleBlock(Auth::id(), $request->blocked_user_id);
+        return $this->responseMessage(
+            $isBlocked ? 'تم حظر المستخدم بنجاح' : 'تم إلغاء حظر المستخدم بنجاح',
+            $isBlocked,
+            $isBlocked ? 201 : 200
+        );
     }
 
-    /**
-     * Get all blocked users for authenticated user.
-     */
-    public function getBlockedUsers()
+    public function getBlockedUsers(): JsonResponse
     {
-        $user = Auth::user();
-        $blockedUsers = $user->blockedUsers()->get();
+        $blockedUsers = $this->blockedUserService->getBlockedUsers(Auth::user());
         return response()->json(['data' => UserResource::collection($blockedUsers)]);
     }
 
-    /**
-     * Validate block user request.
-     */
-    private function validateRequest(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'blocked_user_id' => 'required|exists:users,id',
-        ], [
-            'blocked_user_id.required' => 'معرف المستخدم المحظور مطلوب.',
-            'blocked_user_id.exists' => 'المستخدم المحدد غير موجود.',
-        ]);
-
-        if ($validator->fails()) {
-            response()->json([
-                'message' => 'خطأ في التحقق من البيانات',
-                'error' => $validator->errors()->first(),
-            ], 422)->send();
-            exit;
-        }
-    }
-
-    /**
-     * Return a JSON response message.
-     */
-    private function responseMessage(string $message, bool $isBlocked, int $statusCode)
+    private function responseMessage(string $message, bool $isBlocked, int $statusCode): JsonResponse
     {
         return response()->json([
             'message' => $message,
