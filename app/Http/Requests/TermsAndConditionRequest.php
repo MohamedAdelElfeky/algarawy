@@ -4,17 +4,25 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BlockUserRequest extends FormRequest
+class TermsAndConditionRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
-            'blocked_user_id' => 'required|exists:users,id',
+            'content' => 'required|string',
         ];
     }
 
@@ -25,12 +33,8 @@ class BlockUserRequest extends FormRequest
             'errors' => $validator->errors()->first(),
         ], 422));
     }
-    
-    public function messages(): array
+    public function messages()
     {
-        return [
-            'blocked_user_id.required' => 'معرف المستخدم المحظور مطلوب.',
-            'blocked_user_id.exists' => 'المستخدم المحدد غير موجود.',
-        ];
+        return [];
     }
 }

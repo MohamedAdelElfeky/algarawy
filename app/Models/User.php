@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Domain\Models\Complaint;
 use App\Domain\Models\Favorite;
+use App\Domain\Models\Like;
 use App\Domain\Models\Membership;
 use App\Domain\Models\MembershipAssignment;
+use App\Domain\Models\Notification;
 use App\Domain\Models\Setting;
 use App\Domain\Models\UserDetail;
 use App\Domain\Models\UserSetting;

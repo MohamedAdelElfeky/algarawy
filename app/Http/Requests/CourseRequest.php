@@ -11,7 +11,7 @@ class CourseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true; // Ensure the user is authorized
     }
 
     /**
@@ -22,7 +22,31 @@ class CourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'description' => 'required|string',
+            'files.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt|max:5120',
+            'location' => 'nullable|string',
+            'discount' => 'nullable|numeric|min:0',
+            'link' => 'nullable|url',
+            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:10240',
+            'deleted_images_and_videos' => 'nullable|array',
+            'deleted_files' => 'nullable|array',
+            'status' => 'nullable|in:public,private',
         ];
+    }
+
+    public function messages()
+    {
+        return [];
+    }
+
+     /**
+     * Handle validation failures and return JSON response.
+     */
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        throw new \Illuminate\Validation\ValidationException($validator, response()->json([
+            'message' => 'خطأ في التحقق من البيانات',
+            'errors' => $validator->errors()->first(),
+        ], 422));
     }
 }

@@ -27,7 +27,7 @@ class CourseService
         $course = Course::create($validatedData);
 
         // Handle file uploads
-        $this->fileHandler->attachImages($request, $course, 'courses', 'course_');
+        $this->fileHandler->attachImages($request, $course, 'courses/images', 'course_');
         $this->fileHandler->attachPdfs($request, $course, 'courses/pdf', 'pdf_');
 
         return [
