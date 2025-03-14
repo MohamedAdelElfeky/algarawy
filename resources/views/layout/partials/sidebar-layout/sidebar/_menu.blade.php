@@ -86,7 +86,7 @@
                 </div>
                 <div class="menu-item">
 
-                    <a class="menu-link" href="{{ route('courses.index') }}">
+                    <a class="menu-link" href="{{ route('web-courses.index') }}">
                         <span class="menu-bullet">
                             <i class="fas fa-bookmark me-2"></i>
                         </span>

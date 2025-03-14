@@ -15,7 +15,7 @@ class CourseController extends Controller
     public function index(): View
     {
         $courses = $this->courseService->getPaginated(25);
-        return view('pages.dashboards.job.index', compact('courses'));
+        return view('pages.dashboards.course.index', compact('courses'));
     }
 
 

@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('jobs', JobController::class);
     Route::resource('projects', ProjectController::class);
-    Route::resource('courses', CourseController::class);
+    Route::resource('web-courses', CourseController::class);
     Route::resource('discounts', DiscountController::class);
     Route::resource('meetings', MeetingController::class);
     Route::resource('services', ServiceController::class);
