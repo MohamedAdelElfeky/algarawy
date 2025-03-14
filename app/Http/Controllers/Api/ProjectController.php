@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Services\ProjectService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\ProjectResource;
-use App\Services\ProjectService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -21,10 +20,10 @@ class ProjectController extends Controller
     {
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
-        $projects = $this->projectService->getProjects($perPage, $page);        
+        $projects = $this->projectService->getProjects($perPage, $page);
         return response()->json($projects, 200);
     }
-  
+
     public function show($id)
     {
         return new ProjectResource($this->projectService->getProjectById($id));
@@ -50,8 +49,6 @@ class ProjectController extends Controller
 
     public function search(Request $request)
     {
-        $searchTerm = $request->input('search');
-        $results = $this->projectService->searchProject($searchTerm);
-        return response()->json(['data' => $results]);
+        return $this->projectService->searchProject($request->get('search'));
     }
 }

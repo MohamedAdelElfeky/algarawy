@@ -101,8 +101,8 @@
                     e.preventDefault();
                     var formData = $(this).serialize();
                     $.ajax({
-                        type: 'put',
-                        url: 'regions/create',
+                        type: 'post',
+                        url: '{{ route('regions.store') }}',
                         data: formData,
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

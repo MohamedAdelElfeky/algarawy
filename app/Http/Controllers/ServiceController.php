@@ -3,53 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Models\Service;
-use App\Services\ServiceService;
+use App\Domain\Services\ServiceService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ServiceController extends Controller
 {
-    protected $serviceService;
+    public function __construct(private ServiceService $service) {}
 
-    public function __construct(ServiceService $serviceService)
+    public function index(): View
     {
-        $this->serviceService = $serviceService;
-    }
-
-    public function index()
-    {
-        $services = Service::with([
-            'user',
-            'images',
-            'pdfs',
-            'likes',
-            'favorites',
-        ])->orderBy('created_at', 'desc')->paginate(25);
+        $services = $this->service->getPaginatedServices(25);
         return view('pages.dashboards.service.index', compact('services'));
     }
 
-    public function show($id)
+
+    public function destroy(int $id): JsonResponse
     {
-        $service = $this->serviceService->getServiceById($id);
-        return view('services.show', compact('service'));
-    }
-
-    public function create()
-    {
-        return view('services.create');
-    }
-
-
-    public function destroy($id)
-    {
-        $service = $this->serviceService->getServiceById($id);
-
-        if (!$service) {
-            return back()->with('error', 'Service not found');
-        }
-
-        $this->serviceService->deleteService($service);
-
-        return redirect()->route('services.index')
-            ->with('success', 'Service deleted successfully.');
+        $deleted = $this->service->deleteService($id, 'web');
+        return response()->json([
+            'success' => $deleted,
+            'message' => $deleted ? 'deleted successfully.' : 'Failed to delete.'
+        ]);
     }
 }

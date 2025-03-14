@@ -25,8 +25,8 @@ class ProjectRequest extends FormRequest
             'description' => 'required|string',
             'files.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt|max:5120',
             'location' => 'nullable|string',
-            'images_and_videos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:10240',
-            'deleted_images_and_videos' => 'nullable|array',
+            'images_or_video.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4|max:10240',
+            'deleted_images_or_video' => 'nullable|array',
             'deleted_files' => 'nullable|array',
             'status' => 'nullable|in:public,private',
         ];

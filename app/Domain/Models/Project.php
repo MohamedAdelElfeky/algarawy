@@ -4,10 +4,14 @@ namespace App\Domain\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Shared\Traits\savingUserIdModelTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Project extends Model
 {
+    use HasFactory, savingUserIdModelTrait;
+
     protected $fillable = ['description', 'location', 'user_id'];
 
 

@@ -10,15 +10,8 @@ use App\Domain\Models\Project;
 use App\Domain\Models\Setting;
 use App\Models\User;
 
-use App\Services\MeetingService;
-
 class DashboardController extends Controller
 {
-    protected $meetingService;
-    public function __construct(MeetingService $meetingService)
-    {
-        $this->meetingService = $meetingService;
-    }
     public function index()
     {
         // addVendors(['amcharts', 'amcharts-maps', 'amcharts-stock']);
@@ -28,7 +21,7 @@ class DashboardController extends Controller
         })->whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })->count();
-    
+
         $userNotActive = User::whereHas('userSettings', function ($query) use ($registrationConfirmedSetting) {
             $query->where('setting_id', $registrationConfirmedSetting->id)->where('value', 0);
         })->whereHas('roles', function ($query) {

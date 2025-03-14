@@ -2,46 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\Job;
-use App\Http\Resources\JobResource;
-use App\Services\JobService;
-use Illuminate\Http\Request;
+use App\Domain\Services\JobService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class JobController extends Controller
 {
-    protected $jobService;
+    public function __construct(private JobService $jobService) {}
 
-    public function __construct(JobService $jobService)
+    public function index(): View
     {
-        $this->jobService = $jobService;
-    }
-    public function index()
-    {
-        $jobQuery = Job::with([
-            'region',
-            'city',
-            'neighborhood',
-            'JobCompanies',            
-            'user',
-            'images',
-            'pdfs',
-            'likes',
-            'favorites',
-        ])->orderBy('created_at', 'desc')->paginate(25);
-        $jobs = JobResource::collection($jobQuery);
+        $jobs = $this->jobService->getPaginated(25);
         return view('pages.dashboards.job.index', compact('jobs'));
     }
 
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        // Find the job
-        $job = Job::findOrFail($id);
-
-        // Call the service to delete the job
-        $response = $this->jobService->deleteJob($job);
-
-        return $response;
+        
+        $deleted = $this->jobService->deleteJob($id, 'web');
+        return response()->json([
+            'success' => $deleted,
+            'message' => $deleted ? 'deleted successfully.' : 'Failed to delete.'
+        ]);
     }
-
 }

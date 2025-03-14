@@ -3,30 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Models\Project;
-use App\Services\ProjectService;
-use Illuminate\Http\Request;
+use App\Domain\Services\ProjectService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
-    protected $projectService;
-
-    public function __construct(ProjectService $projectService)
+    public function __construct(private ProjectService $projectService) {}
+    public function index(): View
     {
-
-        $this->projectService = $projectService;
-    }
-
-    public function index()
-    {
-        $projects = Project::with(['images', 'pdfs', 'favorites', 'likes'])
-            ->paginate(25);
+        $projects = $this->projectService->getPaginatedProjects(25);
         return view('pages.dashboards.project.index', compact('projects'));
     }
 
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        return $this->projectService->deleteProject($id);
+        $deleted = $this->projectService->deleteProject($id, 'web');
+        return response()->json([
+            'success' => $deleted,
+            'message' => $deleted ? 'Project deleted successfully.' : 'Failed to delete project.'
+        ]);
     }
 }

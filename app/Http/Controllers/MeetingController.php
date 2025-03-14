@@ -2,41 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\Meeting;
-use App\Http\Resources\MeetingResource;
-use App\Services\MeetingService;
+use App\Domain\Services\MeetingService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class MeetingController extends Controller
 {
 
-    public function __construct(private MeetingService $meetingService)
+    public function __construct(private MeetingService $meetingService) {}
+
+    public function index(): View
     {
-    }
-    public function index()
-    {
-        $meetings = Meeting::with([
-            'user',
-            'images',
-            'pdfs',
-            'likes',
-            'favorites',
-        ])->orderBy('created_at', 'desc')->paginate(25);
+        $meetings = $this->meetingService->getPaginatedMeeting(25);
         return view('pages.dashboards.meeting.index', compact('meetings'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(int $id)
+
+    public function destroy(int $id): JsonResponse
     {
-        $meeting = $this->meetingService->getMeeting($id);
-
-        $this->meetingService->deleteMeeting($meeting);
-
+        $deleted = $this->meetingService->deleteMeeting($id, 'web');
         return response()->json([
-            'message' => 'Meeting deleted successfully',
+            'success' => $deleted,
+            'message' => $deleted ? 'deleted successfully.' : 'Failed to delete.'
         ]);
     }
 }

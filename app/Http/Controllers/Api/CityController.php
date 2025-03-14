@@ -2,22 +2,30 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Domain\Models\City;
 use App\Domain\Models\Region;
+use App\Domain\Services\CityService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CityResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CityController extends Controller
 {
-    public function index()
+
+    public function __construct(private CityService $cityService) {}
+
+    /**
+     * Fetch all cities.
+     */
+    public function index(): AnonymousResourceCollection
     {
-        $cities = City::all();
-        return CityResource::collection($cities);
+        return CityResource::collection($this->cityService->getAllCities());
     }
 
-    public function getCitiesByRegion(Region $region)
+    /**
+     * Get cities by a specific region.
+     */
+    public function getCitiesByRegion(Region $region): AnonymousResourceCollection
     {
-        $cities = $region->cities;
-        return CityResource::collection($cities);
+        return CityResource::collection($this->cityService->getCitiesByRegion($region->id));
     }
 }

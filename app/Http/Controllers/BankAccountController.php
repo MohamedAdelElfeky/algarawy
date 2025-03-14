@@ -2,24 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\BankAccount;
+use App\Domain\Services\BankAccountService;
+use App\Http\Requests\BankAccountRequest;
 use App\Http\Resources\BankAccountResource;
-use App\Services\BankAccountService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class BankAccountController extends Controller
 {
-    protected $bankAccountService;
 
-    public function __construct(BankAccountService $bankAccountService)
-    {
-        $this->bankAccountService = $bankAccountService;
-    }
+    public function __construct(private BankAccountService $bankAccountService) {}
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of the bank accounts.
      */
     public function index()
     {
@@ -28,31 +22,23 @@ class BankAccountController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created bank account.
      */
-    public function store(Request $request)
+    public function store(BankAccountRequest $request)
     {
-        $data = $request->all();
-        $validator = Validator::make($data, [
-            'account_number' => 'required',
-            'iban' => 'required',
-            'bank_name' => 'required',
-            'swift_number' => 'required',
-            'type' => 'required|in:saving,charity,investment',
-        ]);
+        $data = $request->validated();
         $data['user_id'] = Auth::id();
-        if ($validator->fails()) {
-            return ['error' => $validator->errors()];
-        }
-        $bankAccount = BankAccount::create($data);
-        return [
+
+        $bankAccount = $this->bankAccountService->createBankAccount($data);
+
+        return response()->json([
             'message' => 'Bank account created successfully',
             'data' => new BankAccountResource($bankAccount)
-        ];
+        ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified bank account.
      */
     public function show(string $id)
     {
@@ -66,11 +52,11 @@ class BankAccountController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified bank account.
      */
-    public function update(Request $request, string $id)
+    public function update(BankAccountRequest $request, string $id)
     {
-        $data = $request->all();
+        $data = $request->validated();
 
         $bankAccount = $this->bankAccountService->updateBankAccount($id, $data);
 
@@ -82,46 +68,56 @@ class BankAccountController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified bank account.
      */
     public function destroy(string $id)
     {
-        $result = $this->bankAccountService->deleteBankAccount($id);
-
-        if ($result) {
+        if ($this->bankAccountService->deleteBankAccount($id)) {
             return response()->json(['message' => 'Bank account deleted successfully']);
         }
 
         return response()->json(['message' => 'Bank account not found'], 404);
     }
 
-
+    /**
+     * Display charity and saving bank accounts.
+     */
     public function accountCharitySaving()
     {
-        $banks =  BankAccount::whereIn('type', ['charity', 'saving'])->paginate(25);
+        $banks = $this->bankAccountService->getAccountsByType(['charity', 'saving']);
         return view('pages.dashboards.bank.account_charity_saving', compact('banks'));
     }
+
+    /**
+     * Display investment bank accounts.
+     */
     public function accountInvestment()
     {
-        $banks =  BankAccount::where('type', 'investment')->paginate(25);
+        $banks = $this->bankAccountService->getAccountsByType(['investment']);
         return view('pages.dashboards.bank.account_investment', compact('banks'));
     }
 
+    /**
+     * Activate a bank account.
+     */
     public function activate($id)
     {
-        $bank = BankAccount::findOrFail($id);
-        $bank->status = 'active';
-        $bank->save();
+        if ($this->bankAccountService->changeStatus($id, 'active')) {
+            return response()->json(['message' => 'تم تفعيل الحساب بنجاح']);
+        }
 
-        return response()->json(['message' => 'تم تفعيل الحساب بنجاح']);
+        return response()->json(['message' => 'Bank account not found'], 404);
     }
 
+    /**
+     * Deactivate a bank account.
+     */
     public function deactivate($id)
     {
-        $bank = BankAccount::findOrFail($id);
-        $bank->status = 'inactive';
-        $bank->save();
+        if ($this->bankAccountService->changeStatus($id, 'inactive')) {
+            return response()->json(['message' => 'تم إلغاء تنشيط الحساب بنجاح']);
+        }
 
-        return response()->json(['message' => 'تم إلغاء تنشيط الحساب بنجاح']);
+        return response()->json(['message' => 'Bank account not found'], 404);
     }
 }

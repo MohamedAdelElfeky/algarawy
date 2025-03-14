@@ -3,22 +3,29 @@
 namespace App\Http\Controllers\Api;
 
 use App\Domain\Models\City;
-use App\Domain\Models\Neighborhood;
+use App\Domain\Services\NeighborhoodService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\NeighborhoodResource;
-use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class NeighborhoodController extends Controller
 {
-    public function index()
+
+    public function __construct(private NeighborhoodService $neighborhoodService) {}
+
+    /**
+     * Fetch all neighborhoods.
+     */
+    public function index(): AnonymousResourceCollection
     {
-        $neighborhoods = Neighborhood::all();
-        return NeighborhoodResource::collection($neighborhoods);
+        return NeighborhoodResource::collection($this->neighborhoodService->getAllNeighborhoods());
     }
 
-    public function getNeighborhoodsByCity(City $city)
+    /**
+     * Get neighborhoods by a specific city.
+     */
+    public function getNeighborhoodsByCity(City $city): AnonymousResourceCollection
     {
-        $neighborhoods = $city->neighborhoods;
-        return NeighborhoodResource::collection($neighborhoods);
+        return NeighborhoodResource::collection($this->neighborhoodService->getNeighborhoodsByCity($city->id));
     }
 }

@@ -2,21 +2,18 @@
 
 namespace App\Domain\Models;
 
+use App\Shared\Traits\savingUserIdModelTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Course extends Model
 {
-    use HasFactory;
+    use HasFactory, savingUserIdModelTrait;
+
     protected $table = 'courses';
-    protected $fillable = [
-        'description',
-        'location',
-        'discount',
-        'user_id',
-        'link',
-    ];
+
+    protected $fillable = ['user_id', 'description', 'location', 'discount', 'link',];
 
     public function user()
     {

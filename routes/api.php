@@ -24,7 +24,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\OtpController;
-
+use App\Http\Controllers\UserSettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,25 +44,9 @@ Route::post('/send-message', [OtpController::class, 'sendMessage']);
 Route::POST('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-Route::post('/p-password/reset', [AuthController::class, 'PasswordReset']);
 
 Route::get('/getDataDashboard', [DashboardController::class, 'getDataDashboard']);
-Route::get('p-jobs', [JobController::class, 'index']); // Manually add index route
-Route::get('p-courses', [CourseController::class, 'index']);
-Route::get('p-meetings', [MeetingController::class, 'index']);
-Route::get('p-projects', [ProjectController::class, 'index']);
-Route::get('p-discounts', [DiscountController::class, 'index']);
-Route::get('p-services', [ServiceController::class, 'index']);
 Route::get('/terms-and-conditions/last', [TermsAndConditionController::class, 'getLastTermsAndCondition']);
-
-Route::post('p-forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
-Route::post('pt-forgot-password', [PasswordResetLinkController::class, 'store']);
-
-Route::post('forgot-password/send-otp', [ForgotPasswordController::class, 'sendOtp']);
-Route::post('forgot-password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
-Route::post('forgot-password/reset-password', [ForgotPasswordController::class, 'resetPassword']);
-// Route::post('p-send-otp', [AuthController::class, 'sendOTP']);
-// Route::post('p-reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/regions', [RegionController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
@@ -70,72 +54,48 @@ Route::get('/neighborhoods', [NeighborhoodController::class, 'index']);
 Route::get('/regions/{region}/cities', [CityController::class, 'getCitiesByRegion']);
 Route::get('/cities/{city}/neighborhoods', [NeighborhoodController::class, 'getNeighborhoodsByCity']);
 Route::get('/number-support', [UserController::class, 'numberSupport']);
-//
-//Route::prefix('public')->group(function () {
-//    Route::get('/jobs', [JobController::class, 'getJobs']);
-//    Route::get('/courses', [CourseController::class, 'getCourses']);
-//    Route::get('/meetings', [MeetingController::class, 'getMeetings']);
-//    Route::get('/projects', [ProjectController::class, 'getProjects']);
-//    Route::get('/discounts', [DiscountController::class, 'getDiscounts']);
-//    Route::get('/services', [ServiceController::class, 'getServices']);
-//});
+
 Route::middleware(['blocked'])->group(function () {
     // User related routes
     Route::prefix('user')->group(function () {
         Route::get('/meetings', [UserController::class, 'getMeetings']);
         Route::get('/courses', [UserController::class, 'getCourses']);
         Route::get('/data', [UserController::class, 'getUser']);
-        Route::post('/toggle-visibility', [UserController::class, 'toggleVisibility']);
+
+        Route::post('/toggle-visibility', [UserSettingController::class, 'toggleVisibility']);
         Route::get('/getDataUser/{user}', [UserController::class, 'getDataUser']);
         Route::put('/update/{user}', [UserController::class, 'updateProfile']);
         Route::get('/search', [UserController::class, 'searchUser']);
         Route::get('/notifications', [UserController::class, 'getNotificationsForUser']);
         Route::put('/changePassword', [UserController::class, 'changePassword']);
     });
+    Route::post('/toggle-show-complainted', [UserSettingController::class, 'toggleShowNoComplaintedPosts']);
     Route::put('/notifications/AsRead/{notification}', [NotificationController::class, 'markNotificationAsRead']);
     Route::put('/markAllNotificationsAsRead', [NotificationController::class, 'markAllNotificationsAsRead']);
     Route::get('/getNewNotifications', [NotificationController::class, 'getNewNotifications']);
     Route::put('/ChangeStatus', [JobController::class, 'ChangeStatus']);
 
-    // Route::apiResources([
-    //     'p-jobs' => JobController::class, // jobs Resource
-    //     'p-courses' => CourseController::class, // courses Resource
-    //     'p-meetings' => MeetingController::class, // meetings Resource
-    //     'p-bank-accounts' => BankAccountController::class, // bank-accounts Resource
-    //     'p-projects' => ProjectController::class,
-    //     'p-discounts' => DiscountController::class,
-    //     'p-services' => ServiceController::class,
-    //     'p-job-application' => JobApplicationController::class,
-    // ]);
-    Route::apiResource('p-jobs', JobController::class)->except(['index']);
-    Route::apiResource('p-courses', CourseController::class)->except(['index']);
-    Route::apiResource('p-meetings', MeetingController::class)->except(['index']);
-    Route::apiResource('p-projects', ProjectController::class)->except(['index']);
-    Route::apiResource('p-discounts', DiscountController::class)->except(['index']);
-    Route::apiResource('p-services', ServiceController::class)->except(['index']);
+    Route::apiResource('p-jobs', JobController::class);
+    Route::apiResource('p-courses', CourseController::class);
+    Route::apiResource('p-meetings', MeetingController::class);
+    Route::apiResource('p-projects', ProjectController::class);
+    Route::apiResource('p-discounts', DiscountController::class);
+    Route::apiResource('p-services', ServiceController::class);
     Route::apiResource('p-job-application', JobApplicationController::class);
     Route::apiResource('p-bank-accounts', BankAccountController::class);
 
-    // Route::get('p-job-application', [JobApplicationController::class, 'index']);
-    // Route::get('p-bank-accounts', [BankAccountController::class, 'index']);
-    Route::get('/projects/authenticated', [ProjectController::class, 'getAuthenticatedProjects'])->name('projects.authenticated');
-    Route::get('/jobs/authenticated', [JobController::class, 'getAuthenticatedJob'])->name('jobs.authenticated');
-    Route::get('/courses/authenticated', [CourseController::class, 'getAuthenticatedCourses'])->name('courses.authenticated');
-    Route::get('/meetings/authenticated', [MeetingController::class, 'getAuthenticatedMeetings'])->name('meetings.authenticated');
-    Route::get('/discounts/authenticated', [DiscountController::class, 'getAuthenticatedDiscounts'])->name('discounts.authenticated');
-    Route::get('/services/authenticated', [ServiceController::class, 'getAuthenticatedServices'])->name('services.authenticated');
+
     Route::get('/getDataDashboard/authenticated', [DashboardController::class, 'getAuthenticatedDataDashboard'])->name('dashboard.authenticated');
 
     Route::post('/toggle-block', [BlockedUserController::class, 'toggleBlock']);
     Route::get('/blocked-user', [BlockedUserController::class, 'getBlockedUsers']);
-    Route::post('/toggle-show-complainted', [AuthController::class, 'toggleShowNoComplaintedPosts']);
 
+    Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
     Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'toggleFavorite']);
     Route::post('/p-add-like/{type}/{id}', [LikeController::class, 'toggleLike']);
     Route::post('/p-add-complaint/{type}/{id}', [ComplaintController::class, 'toggleComplaint']);
     Route::get('/p-show-complaint/{type}/{id}', [ComplaintController::class, 'showComplaints']);
 
-    Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
     Route::post('/terms-and-conditions', [TermsAndConditionController::class, 'createOrUpdate']);
     Route::post('/complaints/{complaintId}/edit', [ComplaintController::class, 'editComplaint']);
     Route::delete('/complaints/{complaintId}', [ComplaintController::class, 'deleteComplaint']);
@@ -156,7 +116,6 @@ Route::middleware(['blocked'])->group(function () {
     });
 
     Route::get('/getCharityAndSavingBankAccounts', [BankAccountController::class, 'getCharityAndSavingBankAccounts']);
-
 
     Route::get('/job-applications/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
     Route::get('/job-applications/for-user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);

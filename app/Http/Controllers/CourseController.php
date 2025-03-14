@@ -2,39 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\Course;
-use App\Services\CourseService;
-use Illuminate\Http\Request;
+use App\Domain\Services\CourseService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class CourseController extends Controller
 {
-    protected $courseService;
 
-    public function __construct(CourseService $courseService)
-    {
-        $this->courseService = $courseService;
-    }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $courses = Course::with([
-            'user', 'images', 'pdfs', 'likes', 'favorites',
-        ])->orderBy('created_at', 'desc')->paginate(25);
-        return view('pages.dashboards.course.index', compact('courses'));
 
+    public function __construct(private CourseService $courseService) {}
+
+    public function index(): View
+    {
+        $courses = $this->courseService->getPaginated(25);
+        return view('pages.dashboards.job.index', compact('courses'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+
+    public function destroy(int $id): JsonResponse
     {
-        $response = $this->courseService->deleteCourse($id);
+        
+        $deleted = $this->courseService->deleteCourse($id, 'web');
         return response()->json([
-            'message' => $response['message'],
+            'success' => $deleted,
+            'message' => $deleted ? 'deleted successfully.' : 'Failed to delete.'
         ]);
     }
-   
 }

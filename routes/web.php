@@ -34,12 +34,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-// Route::get('/request-otp', [PasswordResetController::class, 'requestOtpForm'])->name('password.request_otp');
-// Route::post('/request-otp', [PasswordResetController::class, 'sendOtp'])->name('password.send_otp');
-// Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-// Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
-// Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp'])->name('password.verify_otp');
-
 require __DIR__ . '/auth.php';
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
@@ -81,13 +75,6 @@ Route::middleware('auth')->group(function () {
     Route::put('addNeighborhoods', [NeighborhoodController::class, 'addNeighborhood'])->name('addNeighborhood');
     
     Route::resource('memberships', MembershipController::class);
-
-
-    // Route::put('/jobs/{job}/change-status', [JobController::class, 'changeStatus'])->name('jobs.changeStatus');
-    // Route::put('/discounts/{discount}/change-status', [DiscountController::class, 'changeStatus'])->name('discounts.changeStatus');
-    // Route::put('/courses/{course}/change-status', [CourseController::class, 'changeStatus'])->name('courses.changeStatus');
-    // Route::put('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.changeStatus');
-    // Route::put('/projects/{project}/change-status-approval', [ProjectController::class, 'changeStatusApproval'])->name('projects.changeApproval');
 
     Route::get('/import', [ImportController::class, 'showForm'])->name('user.import.form');
     Route::post('/import', [ImportController::class, 'import'])->name('import');

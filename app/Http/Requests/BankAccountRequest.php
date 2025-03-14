@@ -16,8 +16,8 @@ class BankAccountRequest extends FormRequest
         return [
             'account_number' => 'required|string|max:50',
             'iban' => 'required|string|max:34',
-            'bank_name' => 'required|string|max:100',
-            'swift_number' => 'required|string|max:20',
+            'bank_name' => 'required|string|max:255',
+            'swift_number' => 'required|string|max:11',
             'type' => 'required|in:saving,charity,investment',
         ];
     }

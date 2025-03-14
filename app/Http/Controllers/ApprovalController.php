@@ -2,29 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\PostApproval;
+use App\Domain\Services\ApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\InvalidModelException;
+use App\Http\Requests\ApprovalStatusRequest;
 
 class ApprovalController extends Controller
 {
-    public function updateApprovalStatus(Request $request, $model, $id)
+    protected $approvalService;
+
+    public function __construct(ApprovalService $approvalService)
     {
-        $allowedModels = ['service', 'job', 'discount', 'meeting', 'project', 'course'];
-        if (!in_array($model, $allowedModels)) {
-            return response()->json(['error' => 'نوع النموذج غير صالح'], 400);
+        $this->approvalService = $approvalService;
+    }
+
+    public function updateApprovalStatus(ApprovalStatusRequest $request, string $model, int $id)
+    {
+        try {
+            $request->validated();
+            $this->approvalService->updateStatus($model, $id, $request->status, Auth::id(), $request->notes);
+
+            return response()->json(['message' => 'تم تحديث حالة الموافقة بنجاح.']);
+        } catch (InvalidModelException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'حدث خطأ غير متوقع.'], 500);
         }
-
-        $modelClass = '\\App\\Domain\\Models\\' . ucfirst($model);
-        $approvable = $modelClass::findOrFail($id);
-
-        PostApproval::updateApprovalStatus(
-            $approvable,
-            $request->status,
-            Auth::id(),
-            $request->notes
-        );
-
-        return response()->json(['message' => 'تم تحديث حالة الموافقة بنجاح.']);
     }
 }

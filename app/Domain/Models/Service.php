@@ -3,11 +3,15 @@
 namespace App\Domain\Models;
 
 use App\Models\User;
+use App\Shared\Traits\savingUserIdModelTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Service extends Model
 {
+    use HasFactory, savingUserIdModelTrait;
+
     protected $fillable = ['user_id', 'description', 'location'];
 
     public function user()

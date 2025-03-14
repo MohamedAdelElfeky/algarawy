@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Services\CourseService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CourseRequest;
 use App\Http\Resources\CourseResource;
-use App\Services\CourseService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
-    public function __construct(private CourseService $courseService)
+    public function __construct(private CourseService $CourseService)
     {
         $this->middleware('optional.auth')->only('index');
         $this->middleware('auth:sanctum')->except('index');
@@ -22,38 +20,35 @@ class CourseController extends Controller
     {
         $perPage = $request->header('per_page', 10);
         $page = $request->header('page', 1);
-        $courses = $this->courseService->getCourses($perPage, $page);
-        return response()->json($courses, 200);
+        $Courses = $this->CourseService->getCourses($perPage, $page);
+        return response()->json($Courses, 200);
     }
 
     public function show($id)
     {
-        $course = new CourseResource($this->courseService->getCourseById($id));
-        return response()->json(['data' => $course], 200);
+        return new CourseResource($this->CourseService->getCourseById($id));
     }
 
     public function store(CourseRequest $request)
     {
-        $course = $this->courseService->createCourse($request);
-        return response()->json($course);
+        $Course = $this->CourseService->createCourse($request);
+        return response()->json($Course, 201);
     }
 
     public function update(CourseRequest $request, $id)
     {
-        $course = $this->courseService->getCourseById($id);
-        $result = $this->courseService->updateCourse($course, $request);
-        return response()->json($result);
+        $Course = $this->CourseService->getCourseById($id);
+        $updatedCourse = $this->CourseService->updateCourse($Course, $request);
+        return response()->json($updatedCourse);
     }
 
     public function destroy($id)
     {
-        $result = $this->courseService->deleteCourse($id);
-        return response()->json($result);
+        return $this->CourseService->deleteCourse($id);
     }
+
     public function search(Request $request)
     {
-        $searchTerm = $request->input('search');
-        $results = $this->courseService->searchCourse($searchTerm);
-        return response()->json(['data' => $results]);
+        return $this->CourseService->searchCourse($request->get('search'));
     }
 }

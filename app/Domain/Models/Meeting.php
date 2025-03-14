@@ -3,11 +3,15 @@
 namespace App\Domain\Models;
 
 use App\Models\User;
+use App\Shared\Traits\savingUserIdModelTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Meeting extends Model
 {
+    use HasFactory, savingUserIdModelTrait;
+
     protected $fillable = [
         'user_id',
         'datetime',

@@ -1,33 +1,62 @@
 <?php
+
 namespace App\Infrastructure;
 
 use App\Domain\Models\Project;
-use App\Domain\Repositories\ProjectRepository;
+use App\Domain\Repositories\ProjectRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pipeline\Pipeline;
+use App\Filters\ApprovalStatusFilter;
+use App\Filters\BlockedUsersFilter;
+use App\Filters\DescriptionFilter;
+use App\Filters\NoComplaintsFilter;
+use App\Filters\VisibilityStatusFilter;
 
-class EloquentProjectRepository implements ProjectRepository
+class EloquentProjectRepository implements ProjectRepositoryInterface
 {
-    public function getAllProjects(int $perPage, int $page)
+    public function get(int $perPage, int $page): LengthAwarePaginator
     {
-        return Project::paginate($perPage, ['*'], 'page', $page);
+        $query = Project::query();
+        return app(Pipeline::class)
+            ->send($query)
+            ->through([
+                ApprovalStatusFilter::class,
+                BlockedUsersFilter::class,
+                NoComplaintsFilter::class,
+                VisibilityStatusFilter::class,
+                DescriptionFilter::class,
+            ])
+            ->thenReturn()
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function getProjectById(int $id)
+    public function findById(int $id): ?Project
     {
         return Project::findOrFail($id);
     }
 
-    public function createProject(array $data)
+    public function create(array $data): Project
     {
         return Project::create($data);
     }
 
-    public function updateProject(Project $project, array $data)
+    public function update(Project $project, array $data): bool
     {
         return $project->update($data);
     }
 
-    public function deleteProject(int $id)
+    public function delete(Project $project): bool
     {
-        return Project::destroy($id);
+        return $project->delete();
+    }
+
+    public function search(string $searchTerm)
+    {
+        return Project::where('description', 'like', '%' . $searchTerm . '%')->get();
+    }
+
+    public function paginate(int $perPage)
+    {
+        return Project::with(['images', 'pdfs', 'favorites', 'likes'])->paginate($perPage);
     }
 }

@@ -21,7 +21,7 @@ class MeetingRequest extends FormRequest
             'start_time'  => 'nullable|date_format:Y-m-d\TH:i:s.v',
             'end_time'    => 'nullable|date_format:Y-m-d\TH:i:s.v|after_or_equal:start_time',
             'description' => 'nullable|string',
-            'type'        => 'required|in:remotely,normal',
+            'type'        => 'nullable|in:remotely,normal',
             'status'      => 'nullable|in:public,private',
         ];
     }

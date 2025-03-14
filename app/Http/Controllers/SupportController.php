@@ -2,30 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\support;
-use Illuminate\Http\Request;
+use App\Domain\Services\SupportService;
+use App\Http\Requests\SupportRequest;
 
 class SupportController extends Controller
 {
+    public function __construct(private SupportService $supportService) {}
 
     public function index()
     {
-        $supportRecord = support::first();
-        $number = $supportRecord ? $supportRecord->number : null;
-        $email = $supportRecord ? $supportRecord->email : null;
-        return view('pages.dashboards.support.index', compact('number', 'email'));
+        $support = $this->supportService->getSupportDetails();
+
+        return view('pages.dashboards.support.index', [
+            'number' => $support?->number,
+            'email' => $support?->email,
+        ]);
     }
 
-    public function addOrUpdateNumber(Request $request)
+    public function addOrUpdateNumber(SupportRequest $request)
     {
-        $number = $request->input('number');
-        $email = $request->input('email');
-        Support::truncate();
-        Support::create([
-            'number' => $number,
-            'email' => $email,
-        ]);
-
-        return redirect()->route('support')->with('success', 'تم إضافة / تحديث الرقم بنجاح');
+        $this->supportService->updateSupportDetails($request->validated());
+        return redirect()->route('support')->with('success', 'تمت إضافة / تحديث الدعم بنجاح');
     }
 }

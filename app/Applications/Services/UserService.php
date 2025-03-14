@@ -1,5 +1,5 @@
 <?php
-namespace App\Application\Services;
+namespace App\Applications\Services;
 
 use App\Infrastructure\UserRepository;
 use Illuminate\Support\Facades\Hash;

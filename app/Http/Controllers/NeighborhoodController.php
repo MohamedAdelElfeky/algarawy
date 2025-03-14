@@ -1,40 +1,54 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Domain\Models\City;
 use App\Domain\Models\Neighborhood;
 use App\Domain\Models\Region;
+use App\Domain\Services\NeighborhoodService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NeighborhoodController extends Controller
 {
+    protected NeighborhoodService $neighborhoodService;
+
+    public function __construct(NeighborhoodService $neighborhoodService)
+    {
+        $this->neighborhoodService = $neighborhoodService;
+    }
+
     /**
-     * Display a listing of the resource.
+     * Display a listing of the neighborhoods.
      */
     public function index()
     {
         $regions = Region::all();
         $cities = City::all();
-        $neighborhoods = Neighborhood::paginate(25);
+        $neighborhoods = $this->neighborhoodService->getAllNeighborhoodsPaginated();
+
         return view('pages.dashboards.neighborhoods.index', compact('cities', 'regions', 'neighborhoods'));
     }
 
-    public function addNeighborhood(Request $request)
+    /**
+     * Store a new neighborhood.
+     */
+    public function addNeighborhood(Request $request): JsonResponse
     {
-        $name = $request->input('name');
-        $city_id = $request->input('city_id');
-        Neighborhood::updateOrCreate(
-            ['name' => $name, 'city_id' => $city_id]
-        );
+        $this->neighborhoodService->saveNeighborhood($request->validate([
+            'name' => 'required|string|max:255',
+            'city_id' => 'required|exists:cities,id',
+        ]));
+
+        return response()->json(['message' => 'تم إضافة / تحديث الحي بنجاح']);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove a neighborhood.
      */
-    public function destroy(string $id)
+    public function destroy(Neighborhood $neighborhood): JsonResponse
     {
-        $neighborhood = Neighborhood::findOrFail($id);
-        $neighborhood->delete();
+        $this->neighborhoodService->deleteNeighborhood($neighborhood);
+
+        return response()->json(['message' => 'تم حذف الحي بنجاح']);
     }
 }

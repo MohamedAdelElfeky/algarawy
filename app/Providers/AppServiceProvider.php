@@ -3,12 +3,20 @@
 namespace App\Providers;
 
 use App\Core\KTBootstrap;
+use App\Domain\Repositories\CourseRepositoryInterface;
 use App\Domain\Repositories\DashboardRepositoryInterface;
+use App\Domain\Repositories\DiscountRepositoryInterface;
+use App\Domain\Repositories\JobRepositoryInterface;
 use App\Domain\Repositories\MeetingRepositoryInterface;
-use App\Domain\Repositories\ProjectRepository;
+use App\Domain\Repositories\ProjectRepositoryInterface;
+use App\Domain\Repositories\ServiceRepositoryInterface;
 use App\Domain\Repositories\UserRepositoryInterface;
+use App\Infrastructure\EloquentCourseRepository;
+use App\Infrastructure\EloquentDiscountRepository;
+use App\Infrastructure\EloquentJobRepository;
 use App\Infrastructure\EloquentMeetingRepository;
 use App\Infrastructure\EloquentProjectRepository;
+use App\Infrastructure\EloquentServiceRepository;
 use App\Infrastructure\EloquentUserRepository;
 use App\Infrastructure\Repositories\DashboardRepository;
 use Illuminate\Database\Schema\Builder;
@@ -24,12 +32,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(ProjectRepository::class, EloquentProjectRepository::class);
-        $this->app->bind(MeetingRepositoryInterface::class, EloquentMeetingRepository::class);
-        $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
         $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
-        
-
+        $this->app->bind(ProjectRepositoryInterface::class, EloquentProjectRepository::class);
+        $this->app->bind(MeetingRepositoryInterface::class, EloquentMeetingRepository::class);
+        $this->app->bind(ServiceRepositoryInterface::class, EloquentServiceRepository::class);
+        $this->app->bind(JobRepositoryInterface::class, EloquentJobRepository::class);
+        $this->app->bind(DiscountRepositoryInterface::class, EloquentDiscountRepository::class);
+        $this->app->bind(CourseRepositoryInterface::class, EloquentCourseRepository::class);
+        $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
     }
 
     /**

@@ -17,7 +17,6 @@ class ComplaintController extends Controller
 
     public function toggleComplaint(ComplaintRequest $request, string $type, int $id)
     {
-        dd($request->validated());
         $result = $this->complaintService->toggleComplaint(Auth::user(), $type, $id, $request->validated());
 
         return response()->json($result['data'], $result['status']);

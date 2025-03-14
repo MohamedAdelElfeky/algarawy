@@ -2,42 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Models\Discount;
-use App\Services\DiscountService;
-use Illuminate\Http\Request;
+use App\Domain\Services\DiscountService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class DiscountController extends Controller
 {
-    protected $discountService;
 
-    public function __construct(DiscountService $discountService)
-    {
-        $this->discountService = $discountService;
-    }
+    public function __construct(private DiscountService $discountService) {}
 
-    public function index()
+    public function index(): View
     {
-        $discounts = Discount::with([
-            'user',
-            'images',
-            'pdfs',
-            'likes',
-            'favorites',
-        ])->orderBy('created_at', 'desc')->paginate(25);
+        $discounts = $this->discountService->getPaginated(25);
         return view('pages.dashboards.discount.index', compact('discounts'));
     }
 
-    public function destroy($id)
+
+    public function destroy(int $id): JsonResponse
     {
-        $discount = $this->discountService->getDiscountById($id);
 
-        if (!$discount) {
-            return back()->with('error', 'Discount not found');
-        }
-
-        $this->discountService->deleteDiscount($discount);
-
-        return redirect()->route('discounts.index')
-            ->with('success', 'Discount deleted successfully.');
+        $deleted = $this->discountService->deleteDiscount($id, 'web');
+        return response()->json([
+            'success' => $deleted,
+            'message' => $deleted ? 'deleted successfully.' : 'Failed to delete.'
+        ]);
     }
 }

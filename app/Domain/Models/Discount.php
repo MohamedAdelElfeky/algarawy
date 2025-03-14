@@ -2,21 +2,18 @@
 
 namespace App\Domain\Models;
 
+use App\Shared\Traits\savingUserIdModelTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Discount extends Model
 {
+    use HasFactory, savingUserIdModelTrait;
+
     protected $table = 'discounts';
-    protected $fillable = [
-        'description',
-        'location',
-        'discount',
-        'price',
-        'link',
-        'user_id',
-    ];
+
+    protected $fillable = ['user_id', 'description', 'location', 'discount', 'price', 'link',];
 
     public function user()
     {

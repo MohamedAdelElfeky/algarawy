@@ -3,14 +3,17 @@
 namespace App\Domain\Models;
 
 use App\Models\User;
+use App\Shared\Traits\savingUserIdModelTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Job extends Model
 {
-    use HasFactory;
+    use HasFactory, savingUserIdModelTrait;
+
     protected $table = 'jobs';
+    
     protected $fillable = [
         'description',
         'title',
@@ -39,7 +42,7 @@ class Job extends Model
     {
         return $this->morphMany(FilePdf::class, 'pdfable');
     }
-    
+
     public function favorites()
     {
         return $this->morphMany(Favorite::class, 'favoritable');
@@ -64,7 +67,7 @@ class Job extends Model
     {
         return $this->belongsTo(Neighborhood::class, 'neighborhood_id');
     }
-    
+
     public function jobApplications()
     {
         return $this->hasMany(JobApplication::class, 'job_id');
@@ -85,8 +88,8 @@ class Job extends Model
         return $this->hasOne(JobCompanies::class);
     }
 
-    
-   
+
+
     public function approval()
     {
         return $this->morphOne(PostApproval::class, 'approvable');
@@ -101,21 +104,21 @@ class Job extends Model
     {
         return optional($this->visibility)->status;
     }
-    
+
     public function scopeApprovalStatus($query, $status = 'pending')
     {
         $allowedStatuses = ['pending', 'approved', 'rejected'];
-    
+
         if (!in_array($status, $allowedStatuses)) {
             $status = 'pending';
         }
-    
+
         return $query->whereHas('approval', function ($query) use ($status) {
             $query->where('status', $status);
         });
     }
-    
-    
+
+
     public function scopeVisibilityStatus($query, $status = 'public')
     {
         $allowedStatuses = ['public', 'private'];

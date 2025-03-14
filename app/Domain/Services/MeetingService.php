@@ -3,55 +3,102 @@
 namespace App\Domain\Services;
 
 use App\Domain\Models\Meeting;
+use App\Domain\Models\User;
 use App\Domain\Repositories\MeetingRepositoryInterface;
+use App\Http\Requests\MeetingRequest;
 use App\Http\Resources\MeetingResource;
+use App\Shared\Traits\ownershipAuthorization;
+use DateTime;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 
 class MeetingService
 {
-    private $repository;
+    use ownershipAuthorization;
 
-    public function __construct(MeetingRepositoryInterface $repository)
+    public function __construct(
+        private MeetingRepositoryInterface $meetingRepository,
+        private PaginationService $paginationService
+    ) {}
+
+    public function getMeetings(int $perPage = 10, int $page = 1): array
     {
-        $this->repository = $repository;
-    }
-
-
-    public function createMeeting(array $data)
-    {
-        $data['user_id'] = Auth::id();
-        $meeting = $this->repository->create($data);
-        return new MeetingResource($meeting);
-    }
-
-    public function updateMeeting(Meeting $meeting, array $data)
-    {
-        if ($meeting->user_id != Auth::id()) {
-            throw new \Exception('هذا الاجتماع ليس من إنشائك');
-        }
-        $updatedMeeting = $this->repository->update($meeting, $data);
-        return new MeetingResource($updatedMeeting);
-    }
-
-    public function deleteMeeting(Meeting $meeting)
-    {
-        if ($meeting->user_id != Auth::id()) {
-            throw new \Exception('هذا الاجتماع ليس من إنشائك');
-        }
-        $this->repository->delete($meeting);
-        return response()->json(['message' => 'تم حذف الاجتماع بنجاح'], 200);
-    }
-
-    public function getMeeting(string $id)
-    {
-        $meeting = $this->repository->findById($id);
-        return new MeetingResource($meeting);
-    }
-
-    public function getAllMeetings(int $perPage, int $page)
-    {
-        $meetings = $this->repository->getAll($perPage, $page);
-        return MeetingResource::collection($meetings);
+        $meetings = $this->meetingRepository->get($perPage, $page);
+        return [
+            'data' => MeetingResource::collection($meetings),
+            'metadata' => $this->paginationService->getPaginationData($meetings),
+        ];
     }
     
+    public function getMeetingById(string $id): Meeting
+    {
+        return Meeting::findOrFail($id);
+    }
+
+    public function createMeeting(MeetingRequest $request): array
+    {
+        $validatedData = $request->validated();
+        $meeting = Meeting::create($validatedData);
+        $meeting->approval()->create(['status' => 'pending']);
+        $meeting->visibility()->create(['status' => 'private']);
+
+        $this->notifyUsersAboutMeeting($meeting, 'دعوة', 'تمت دعوتك لحضور الاجتماع');
+
+        return [
+            'message' => 'تم إنشاء الاجتماع بنجاح',
+            'data' => new MeetingResource($meeting),
+        ];
+    }
+
+    public function updateMeeting(Meeting $meeting, MeetingRequest $request)
+    {
+        $this->authorizeOwnership($meeting);
+
+        $meeting->update($request->validated());
+
+        $this->notifyUsersAboutMeeting($meeting, 'دعوة', 'تم تحديث الدعوة لحضور الاجتماع');
+
+        return [
+            'message' => 'تم تحديث الاجتماع بنجاح',
+            'data' => new MeetingResource($meeting),
+        ];
+    }
+
+    public function deleteMeeting(int $id, $type = 'api'): JsonResponse
+    {
+        $meeting = $this->getMeetingById($id);
+
+        $this->authorizeOwnership($meeting, $type);
+
+
+        $meeting->delete();
+        return response()->json(['message' => 'تم حذف الاجتماع بنجاح']);
+    }
+
+ 
+    public function searchMeeting(string $searchTerm)
+    {
+        return MeetingResource::collection($this->meetingRepository->search($searchTerm));
+    }
+
+    public function getPaginatedMeeting(int $perPage)
+    {
+        return $this->meetingRepository->paginate($perPage);
+    }
+
+
+    private function notifyUsersAboutMeeting(Meeting $meeting, string $title, string $messagePrefix): void
+    {
+        $meetingDateTime = new DateTime($meeting->datetime);
+        $formattedDate = $meetingDateTime->format('Y-m-d');
+
+        User::where('id', '!=', Auth::id())->each(function (User $user) use ($meeting, $title, $messagePrefix, $formattedDate) {
+            $meeting->notifications()->create([
+                'user_id' => $user->id,
+                'notifiable_id' => $meeting->id,
+                'title' => $title,
+                'message' => "{$messagePrefix} {$meeting->name} بتاريخ {$formattedDate}",
+            ]);
+        });
+    }
 }

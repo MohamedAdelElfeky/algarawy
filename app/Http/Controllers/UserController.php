@@ -17,6 +17,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\FileHandlerService;
 use App\Services\PaginationService;
+use App\Shared\Traits\HandlesSingleImageUpload;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,8 +26,9 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    use HandlesSingleImageUpload;
 
-    public function __construct(private PaginationService $paginationService, private FileHandlerService $fileHandler)
+    public function __construct(private PaginationService $paginationService)
     {
         $this->middleware('auth:sanctum');
     }
@@ -54,50 +56,6 @@ class UserController extends Controller
             'user' =>  new UserResource($user),
         ], 200);
     }
-
-    public function toggleVisibility(Request $request)
-    {
-        $user = auth()->user();
-
-        $fields = ['mobile_number', 'birthdate', 'email'];
-
-        $errors = [];
-
-        foreach ($fields as $field) {
-            if ($request->has($field)) {
-                $visibility = $request->input($field);
-
-                if (!in_array($visibility, [true, false, 'true', 'false', 1, 0, '1', '0'], true)) {
-                    $errors[] = "قيمة رؤية غير صالحة لـ {$field}.";
-                    continue;
-                }
-
-                $setting = Setting::where('key', "{$field}_visibility")->first();
-                if (!$setting) {
-                    $errors[] = "الإعداد {$field}_visibility غير موجود.";
-                    continue;
-                }
-
-                $userSetting = $user->userSettings()->where('setting_id', $setting->id)->first();
-                if ($userSetting) {
-                    $userSetting->update(['value' => filter_var($visibility, FILTER_VALIDATE_BOOLEAN)]);
-                } else {
-                    $user->userSettings()->create([
-                        'setting_id' => $setting->id,
-                        'value' => filter_var($visibility, FILTER_VALIDATE_BOOLEAN),
-                    ]);
-                }
-            }
-        }
-
-        if (!empty($errors)) {
-            return response()->json(['errors' => $errors], 400);
-        }
-
-        return response()->json(['message' => 'تم تحديث إعدادات الرؤية بنجاح.']);
-    }
-
-
 
     public function getDataUser($userId)
     {
@@ -393,7 +351,7 @@ class UserController extends Controller
             ]
         );
         foreach ($imageFields as $field) {
-            $this->fileHandler->uploadSingleImage($request, $userDetail, 'users', 'user', 'image', $field);
+            $this->uploadSingleImage($request, $userDetail, 'users', 'user', 'image', $field);
         }
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $user->assignRole($adminRole);
