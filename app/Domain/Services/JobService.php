@@ -44,13 +44,28 @@ class JobService
     public function createJob(JobRequest $request): array
     {
         $validatedData = $request->validated();
-
+        $validatedData['type'] = $validatedData['job_type'] ?? null;
+        $validatedData['duration'] = $validatedData['job_duration'] ?? null;
+        unset($validatedData['job_type'], $validatedData['job_duration']);
+        // $jobData = collect($validatedData)->only([
+        //     'description',
+        //     'title',
+        //     'type',
+        //     'duration',
+        //     'is_training',
+        //     'price',
+        //     'job_status',
+        //     'user_id',
+        //     'region_id',
+        //     'city_id',
+        //     'neighborhood_id'
+        // ])->toArray();
         $job = $this->jobRepository->create($validatedData);
-
+       
         $job->Approval()->create(['status' => 'pending']);
         $job->visibility()->create(['status' => 'private']);
 
-        $this->attachFiles($request, $job);
+        $this->handleFileAttachments($request, $job);
         $this->handleJobCompany($request, $job, $validatedData);
 
         return [
@@ -61,13 +76,17 @@ class JobService
 
     public function updateJob(Job $job, JobRequest $request)
     {
-        
+
         $this->authorizeOwnership($job);
         $validatedData = $request->validated();
-
-        $job->update($validatedData);
-
-        $this->attachFiles($request, $job);
+        $validatedData['type'] = $validatedData['job_type'] ?? $job->type;
+        $validatedData['duration'] = $validatedData['job_duration'] ?? $job->duration;    
+        $jobData = collect($validatedData)->only([
+            'description', 'title', 'type', 'duration', 'is_training', 'price',
+            'job_status', 'region_id', 'city_id', 'neighborhood_id'
+        ])->toArray();
+        $job->update($jobData);
+        $this->handleFileAttachments($request, $job);
         $this->handleJobCompany($request, $job, $validatedData);
 
         return [
@@ -94,7 +113,7 @@ class JobService
         return $this->jobRepository->paginate($perPage);
     }
 
-    private function attachFiles(JobRequest $request, Job $job): void
+    private function handleFileAttachments(JobRequest $request, Job $job): void
     {
         $this->attachImages($request, $job, 'job/images', 'project_');
         $this->attachFiles($request, $job, 'job/pdf', 'pdf_');
@@ -102,7 +121,7 @@ class JobService
 
     private function handleJobCompany(JobRequest $request, Job $job, array $validatedData): void
     {
-        if (!empty($validatedData['company_name'])) {
+        if (!empty($validatedData['company_name'])) { 
             $jobCompany = JobCompanies::updateOrCreate(
                 ['job_id' => $job->id],
                 array_filter([

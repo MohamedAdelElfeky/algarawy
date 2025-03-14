@@ -46,6 +46,8 @@ class JobRequest extends FormRequest
             'company_neighborhood_id' => 'nullable|exists:neighborhoods,id',
             'is_training' => 'nullable',
             'status'      => 'nullable|in:public,private',
+            'deleted_images_or_video' => 'nullable|array',
+            'deleted_files' => 'nullable|array',
         ];
     }
 
