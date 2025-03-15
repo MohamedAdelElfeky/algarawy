@@ -14,4 +14,5 @@ interface ProjectRepositoryInterface
     public function delete(Project $project): bool;
     public function search(string $searchTerm);
     public function paginate(int $perPage);
+    public function count(): int;
 }

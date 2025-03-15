@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure;
 
+use App\Domain\Models\Setting;
 use App\Domain\Repositories\UserRepositoryInterface;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -43,8 +44,28 @@ class EloquentUserRepository implements UserRepositoryInterface
     }
 
     public function findByNationalId(string $nationalId)
-    {   
-        $user = User::with(['userSettings','details.images'])->where('national_id', $nationalId)->first();
+    {
+        $user = User::with(['userSettings', 'details.images'])->where('national_id', $nationalId)->first();
         return $user ? new UserResource($user) : null;
+    }
+
+    public function countActiveUsers(): int
+    {
+        $registrationConfirmedSetting = Setting::where('key', 'registration_confirmed')->first();
+        return User::whereHas('userSettings', function ($query) use ($registrationConfirmedSetting) {
+            $query->where('setting_id', $registrationConfirmedSetting->id)->where('value', 1);
+        })->whereHas('roles', function ($query) {
+            $query->where('name', 'user');
+        })->count();
+    }
+
+    public function countInactiveUsers(): int
+    {
+        $registrationConfirmedSetting = Setting::where('key', 'registration_confirmed')->first();
+        return User::whereHas('userSettings', function ($query) use ($registrationConfirmedSetting) {
+            $query->where('setting_id', $registrationConfirmedSetting->id)->where('value', 0);
+        })->whereHas('roles', function ($query) {
+            $query->where('name', 'user');
+        })->count();
     }
 }

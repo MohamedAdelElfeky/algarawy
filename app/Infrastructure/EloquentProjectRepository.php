@@ -59,4 +59,8 @@ class EloquentProjectRepository implements ProjectRepositoryInterface
     {
         return Project::with(['images', 'pdfs', 'favorites', 'likes'])->paginate($perPage);
     }
+    public function count(): int
+    {
+        return Project::count();
+    }
 }

@@ -60,4 +60,8 @@ class EloquentCourseRepository implements CourseRepositoryInterface
     {
         return Course::with(['images', 'pdfs', 'favorites', 'likes'])->paginate($perPage);
     }
+    public function count(): int
+    {
+        return Course::count();
+    }
 }

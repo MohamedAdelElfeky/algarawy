@@ -14,4 +14,5 @@ interface DiscountRepositoryInterface
     public function delete(Discount $project): bool;
     public function search(string $searchTerm);
     public function paginate(int $perPage);
+    public function count(): int;
 }

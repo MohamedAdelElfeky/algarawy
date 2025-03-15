@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Domain\Models\Job;
 use App\Domain\Models\JobApplication;
+use App\Domain\Services\JobApplicationService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\JobApplication2Resource;
 use App\Http\Resources\JobApplicationResource;
-use App\Services\JobApplicationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -102,7 +103,7 @@ class JobApplicationController extends Controller
 
     public function getJobApplicationsByUserId()
     {
-        $jobApplications =  JobApplicationResource::collection($this->jobApplicationService->getJobApplicationsByUserId());
+        $jobApplications =  JobApplication2Resource::collection($this->jobApplicationService->getJobApplicationsByUserId());
         if ($jobApplications === null) {
             $errorMessage = "No job applications found for the specified job.";
             return response()->json(['error' => $errorMessage], 404);

@@ -95,7 +95,7 @@
         </div>
         <div class="col-xl-3">
             <!--begin::Statistics Widget 5-->
-            <a href="{{ route('courses.index') }}" class="card bg-warning hoverable card-xl-stretch mb-xl-8">
+            <a href="{{ route('web-courses.index') }}" class="card bg-warning hoverable card-xl-stretch mb-xl-8">
                 <!--begin::Body-->
                 <div class="card-body">
                     <i class="ki-duotone ki-parcel-tracking text-white fs-3x ms-n1">

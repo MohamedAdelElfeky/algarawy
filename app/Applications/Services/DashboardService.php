@@ -30,18 +30,30 @@ class DashboardService
         ]);
     }
 
-    private function getAuthenticatedData()
+    private function getAuthenticatedData(): array
     {
         $user = Auth::guard('sanctum')->user();
-        $blockedUserIds = $user->blockedUsers()->pluck('blocked_user_id')->toArray();
-        $showNoComplaintedPosts = $user->userSettings()
-            ->whereHas('setting', fn($query) => $query->where('key', 'show_no_complaints_posts'))
-            ->value('value') ?? false;
+
+        if (!$user) {
+            return [];
+        }
 
         return $this->dashboardRepository->getData([
             'approval' => 'approved',
-            'showNoComplaintedPosts' => $showNoComplaintedPosts,
+            'showNoComplaintedPosts' => $this->shouldShowNoComplaintsPosts($user),
             'user_id' => $user->id,
-        ], $blockedUserIds);
+        ], $this->getBlockedUserIds($user));
+    }
+
+    private function getBlockedUserIds($user): array
+    {
+        return $user->blockedUsers()->pluck('blocked_user_id')->toArray();
+    }
+
+    private function shouldShowNoComplaintsPosts($user): bool
+    {
+        return (bool) $user->userSettings()
+            ->whereHas('setting', fn($query) => $query->where('key', 'show_no_complaints_posts'))
+            ->value('value');
     }
 }

@@ -59,4 +59,9 @@ class EloquentDiscountRepository implements DiscountRepositoryInterface
     {
         return Discount::with(['images', 'pdfs', 'favorites', 'likes'])->paginate($perPage);
     }
+
+    public function count(): int
+    {
+        return Discount::count();
+    }
 }

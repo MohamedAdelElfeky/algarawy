@@ -59,4 +59,8 @@ class EloquentJobRepository implements JobRepositoryInterface
     {
         return Job::with(['images', 'pdfs', 'favorites', 'likes', 'JobCompanies'])->paginate($perPage);
     }
+    public function count(): int
+    {
+        return Job::count();
+    }
 }
