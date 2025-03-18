@@ -128,5 +128,7 @@ Route::middleware(['blocked'])->group(function () {
         Route::post('/conversation', [ChatController::class, 'createConversation']);
         Route::post('/send', [ChatController::class, 'sendMessage']);
         Route::get('/messages/{id}', [ChatController::class, 'getMessages']);
+        Route::get('/Conversations', [ChatController::class, 'getConversations']);
+        Route::get('/user/Conversations', [ChatController::class, 'getUserConversations']);
     });
 });

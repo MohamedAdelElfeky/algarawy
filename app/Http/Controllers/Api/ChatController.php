@@ -8,12 +8,14 @@ use App\Domain\Chat\DTOs\MessageDTO;
 use App\Domain\Chat\DTOs\ConversationDTO;
 use App\Http\Requests\ChatMessageRequest;
 use App\Http\Requests\CreateConversationRequest;
+use App\Http\Resources\ConversationResource;
+use App\Http\Resources\ChatMessageResource;
 use Illuminate\Http\JsonResponse;
 
 class ChatController extends Controller
 {
-
-    public function __construct(private ChatService $chatService) {
+    public function __construct(private ChatService $chatService)
+    {
         $this->middleware('auth:sanctum');
     }
 
@@ -25,26 +27,60 @@ class ChatController extends Controller
             name: $validatedData['name'],
             user_ids: $validatedData['user_ids']
         );
+
+        $conversation = $this->chatService->createConversation($conversationDTO);
+
         return response()->json([
-            'message' => $this->chatService->createConversation($conversationDTO),
-            'data' => $conversationDTO
+            'message' => 'تم إنشاء المحادثة بنجاح.',
+            'data' => new ConversationResource($conversation)
         ], 201);
     }
 
-    public function sendMessage(ChatMessageRequest $request)
+    public function sendMessage(ChatMessageRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
         $dto = new MessageDTO(
             $validatedData['conversation_id'],
             auth()->id(),
-            $validatedData['message'],
+            $validatedData['message']
         );
 
-        return response()->json($this->chatService->sendMessage($dto));
+        $message = $this->chatService->sendMessage($dto);
+
+        return response()->json([
+            'message' => 'تم إرسال الرسالة بنجاح.',
+            'data' => new ChatMessageResource($message)
+        ]);
     }
 
-    public function getMessages($conversationId)
+    public function getMessages($conversationId): JsonResponse
     {
-        return response()->json($this->chatService->getMessages($conversationId));
+        $messages = $this->chatService->getMessages($conversationId);
+
+        return response()->json([
+            'message' => 'تم استرجاع الرسائل بنجاح',
+            'data' => ChatMessageResource::collection($messages)
+        ]);
+    }
+
+    public function getUserConversations(): JsonResponse
+    {
+        $userId = auth()->id();
+        $conversations = $this->chatService->getUserConversations($userId);
+
+        return response()->json([
+            'message' => 'User conversations retrieved successfully',
+            'data' => ConversationResource::collection($conversations)
+        ]);
+    }
+
+    public function getConversations(): JsonResponse
+    {
+        $conversations = $this->chatService->getConversations();
+
+        return response()->json([
+            'message' => 'All conversations retrieved successfully',
+            'data' => ConversationResource::collection($conversations)
+        ]);
     }
 }

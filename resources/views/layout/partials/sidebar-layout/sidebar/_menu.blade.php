@@ -159,6 +159,14 @@
                         <span class="menu-title"> العضويات </span>
                     </a>
                 </div>
+                <div class="menu-item">
+                    <a class="menu-link" href="{{ route('chat.index') }}">
+                        <span class="menu-bullet">
+                            <i class="fas fa-comment-alt me-2"></i>
+                        </span>
+                        <span class="menu-title"> المحادثات </span>
+                    </a>
+                </div>
             </div>
         </div>
         <!--end::Menu-->

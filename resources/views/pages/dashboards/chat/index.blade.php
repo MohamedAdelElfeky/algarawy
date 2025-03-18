@@ -54,6 +54,8 @@
             justify-content: space-between;
             font-size: 12px;
             color: #555;
+            padding-bottom: 5px;
+            gap: 10px; 
         }
 
         .chat-text {
@@ -61,6 +63,7 @@
             line-height: 1.4;
             word-wrap: break-word;
         }
+        
     </style>
     <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
         <div class="col-lg-4">
@@ -179,7 +182,7 @@
                         Swal.fire({
                             icon: 'warning',
                             title: 'Oops...',
-                            text: 'Please select a conversation and enter a message!',
+                            text: 'الرجاء تحديد المحادثة وإدخال الرسالة!',
                         });
                         return;
                     }
@@ -203,8 +206,8 @@
 
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'Message Sent!',
-                                    text: 'Your message has been successfully sent.',
+                                    title: 'تم إرسال الرسالة!',
+                                    text: 'لقد تم إرسال رسالتك بنجاح.',
                                     timer: 2000,
                                     showConfirmButton: false
                                 });
@@ -212,7 +215,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error!',
-                                    text: 'Something went wrong while sending your message.',
+                                    text: 'حدث خطأ أثناء إرسال رسالتك.',
                                 });
                             }
                         })
@@ -221,7 +224,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error!',
-                                text: 'Failed to send message. Please try again.',
+                                text: 'فشل إرسال الرسالة. يُرجى المحاولة مرة أخرى..',
                             });
                         });
                 });
