@@ -20,6 +20,8 @@
                             <th> {{ __('lang.name') }}</th>
                             <th> {{ __('lang.email') }}</th>
                             <th> {{ __('lang.phone') }}</th>
+                            <th> {{ __('lang.occupation_category') }}</th>
+                            <th> {{ __('lang.phone_whatsapp') }}</th>
                             <th> {{ __('lang.address') }}</th>
                             <th> {{ __('lang.image_profile') }}</th>
                             <th> {{ __('lang.image_card_from') }}</th>
@@ -31,9 +33,11 @@
                         <tbody>
                             @foreach ($users as $user)
                                 <tr>
-                                    <td>{{ $user->first_name . ' ' . $user->last_name }}</td>
+                                    <td>{{ $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name . 'القرعاوي'}}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->phone }}</td>
+                                    <td>{{ $user->occupation_category }}</td>
+                                    <td>{{ $user->phone_whatsapp }}</td>
                                     <td>
                                         {{ optional($user->details)->getFullLocation() }}
                                     </td>

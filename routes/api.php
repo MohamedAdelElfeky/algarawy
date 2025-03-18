@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\BankAccountController;
 use App\Http\Controllers\Api\BlockedUserController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\MeetingController;
@@ -117,7 +118,15 @@ Route::middleware(['blocked'])->group(function () {
 
     Route::get('/getCharityAndSavingBankAccounts', [BankAccountController::class, 'getCharityAndSavingBankAccounts']);
 
-    Route::get('/job-applications/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
-    Route::get('/job-applications/for-user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);
-    Route::get('/job-applications/by-user', [JobApplicationController::class, 'getJobApplicationsByUserId']);
+    Route::prefix('job-applications')->group(function () {
+        Route::get('/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);
+        Route::get('/for-user/{jobId}', [JobApplicationController::class, 'getJobApplicationsForUserAndJob']);
+        Route::get('/by-user', [JobApplicationController::class, 'getJobApplicationsByUserId']);
+    });
+
+    Route::prefix('chat')->group(function () {
+        Route::post('/conversation', [ChatController::class, 'createConversation']);
+        Route::post('/send', [ChatController::class, 'sendMessage']);
+        Route::get('/messages/{id}', [ChatController::class, 'getMessages']);
+    });
 });

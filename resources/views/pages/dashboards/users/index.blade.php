@@ -10,10 +10,11 @@
                 <div class="table-responsive">
                     <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
                         <thead>
-                            <th>الاسم الأول</th>
-                            <th>الاسم الأخير</th>
+                            <th>الاسم </th>
                             <th>البريد الإلكتروني</th>
                             <th>الهاتف</th>
+                            <th> {{ __('lang.occupation_category') }}</th>
+                            <th> {{ __('lang.phone_whatsapp') }}</th>
                             <th>الموقع</th>
                             <th>الصورة الرمزية</th>
                             <th>صورة البطاقة الأمامية</th>
@@ -26,10 +27,11 @@
                         <tbody>
                             @foreach ($users as $user)
                                 <tr>
-                                    <td>{{ $user->first_name }}</td>
-                                    <td>{{ $user->last_name }}</td>
+                                    <td>{{ $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name . 'القرعاوي'}}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->phone }}</td>
+                                    <td>{{ $user->occupation_category }}</td>
+                                    <td>{{ $user->phone_whatsapp }}</td>
                                     <td>
                                         {{ optional($user->region)->name . ' ' . optional($user->region)->city . ' ' . optional($user->neighborhood)->name }}
                                     </td>

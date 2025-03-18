@@ -4,6 +4,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
@@ -73,7 +74,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('neighborhoods', NeighborhoodController::class);
     Route::put('addNeighborhoods', [NeighborhoodController::class, 'addNeighborhood'])->name('addNeighborhood');
-    
+
     Route::resource('memberships', MembershipController::class);
 
     Route::get('/import', [ImportController::class, 'showForm'])->name('user.import.form');
@@ -83,6 +84,13 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/approve/{model}/{id}', [ApprovalController::class, 'updateApprovalStatus'])->name('approve.update');
     Route::put('/visibility/{model}/{id}', [VisibilityController::class, 'updateVisibilityStatus'])->name('visibility.update');
+
+    Route::prefix('chat')->group(function () {
+        Route::get('/', [ChatController::class, 'index'])->name('chat.index');
+        Route::get('/messages/{conversationId}', [ChatController::class, 'getMessages']);
+        Route::post('/send', [ChatController::class, 'sendMessage']);
+        Route::post('/conversation', [ChatController::class, 'createConversation']);
+    });
 });
 
 Route::get('/error', function () {

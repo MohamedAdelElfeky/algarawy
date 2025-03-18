@@ -106,4 +106,6 @@ return [
     'image_card_back' => 'صورة البطاقة الخلفية',
     'national_id' => 'رقم الهوية',
     'preview_image' => 'عرض الصوره',
+    'occupation_category' => 'قسم التخصص',
+    'phone_whatsapp' => 'هاتف واتساب',
 ];

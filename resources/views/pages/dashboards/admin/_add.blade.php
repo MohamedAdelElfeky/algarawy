@@ -16,9 +16,19 @@
                                     name="first_name" required />
                             </div>
                             <div class="col-md-6">
+                                <label class="fs-6 fw-semibold mb-2">الاسم الاوسط</label>
+                                <input type="text" class="form-control form-control-solid" placeholder="الاسم الاوسط"
+                                    name="middle_name" required />
+                            </div>
+                            <div class="col-md-6">
                                 <label class="fs-6 fw-semibold mb-2">الاسم الأخير</label>
                                 <input type="text" class="form-control form-control-solid" placeholder="الاسم الأخير"
                                     name="last_name" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fs-6 fw-semibold mb-2"> التخصص </label>
+                                <input type="text" class="form-control form-control-solid" placeholder="التخصص "
+                                    name="occupation_category" required />
                             </div>
                         </div>
                     </div>
@@ -33,6 +43,11 @@
                                 <label class="fs-6 fw-semibold mb-2">الهاتف</label>
                                 <input type="tel" class="form-control form-control-solid" placeholder="الهاتف"
                                     name="phone" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fs-6 fw-semibold mb-2">هاتف الواتس</label>
+                                <input type="tel" class="form-control form-control-solid" placeholder="هاتف الواتس"
+                                    name="phone_whatsapp" required />
                             </div>
                         </div>
                     </div>
