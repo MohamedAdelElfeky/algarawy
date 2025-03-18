@@ -71,7 +71,7 @@ class JobApplicationService
         $jobApplications = JobApplication::where('job_id', $jobId)
             ->get();
 
-        return JobApplication2Resource::collection($jobApplications);
+        return JobApplicationResource::collection($jobApplications);
     }
 
     public function getJobApplicationsByUserId()
