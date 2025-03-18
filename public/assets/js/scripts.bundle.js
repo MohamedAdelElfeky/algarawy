@@ -571,7 +571,7 @@ var KTApp = function () {
                     const modalEl = document.querySelector(this.getAttribute("data-bs-stacked-modal"));
     
                     if (modalEl) {
-                        const modal = new bootstrap.Modal(modalEl);
+                        const modal = new bootstrap.Modal(modalEl, {backdrop: false});
                         modal.show();
                     }                
                 }); 
@@ -2576,7 +2576,7 @@ var KTMenu = function(element, options) {
         }
 
         // Item is parent of element
-        if ( (item = element.closest('.menu-item[data-kt-menu-trigger]')) ) {
+        if ( (item = element.closest('.menu-item')) ) {
             return item;
         }
 
@@ -2903,6 +2903,11 @@ var KTMenu = function(element, options) {
 
     var _setActiveLink = function(link) {
         var item = _getItemElement(link);
+
+        if (!item) {
+            return;
+        }
+
         var parentItems = _getItemParentElements(item);
         var parentTabPane = link.closest('.tab-pane');
 
@@ -2952,7 +2957,7 @@ var KTMenu = function(element, options) {
     }
 
     var _getLinkByAttribute = function(value, name = "href") {
-        var link = the.element.querySelector('a[' + name + '="' + value + '"]');
+        var link = the.element.querySelector('.menu-link[' + name + '="' + value + '"]');
 
         if (link) {
             return link;
@@ -3311,7 +3316,7 @@ KTMenu.updateByLinkAttribute = function(value, name = "href") {
             var menu = KTMenu.getInstance(elements[i]);
 
             if (menu) {
-                var link = menu.getLinkByAttribute(value, name);
+                var link = menu.getLinkByAttribute(value, name);                
                 if (link) {
                     menu.setActiveLink(link);
                 }

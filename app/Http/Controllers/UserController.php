@@ -174,15 +174,15 @@ class UserController extends Controller
                 $query->orWhere($field, 'like', '%' . $searchTerm . '%');
             }
         })
-            ->when($region_id, function ($query) use ($region_id) {
-                return $query->orWhere('region_id', $region_id);
-            })
-            ->when($city_id, function ($query) use ($city_id) {
-                return $query->orWhere('city_id', $city_id);
-            })
-            ->when($neighborhood_id, function ($query) use ($neighborhood_id) {
-                return $query->orWhere('neighborhood_id', $neighborhood_id);
-            })
+            // ->when($region_id, function ($query) use ($region_id) {
+            //     return $query->orWhere('region_id', $region_id);
+            // })
+            // ->when($city_id, function ($query) use ($city_id) {
+            //     return $query->orWhere('city_id', $city_id);
+            // })
+            // ->when($neighborhood_id, function ($query) use ($neighborhood_id) {
+            //     return $query->orWhere('neighborhood_id', $neighborhood_id);
+            // })
             ->get();
 
         return response()->json(UserResource::collection($users));

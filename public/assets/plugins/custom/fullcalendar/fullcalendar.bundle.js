@@ -1,5 +1,5 @@
 /*!
-FullCalendar v5.11.3
+FullCalendar v5.11.4
 Docs & License: https://fullcalendar.io/
 (c) 2022 Adam Shaw
 */
@@ -9812,7 +9812,7 @@ var FullCalendar = (function (exports) {
 
     // exports
     // --------------------------------------------------------------------------------------------------
-    var version = '5.11.3'; // important to type it, so .d.ts has generic string
+    var version = '5.11.4'; // important to type it, so .d.ts has generic string
 
     var Calendar = /** @class */ (function (_super) {
         __extends(Calendar, _super);
