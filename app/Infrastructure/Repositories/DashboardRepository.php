@@ -42,7 +42,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             $paginatedData = $query->paginate(5);
             $resourceClass = $this->resources[$type];
 
-            $result['data'][] = [
+            $result['date'][] = [
                 'type' => $type,
                 'data' => $resourceClass::collection($paginatedData),
             ];
