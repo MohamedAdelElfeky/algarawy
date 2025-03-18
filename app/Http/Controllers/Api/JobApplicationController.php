@@ -103,7 +103,7 @@ class JobApplicationController extends Controller
 
     public function getJobApplicationsByUserId()
     {
-        $jobApplications =  JobApplication2Resource::collection($this->jobApplicationService->getJobApplicationsByUserId());
+        $jobApplications =  JobApplicationResource::collection($this->jobApplicationService->getJobApplicationsByUserId());
         if ($jobApplications === null) {
             $errorMessage = "No job applications found for the specified job.";
             return response()->json(['error' => $errorMessage], 404);

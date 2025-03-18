@@ -34,7 +34,7 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function getData(array $filters = [], array $blockedUserIds = []): array
     {
-        $result = ['data' => []];
+        $result = ['date' => []];
 
         foreach ($this->models as $type => $query) {
             $this->applyFilters($query, $filters, $blockedUserIds);
