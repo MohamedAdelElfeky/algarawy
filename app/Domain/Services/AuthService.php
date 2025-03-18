@@ -4,6 +4,7 @@ namespace App\Domain\Services;
 
 use App\Models\User;
 use App\Domain\Models\UserDetail;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Shared\Traits\HandlesSingleImageUpload;
@@ -26,7 +27,7 @@ class AuthService
         }
 
         return [
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $user->createToken('authToken')->plainTextToken,
             'status' => Response::HTTP_CREATED
         ];
@@ -41,7 +42,7 @@ class AuthService
 
             return [
                 'message' => 'تم التسجيل بنجاح',
-                'user' => $user,
+                'user' => new UserResource($user),
                 'status' => Response::HTTP_CREATED
             ];
         } catch (ValidationException $e) {
