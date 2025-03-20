@@ -33,20 +33,37 @@ class ChatRepository
         ]);
     }
 
-    public function getMessages(int $conversationId)
+    public function getMessages(int $conversationId, ?int $perPage = null, ?int $page = null)
     {
-        return Message::where('conversation_id', $conversationId)->with('user')->get();
+        $query = Message::where('conversation_id', $conversationId)->with('user');
+
+        if ($perPage && $page) {
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $query->get();
     }
 
-    public function getUserConversations(int $userId)
+    public function getUserConversations(int $userId, ?int $perPage = null, ?int $page = null)
     {
-        return Conversation::with('participants.user')
-            ->whereHas('participants', fn($q) => $q->where('user_id', $userId))
-            ->get();
+        $query = Conversation::with('participants.user')
+            ->whereHas('participants', fn($q) => $q->where('user_id', $userId));
+
+        if ($perPage && $page) {
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $query->get();
     }
 
-    public function getConversations()
+    public function getConversations(?int $perPage = null, ?int $page = null)
     {
-        return Conversation::with('participants.user')->get();
+        $query = Conversation::with('participants');
+
+        if ($perPage && $page) {
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $query->get();
     }
 }

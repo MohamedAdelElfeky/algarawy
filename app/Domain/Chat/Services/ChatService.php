@@ -25,18 +25,20 @@ class ChatService
         return $this->chatRepository->sendMessage($dto);
     }
 
-    public function getMessages(int $conversationId)
+    public function getMessages(int $conversationId, ?int $perPage = null, ?int $page = null)
     {
-        return $this->chatRepository->getMessages($conversationId);
+        return $this->chatRepository->getMessages($conversationId, $perPage, $page);
     }
-
-    public function getUserConversations(int $userId)
+    
+    public function getUserConversations(int $userId, ?int $perPage = null, ?int $page = null)
     {
-        return $this->chatRepository->getUserConversations($userId);
+        return $this->chatRepository->getUserConversations($userId, $perPage, $page);
     }
-
-    public function getConversations()
+    
+    public function getConversations(?int $perPage = null, ?int $page = null)
     {
-        return $this->chatRepository->getConversations();
+        return $this->chatRepository->getConversations($perPage, $page);
     }
+    
+    
 }

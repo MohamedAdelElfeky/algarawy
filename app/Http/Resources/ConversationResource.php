@@ -20,6 +20,7 @@ class ConversationResource extends JsonResource
             'name' => $this->name,
             'participants' => ConversationParticipantResource::collection($this->whenLoaded('participants')),
             'messages' => ChatMessageResource::collection($this->whenLoaded('messages')),
+            'last_message' => new ChatMessageResource($this->messages()->latest()->first()), 
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }

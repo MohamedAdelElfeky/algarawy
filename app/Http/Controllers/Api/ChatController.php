@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Domain\Chat\Services\ChatService;
 use App\Domain\Chat\DTOs\MessageDTO;
 use App\Domain\Chat\DTOs\ConversationDTO;
+use App\Domain\Services\PaginationService;
 use App\Http\Requests\ChatMessageRequest;
 use App\Http\Requests\CreateConversationRequest;
 use App\Http\Resources\ConversationResource;
@@ -55,32 +56,40 @@ class ChatController extends Controller
 
     public function getMessages($conversationId): JsonResponse
     {
-        $messages = $this->chatService->getMessages($conversationId);
+        $perPage = request()->get('per_page', 10);
+        $page = request()->get('page', 1);
+
+        $messages = $this->chatService->getMessages($conversationId, $perPage, $page);
 
         return response()->json([
             'message' => 'تم استرجاع الرسائل بنجاح',
-            'data' => ChatMessageResource::collection($messages)
+            'data' => ChatMessageResource::collection($messages),
+            'pagination' => (new PaginationService)->getPaginationData($messages),
         ]);
     }
 
     public function getUserConversations(): JsonResponse
     {
         $userId = auth()->id();
-        $conversations = $this->chatService->getUserConversations($userId);
-
+        $perPage = request()->get('per_page', 10);
+        $page = request()->get('page', 1);
+        $conversations = $this->chatService->getUserConversations($userId, $perPage, $page);
         return response()->json([
             'message' => 'User conversations retrieved successfully',
-            'data' => ConversationResource::collection($conversations)
+            'data' => ConversationResource::collection($conversations),
+            'pagination' => (new PaginationService)->getPaginationData($conversations),
         ]);
     }
 
     public function getConversations(): JsonResponse
     {
-        $conversations = $this->chatService->getConversations();
-
+        $perPage = request()->get('per_page', 10);
+        $page = request()->get('page', 1);
+        $conversations = $this->chatService->getConversations($perPage, $page);
         return response()->json([
             'message' => 'All conversations retrieved successfully',
-            'data' => ConversationResource::collection($conversations)
+            'data' => ConversationResource::collection($conversations),
+            'pagination' => (new PaginationService)->getPaginationData($conversations),
         ]);
     }
 }

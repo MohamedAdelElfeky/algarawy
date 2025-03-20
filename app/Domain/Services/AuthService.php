@@ -21,7 +21,7 @@ class AuthService
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return [
-                'message' => 'بيانات تسجيل الدخول غير صحيحة', 
+                'message' => 'بيانات تسجيل الدخول غير صحيحة',
                 'status' => Response::HTTP_UNAUTHORIZED
             ];
         }
@@ -90,10 +90,9 @@ class AuthService
 
     private function handleImageUploads($request, UserDetail $userDetail): void
     {
-        $imageFields = ['avatar', 'national_card_image_front', 'national_card_image_back'];
-
+        $imageFields = ['avatar', 'national_card_image_front', 'national_card_image_back', 'card_images'];
         foreach ($imageFields as $field) {
-            $this->uploadSingleImage($request, $userDetail, 'users', 'user', 'image', $field);
+            $this->uploadSingleImage($request, $userDetail, 'users', 'user',  $field, $field);
         }
     }
 }

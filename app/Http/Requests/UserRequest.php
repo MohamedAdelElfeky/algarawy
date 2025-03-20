@@ -45,7 +45,7 @@ class UserRequest extends FormRequest
             ],
             'another_name' => 'nullable|string|max:255',
             'phone_whatsapp' => [
-                'required',
+                'nullable',
                 'string',
                 'max:15',
                 Rule::unique('users', 'phone_whatsapp')->ignore($user->id ?? null),
