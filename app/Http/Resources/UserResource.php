@@ -18,16 +18,17 @@ class UserResource extends JsonResource
             'id'  => $this->id,
             'first_name' => $this->first_name,
             'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
+            'last_name' => $this->last_name ?? 'last',
             'personal_title' => $this->personal_title,
             'family_name' =>  'القرعاوي',
             'email' => $this->email,
             'phone' => $this->phone,
 
             'birthdate' => optional($this->details)->birthdate  ? optional($this->details)->birthdate : null,
-            'region' => optional($this->details)->region ? optional($this->details->region)->name : null,
-            'city' => optional($this->details->city)->name ? optional($this->details->city)->name : null,
-            'neighborhood' => optional($this->details->neighborhood)->name ? optional($this->details->neighborhood)->name : null,
+            'region' => optional(optional($this->details)->region)->name,
+            'city' => optional(optional($this->details)->city)->name,
+            'neighborhood' => optional(optional($this->details)->neighborhood)->name,
+
 
             'mobile_number_visibility' => $this->getBooleanSetting('mobile_number_visibility'),
             'birthdate_visibility' => $this->getBooleanSetting('birthdate_visibility'),
