@@ -7,6 +7,7 @@ use App\Domain\Chat\Services\ChatService;
 use App\Domain\Chat\DTOs\MessageDTO;
 use App\Domain\Chat\DTOs\ConversationDTO;
 use App\Domain\Services\PaginationService;
+use App\Events\MessageSent;
 use App\Http\Requests\ChatMessageRequest;
 use App\Http\Requests\CreateConversationRequest;
 use App\Http\Resources\ConversationResource;
@@ -47,6 +48,7 @@ class ChatController extends Controller
         );
 
         $message = $this->chatService->sendMessage($dto);
+        broadcast(new MessageSent($message))->toOthers();
 
         return response()->json([
             'message' => 'تم إرسال الرسالة بنجاح.',

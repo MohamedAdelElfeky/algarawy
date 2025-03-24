@@ -9,28 +9,28 @@ use Illuminate\Http\Request;
 
 class UserSettingController extends Controller
 {
-    
+
     public function __construct(private UserSettingService $userSettingService)
     {
         $this->middleware('auth:sanctum');
     }
 
     public function toggleShowNoComplaintedPosts()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $currentValue = $user->userSettings()
-        ->whereHas('setting', fn($query) => $query->where('key', 'show_no_complaints_posts'))
-        ->value('value') ?? false;
+        $currentValue = $user->userSettings()
+            ->whereHas('setting', fn($query) => $query->where('key', 'show_no_complaints_posts'))
+            ->value('value') ?? false;
 
-    $newValue = !$currentValue;
+        $newValue = !$currentValue;
 
-    $response = $this->userSettingService->toggleSetting('show_no_complaints_posts', $newValue);
+        $response = $this->userSettingService->toggleSetting('show_no_complaints_posts', $newValue);
 
-    $status = $response['success'] ? 200 : 400;
+        $status = $response['success'] ? 200 : 400;
 
-    return response()->json($response, $status);
-}
+        return response()->json($response, $status);
+    }
 
 
     public function toggleVisibility(Request $request)

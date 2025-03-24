@@ -10,7 +10,7 @@ class BankAccount extends Model
 {
     use HasFactory;
     protected $table = 'bank_accounts';
-    protected $fillable = ['account_number', 'iban', 'bank_name', 'swift_number', 'type', 'user_id'];
+    protected $fillable = ['account_number', 'iban', 'bank_name', 'swift_number', 'type', 'status', 'user_id'];
 
     public function user()
     {

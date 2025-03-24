@@ -11,7 +11,7 @@ class ChangePasswordRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,13 +22,8 @@ class ChangePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name'       => 'nullable|string',
-            'middle_name'       => 'nullable|string',
-            'last_name'        => 'nullable|string',
-            'email'            => 'nullable|email|unique:users,email,' . $this->user->id,
-            'phone'            => 'nullable|string|unique:users,phone,' . $this->user->id,
-            'avatar'           => 'nullable|image|mimes:jpeg,png,jpg,gif',
-            'is_avatar_deleted' => 'nullable|boolean',
+            'user_id' => 'required|exists:users,id',
+            'password' => 'required|min:6|confirmed',
         ];
     }
 }

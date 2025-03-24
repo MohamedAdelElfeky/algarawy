@@ -28,7 +28,7 @@ class User extends Authenticatable
         'middle_name',
         'last_name',
         'personal_title',
-        'occupation_id',
+        'occupation_category',
         'is_whatsapp',
         'email',
         'phone',

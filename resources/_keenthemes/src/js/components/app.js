@@ -682,3 +682,27 @@ var KTApp = function () {
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = KTApp;
 }
+
+import Pusher from "pusher-js";
+
+Pusher.logToConsole = true;
+
+let pusher = new Pusher("algarawyKey", {
+    cluster: "mt1",
+    wsHost: window.location.hostname,
+    wsPort: 6001,
+    forceTLS: false,
+    disableStats: true,
+    authEndpoint: "/broadcasting/auth",
+    auth: {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+    }
+});
+
+let channel = pusher.subscribe("private-chat.1"); 
+
+channel.bind("MessageSent", function (data) {
+    console.log("New message:", data);
+});

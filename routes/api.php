@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ComplaintController;
@@ -19,12 +19,14 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\JobApplicationController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\NeighborhoodController;
+use App\Http\Controllers\Api\SearchUserController;
 use App\Http\Controllers\Api\TermsAndConditionController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\OtpController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserSettingController;
 
 /*
@@ -54,7 +56,7 @@ Route::get('/cities', [CityController::class, 'index']);
 Route::get('/neighborhoods', [NeighborhoodController::class, 'index']);
 Route::get('/regions/{region}/cities', [CityController::class, 'getCitiesByRegion']);
 Route::get('/cities/{city}/neighborhoods', [NeighborhoodController::class, 'getNeighborhoodsByCity']);
-Route::get('/number-support', [UserController::class, 'numberSupport']);
+Route::get('/number-support', [SupportController::class, 'numberSupport']);
 
 Route::middleware(['blocked'])->group(function () {
     // User related routes
@@ -63,12 +65,12 @@ Route::middleware(['blocked'])->group(function () {
         Route::get('/courses', [UserController::class, 'getCourses']);
         Route::get('/data', [UserController::class, 'getUser']);
 
-        Route::post('/toggle-visibility', [UserSettingController::class, 'toggleVisibility']);
         Route::get('/getDataUser/{user}', [UserController::class, 'getDataUser']);
         Route::put('/update/{user}', [UserController::class, 'updateProfile']);
-        Route::get('/search', [UserController::class, 'searchUser']);
-        Route::get('/notifications', [UserController::class, 'getNotificationsForUser']);
         Route::put('/changePassword', [UserController::class, 'changePassword']);
+        Route::get('/notifications', [UserController::class, 'getNotificationsForUser']);
+        Route::post('/toggle-visibility', [UserSettingController::class, 'toggleVisibility']);
+        Route::get('/search', [SearchUserController::class, 'searchUser']);
     });
     Route::post('/toggle-show-complainted', [UserSettingController::class, 'toggleShowNoComplaintedPosts']);
     Route::put('/notifications/AsRead/{notification}', [NotificationController::class, 'markNotificationAsRead']);
@@ -93,14 +95,16 @@ Route::middleware(['blocked'])->group(function () {
 
     Route::get('/user/favorites', [FavoriteController::class, 'getUserFavorites']);
     Route::post('/p-add-favorite/{type}/{id}', [FavoriteController::class, 'toggleFavorite']);
+    
     Route::post('/p-add-like/{type}/{id}', [LikeController::class, 'toggleLike']);
-    Route::post('/p-add-complaint/{type}/{id}', [ComplaintController::class, 'toggleComplaint']);
-    Route::get('/p-show-complaint/{type}/{id}', [ComplaintController::class, 'showComplaints']);
 
+  
     Route::post('/terms-and-conditions', [TermsAndConditionController::class, 'createOrUpdate']);
+
     Route::post('/complaints/{complaintId}/edit', [ComplaintController::class, 'editComplaint']);
     Route::delete('/complaints/{complaintId}', [ComplaintController::class, 'deleteComplaint']);
-
+    Route::post('/p-add-complaint/{type}/{id}', [ComplaintController::class, 'toggleComplaint']);
+    Route::get('/p-show-complaint/{type}/{id}', [ComplaintController::class, 'showComplaints']);
 
     // Search
     Route::get('/p-projectsSearch', [ProjectController::class, 'search']);
@@ -115,8 +119,8 @@ Route::middleware(['blocked'])->group(function () {
         Route::get('/getSavings', [BankAccountController::class, 'getSavings']);
         Route::get('/getCharities', [BankAccountController::class, 'getCharities']);
     });
-
     Route::get('/getCharityAndSavingBankAccounts', [BankAccountController::class, 'getCharityAndSavingBankAccounts']);
+
 
     Route::prefix('job-applications')->group(function () {
         Route::get('/count/{jobId}', [JobApplicationController::class, 'getJobApplicationCount']);

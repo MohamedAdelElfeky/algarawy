@@ -108,4 +108,5 @@ return [
     'preview_image' => 'عرض الصوره',
     'occupation_category' => 'قسم التخصص',
     'phone_whatsapp' => 'هاتف واتساب',
+    'birthdate' => 'تاريخ الميلاد',
 ];

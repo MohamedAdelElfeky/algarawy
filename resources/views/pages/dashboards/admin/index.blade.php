@@ -26,6 +26,7 @@
                             <th> {{ __('lang.image_profile') }}</th>
                             <th> {{ __('lang.image_card_from') }}</th>
                             <th> {{ __('lang.image_card_back') }}</th>
+                            <th> {{ __('lang.birthdate') }}</th>
                             <th> {{ __('lang.national_id') }}</th>
                             <th> {{ __('lang.action') }}</th>
 
@@ -33,7 +34,9 @@
                         <tbody>
                             @foreach ($users as $user)
                                 <tr>
-                                    <td>{{ $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name . 'القرعاوي'}}</td>
+                                    <td>
+                                        {{ $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name . ' ' . 'القرعاوي' }}
+                                    </td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->phone }}</td>
                                     <td>{{ $user->occupation_category }}</td>

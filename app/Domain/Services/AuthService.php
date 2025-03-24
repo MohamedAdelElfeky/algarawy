@@ -4,12 +4,14 @@ namespace App\Domain\Services;
 
 use App\Models\User;
 use App\Domain\Models\UserDetail;
+use App\Domain\Models\UserSetting;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Shared\Traits\HandlesSingleImageUpload;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use Spatie\Permission\Models\Role;
 
 class AuthService
 {
@@ -39,7 +41,23 @@ class AuthService
             $user = $this->createOrUpdateUser($validatedData);
             $userDetail = $this->createOrUpdateUserDetail($user, $validatedData);
             $this->handleImageUploads($request, $userDetail);
+            $userRole = Role::firstOrCreate(['name' => 'user']);
+            $user->assignRole($userRole);
 
+            $settings = [
+                'mobile_number_visibility' => true,
+                'birthdate_visibility' => true,
+                'email_visibility' => true,
+                'registration_confirmed' => false,
+                'show_no_complaints_posts' => true,
+            ];
+
+            foreach ($settings as $key => $value) {
+                UserSetting::updateOrCreate(
+                    ['user_id' => $user->id, 'setting_id' => $this->getSettingIdByName($key)],
+                    ['value' => $value]
+                );
+            }
             return [
                 'message' => 'تم التسجيل بنجاح',
                 'user' => new UserResource($user),
@@ -71,6 +89,8 @@ class AuthService
                 'phone' => $data['phone'],
                 'password' => bcrypt($data['password']),
                 'national_id' => $data['national_id'],
+                'occupation_category' => $data['occupation_category'] ?? null,
+                'is_whatsapp' => $data['is_whatsapp'] ?? false,
             ]
         );
     }
@@ -94,5 +114,9 @@ class AuthService
         foreach ($imageFields as $field) {
             $this->uploadSingleImage($request, $userDetail, 'users', 'user',  $field, $field);
         }
+    }
+    private function getSettingIdByName($name)
+    {
+        return \App\Domain\Models\Setting::where('key', $name)->value('id');
     }
 }

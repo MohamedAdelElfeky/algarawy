@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Services\SupportService;
 use App\Http\Requests\SupportRequest;
+use Illuminate\Http\JsonResponse;
 
 class SupportController extends Controller
 {
@@ -23,5 +24,13 @@ class SupportController extends Controller
     {
         $this->supportService->updateSupportDetails($request->validated());
         return redirect()->route('support')->with('success', 'تمت إضافة / تحديث الدعم بنجاح');
+    }
+
+    public function numberSupport(): JsonResponse
+    {
+        $support = $this->supportService->getSupportDetails();
+        $number = $support?->number;
+
+        return response()->json(['number' => $number]);
     }
 }

@@ -25,7 +25,9 @@ class UserRequest extends FormRequest
 
         return [
             'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['nullable', 'string', 'max:255'],
+            'personal_title' => ['nullable', 'string', 'max:255'],
             'email' => [
                 'required',
                 'email',
@@ -42,17 +44,12 @@ class UserRequest extends FormRequest
                 'string',
                 'max:15',
                 Rule::unique('users', 'national_id')->ignore($user->id ?? null),
-            ],
-            'another_name' => 'nullable|string|max:255',
-            'phone_whatsapp' => [
-                'nullable',
-                'string',
-                'max:15',
-                Rule::unique('users', 'phone_whatsapp')->ignore($user->id ?? null),
-            ],
+            ],           
             'occupation_category' => 'nullable|string|max:255',
+            'is_whatsapp' => 'nullable|boolean',
+            'occupation_id' => ['nullable', 'integer', 'exists:occupations,id'],
             'password' => [$this->isMethod('post') ? 'required' : 'nullable', 'string', 'min:6'],
-            'birthdate' => ['nullable', 'date'],
+            'birth_date' => ['nullable', 'date'],
             'region_id' => ['nullable', 'integer', 'exists:regions,id'],
             'city_id' => ['nullable', 'integer', 'exists:cities,id'],
             'neighborhood_id' => ['nullable', 'integer', 'exists:neighborhoods,id'],

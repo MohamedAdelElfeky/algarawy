@@ -11,7 +11,7 @@ class UpdateProfileRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,9 +21,14 @@ class UpdateProfileRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = auth()->id();
         return [
-            'old_password' => 'required',
-            'password'     => 'required|confirmed|min:6',
+           'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'email' => 'nullable|email|unique:users,email,' . $userId,
+            'phone' => 'nullable|string|unique:users,phone,' . $userId,
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'is_avatar_deleted' => 'nullable|boolean',
         ];
     }
 }

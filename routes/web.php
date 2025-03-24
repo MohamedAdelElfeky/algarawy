@@ -19,6 +19,7 @@ use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserWebController;
 use App\Http\Controllers\VisibilityController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,15 +41,15 @@ require __DIR__ . '/auth.php';
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
     ->middleware('auth');
 Route::middleware('auth')->group(function () {
-
-    Route::get('/users', [UserController::class, 'getAllUsers'])->name('users.index');
-    Route::get('/users', [UserController::class, 'show'])->name('user');
+   
+    
+    Route::get('/admin', [UserWebController::class, 'admin'])->name('admin');
+    Route::post('/admin/add-user', [UserWebController::class, 'addUser'])->name('addUser');
+    Route::get('/userActive', [UserWebController::class, 'userActive'])->name('userActive');
+    Route::get('/userNotActive', [UserWebController::class, 'userNotActive'])->name('userNotActive');
+    Route::post('/changePasswordByAdmin', [UserWebController::class, 'changePasswordByAdmin'])->name('changePasswordByAdmin');
+    
     Route::post('/toggle-user/{id}', [UserController::class, 'toggleUser']);
-    Route::get('/admin', [UserController::class, 'admin'])->name('admin');
-    Route::post('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
-    Route::get('/userActive', [UserController::class, 'userActive'])->name('userActive');
-    Route::get('/userNotActive', [UserController::class, 'userNotActive'])->name('userNotActive');
-    Route::post('/changePasswordByAdmin', [UserController::class, 'changePasswordByAdmin'])->name('changePasswordByAdmin');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

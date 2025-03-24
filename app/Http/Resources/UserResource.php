@@ -23,6 +23,8 @@ class UserResource extends JsonResource
             'family_name' =>  'القرعاوي',
             'email' => $this->email,
             'phone' => $this->phone,
+            'occupation_category' => $this->occupation_category,
+            'is_whatsapp' => $this->is_whatsapp,
 
             'birthdate' => optional($this->details)->birthdate  ? optional($this->details)->birthdate : null,
             'region' => optional(optional($this->details)->region)->name,
