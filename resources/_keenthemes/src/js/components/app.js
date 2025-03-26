@@ -701,7 +701,7 @@ let pusher = new Pusher("f21df2635ce1f863c7a8", {
     }
 });
 
-let channel = pusher.subscribe("private-chat.1"); 
+let channel = pusher.subscribe("chat.1"); 
 
 channel.bind("MessageSent", function (data) {
     console.log("New message:", data);
