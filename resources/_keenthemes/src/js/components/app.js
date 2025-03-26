@@ -687,7 +687,7 @@ import Pusher from "pusher-js";
 
 Pusher.logToConsole = true;
 
-let pusher = new Pusher("algarawyKey", {
+let pusher = new Pusher("f21df2635ce1f863c7a8", {
     cluster: "mt1",
     wsHost: window.location.hostname,
     wsPort: 6001,

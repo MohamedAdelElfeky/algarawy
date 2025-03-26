@@ -14,7 +14,7 @@
     <meta property="og:type" content="article"/>
     <meta property="og:title" content=""/>
     <link rel="canonical" href=""/>
-
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     {!! includeFavicon() !!}
 
     <!--begin::Fonts-->
