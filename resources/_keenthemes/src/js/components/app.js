@@ -691,7 +691,9 @@ let pusher = new Pusher("f21df2635ce1f863c7a8", {
     cluster: "mt1",
     wsHost: window.location.hostname,
     wsPort: 6001,
-    forceTLS: false,
+    wssPort: 6001,
+    forceTLS: true,
+    enabledTransports: ['ws', 'wss'],
     disableStats: true,
     authEndpoint: "/broadcasting/auth",
     auth: {
