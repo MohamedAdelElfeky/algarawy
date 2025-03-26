@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Chat\Models\Message;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -41,14 +42,14 @@ require __DIR__ . '/auth.php';
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
     ->middleware('auth');
 Route::middleware('auth')->group(function () {
-   
-    
+
+
     Route::get('/admin', [UserWebController::class, 'admin'])->name('admin');
     Route::post('/admin/add-user', [UserWebController::class, 'addUser'])->name('addUser');
     Route::get('/userActive', [UserWebController::class, 'userActive'])->name('userActive');
     Route::get('/userNotActive', [UserWebController::class, 'userNotActive'])->name('userNotActive');
     Route::post('/changePasswordByAdmin', [UserWebController::class, 'changePasswordByAdmin'])->name('changePasswordByAdmin');
-    
+
     Route::post('/toggle-user/{id}', [UserController::class, 'toggleUser']);
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -99,3 +100,17 @@ Route::get('/error', function () {
 });
 
 Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
+Route::get('/test-websocket', function () {
+    // Trigger an event for testing
+    \Illuminate\Support\Facades\Broadcast::channel('messages', function () {
+        return true;
+    });
+    $object = new  Message();
+    $object->id = 1;
+    $object->conversation_id = 1;
+    $object->user_id = 2;
+    $object->message = "Hello from WebSocket!";
+
+    event(new \App\Events\MessageSent($object));
+    return 'WebSocket event sent!';
+});
