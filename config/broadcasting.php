@@ -38,9 +38,13 @@ return [
             'options' => [
                 'host' => env('PUSHER_HOST', '127.0.0.1'),
                 'port' => env('PUSHER_PORT', 6001),
-                'scheme' => env('PUSHER_SCHEME', 'http'),
-                'useTLS' => false,
-                'encrypted' => false,
+                'scheme' => env('PUSHER_SCHEME', 'https'),
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'encrypted' => true,
+                'curl_options' => [
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_SSL_VERIFYPEER => 0,
+                ],
             ],
         ],
 
