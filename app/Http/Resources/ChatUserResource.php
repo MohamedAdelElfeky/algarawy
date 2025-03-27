@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class ChatUserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,30 +18,18 @@ class UserResource extends JsonResource
             'id'  => $this->id,
             'first_name' => $this->first_name,
             'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name ?? '-',
+            'last_name' => $this->last_name,
             'personal_title' => $this->personal_title,
             'family_name' =>  'القرعاوي',
-            'email' => $this->email,
-            'phone' => $this->phone,
+            'email' => $this->getBooleanSetting('email_visibility') ? $this->email : null,
+            'phone' => $this->getBooleanSetting('mobile_number_visibility') ? $this->phone : null,
             'occupation_category' => $this->occupation_category,
             'is_whatsapp' => $this->is_whatsapp,
-
-            'birthdate' => optional($this->details)->birthdate  ? optional($this->details)->birthdate : null,
+            'birthdate' => $this->getBooleanSetting('birthdate_visibility') ? optional($this->details)->birthdate : null,
             'region' => optional(optional($this->details)->region)->name,
             'city' => optional(optional($this->details)->city)->name,
             'neighborhood' => optional(optional($this->details)->neighborhood)->name,
-
-
-            'mobile_number_visibility' => $this->getBooleanSetting('mobile_number_visibility'),
-            'birthdate_visibility' => $this->getBooleanSetting('birthdate_visibility'),
-            'email_visibility' => $this->getBooleanSetting('email_visibility'),
-            'show_no_complaints_posts' => $this->getBooleanSetting('show_no_complaints_posts'),
-            'registration_confirmed' => $this->getBooleanSetting('registration_confirmed'),
-
             'avatar' => $this->getImageByType('avatar'),
-            'national_card_image_front' => $this->getImageByType('national_card_image_front'),
-            'national_card_image_back' => $this->getImageByType('national_card_image_back'),
-            'card_images' => $this->getImageByType('card_images'),
         ];
     }
 

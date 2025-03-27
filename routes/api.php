@@ -134,5 +134,6 @@ Route::middleware(['blocked'])->group(function () {
         Route::get('/messages/{id}', [ChatController::class, 'getMessages']);
         Route::get('/Conversations', [ChatController::class, 'getConversations']);
         Route::get('/user/Conversations', [ChatController::class, 'getUserConversations']);
+        Route::get('/conversations/{conversationId}/participants', [ChatController::class, 'getConversationParticipants']);
     });
 });

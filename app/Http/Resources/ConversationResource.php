@@ -18,10 +18,13 @@ class ConversationResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type,
             'name' => $this->name,
-            'participants' => ConversationParticipantResource::collection($this->whenLoaded('participants')),
+            'participants' => $this->participants->pluck('user_id')->toArray(),
             'messages' => ChatMessageResource::collection($this->whenLoaded('messages')),
-            'last_message' => new ChatMessageResource($this->messages()->latest()->first()), 
+            'last_message' => new ChatMessageResource($this->messages()->latest()->first()),
+            'last_created_at_message' => optional($this->messages()->latest('created_at')->first())->created_at?->format('Y-m-d H:i:s'),
+            'last_updated_at_message' => optional($this->messages()->latest('updated_at')->first())->updated_at?->format('Y-m-d H:i:s'),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 }

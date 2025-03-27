@@ -6,6 +6,7 @@ use App\Domain\Chat\Models\Conversation;
 use App\Domain\Chat\Models\Message;
 use App\Domain\Chat\DTOs\MessageDTO;
 use App\Domain\Chat\DTOs\ConversationDTO;
+use App\Domain\Chat\Models\ConversationParticipant;
 
 class ChatRepository
 {
@@ -59,6 +60,18 @@ class ChatRepository
     public function getConversations(?int $perPage = null, ?int $page = null)
     {
         $query = Conversation::with('participants');
+
+        if ($perPage && $page) {
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $query->get();
+    }
+
+    public function getConversationParticipants(int $conversationId, ?int $perPage = null, ?int $page = null)
+    {
+        $query = ConversationParticipant::with('user')
+            ->where('conversation_id', $conversationId);
 
         if ($perPage && $page) {
             return $query->paginate($perPage, ['*'], 'page', $page);

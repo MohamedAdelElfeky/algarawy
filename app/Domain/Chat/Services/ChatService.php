@@ -14,7 +14,7 @@ class ChatService
     {
         $this->chatRepository = $chatRepository;
     }
-   
+
     public function createConversation(ConversationDTO $dto)
     {
         return $this->chatRepository->createConversation($dto);
@@ -29,16 +29,20 @@ class ChatService
     {
         return $this->chatRepository->getMessages($conversationId, $perPage, $page);
     }
-    
+
     public function getUserConversations(int $userId, ?int $perPage = null, ?int $page = null)
     {
         return $this->chatRepository->getUserConversations($userId, $perPage, $page);
     }
-    
+
     public function getConversations(?int $perPage = null, ?int $page = null)
     {
         return $this->chatRepository->getConversations($perPage, $page);
     }
-    
+
+    public function getConversationParticipants(int $conversationId, ?int $perPage = null, ?int $page = null)
+    {
+        return $this->chatRepository->getConversationParticipants($conversationId, $perPage, $page);
+    }
     
 }

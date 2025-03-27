@@ -12,6 +12,7 @@ use App\Http\Requests\ChatMessageRequest;
 use App\Http\Requests\CreateConversationRequest;
 use App\Http\Resources\ConversationResource;
 use App\Http\Resources\ChatMessageResource;
+use App\Http\Resources\ConversationParticipantResource;
 use Illuminate\Http\JsonResponse;
 
 class ChatController extends Controller
@@ -83,15 +84,17 @@ class ChatController extends Controller
         ]);
     }
 
-    public function getConversations(): JsonResponse
+    public function getConversationParticipants(int $conversationId): JsonResponse
     {
         $perPage = request()->get('per_page', 10);
         $page = request()->get('page', 1);
-        $conversations = $this->chatService->getConversations($perPage, $page);
+
+        $participants = $this->chatService->getConversationParticipants($conversationId, $perPage, $page);
+
         return response()->json([
-            'message' => 'All conversations retrieved successfully',
-            'data' => ConversationResource::collection($conversations),
-            'pagination' => (new PaginationService)->getPaginationData($conversations),
+            'message' => 'Participants retrieved successfully',
+            'data' => ConversationParticipantResource::collection($participants),  
+            'pagination' => (new PaginationService())->getPaginationData($participants)
         ]);
     }
 }
