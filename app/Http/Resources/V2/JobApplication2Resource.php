@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\V2;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ChatMessageResource extends JsonResource
+class JobApplication2Resource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
+
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
-            'conversation_id' => $this->conversation_id,
-            'user' => new ChatUserResource($this->user),
-            'message' => $this->message,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'user' => new UserResource($this->user),
+            'files' => $this->pdfs,
+            'applied_date' => $this->created_at->toDateTimeString(),
         ];
     }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\V2;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ChatMessageResource extends JsonResource
+class ComplaintResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,9 @@ class ChatMessageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'conversation_id' => $this->conversation_id,
-            'user' => new ChatUserResource($this->user),
-            'message' => $this->message,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'comment' => $this->comment,
+            'user' => new UserResource($this->user),
+            'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
         ];
     }
 }

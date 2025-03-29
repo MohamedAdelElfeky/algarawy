@@ -6,13 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Domain\Chat\Services\ChatService;
 use App\Domain\Chat\DTOs\MessageDTO;
 use App\Domain\Chat\DTOs\ConversationDTO;
+use App\Domain\Chat\Models\Conversation;
 use App\Domain\Services\PaginationService;
 use App\Events\MessageSent;
+use App\Http\Requests\AddParticipantsRequest;
 use App\Http\Requests\ChatMessageRequest;
 use App\Http\Requests\CreateConversationRequest;
 use App\Http\Resources\ConversationResource;
 use App\Http\Resources\ChatMessageResource;
+use App\Http\Resources\ConversationParticipantResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Kreait\Firebase\Contract\Firestore;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
 
 class ChatController extends Controller
 {
@@ -30,8 +37,8 @@ class ChatController extends Controller
             user_ids: $validatedData['user_ids']
         );
 
-        $conversation = $this->chatService->createConversation($conversationDTO);
-
+        $conversation = $this->chatService->createConversation($conversationDTO, $request);
+        $this->chatService->addParticipants($conversation->id, $validatedData['user_ids']);
         return response()->json([
             'message' => 'تم إنشاء المحادثة بنجاح.',
             'data' => new ConversationResource($conversation)
@@ -48,8 +55,7 @@ class ChatController extends Controller
         );
 
         $message = $this->chatService->sendMessage($dto);
-        broadcast(new MessageSent($message))->toOthers();
-
+       
         return response()->json([
             'message' => 'تم إرسال الرسالة بنجاح.',
             'data' => new ChatMessageResource($message)
@@ -83,15 +89,42 @@ class ChatController extends Controller
         ]);
     }
 
-    public function getConversations(): JsonResponse
+    public function getConversationParticipants(int $conversationId): JsonResponse
     {
         $perPage = request()->get('per_page', 10);
         $page = request()->get('page', 1);
-        $conversations = $this->chatService->getConversations($perPage, $page);
+
+        $participants = $this->chatService->getConversationParticipants($conversationId, $perPage, $page);
+
         return response()->json([
-            'message' => 'All conversations retrieved successfully',
-            'data' => ConversationResource::collection($conversations),
-            'pagination' => (new PaginationService)->getPaginationData($conversations),
+            'message' => 'Participants retrieved successfully',
+            'data' => ConversationParticipantResource::collection($participants),
+            'pagination' => (new PaginationService())->getPaginationData($participants)
         ]);
     }
+
+    public function addParticipantsToConversation(AddParticipantsRequest $request, $conversationId): JsonResponse
+    {
+        $participants = $this->chatService->addParticipantsToConversation($conversationId, $request->user_ids);
+        $this->chatService->addParticipants($conversationId, $request->user_ids);
+        return response()->json([
+            'message' => 'تمت إضافة المستخدمين بنجاح',
+            'data' => ConversationParticipantResource::collection($participants)
+        ]);
+    }
+
+    public function updatePhoto(Request$request, Conversation $conversation): JsonResponse
+{
+    $request->validate([
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    $updatedConversation = $this->chatService->updateConversationPhoto($request, $conversation);
+
+    return response()->json([
+        'message' => 'تم تحديث صورة المحادثة بنجاح.',
+        'data' => new ConversationResource($updatedConversation),
+    ]);
+}
+
 }

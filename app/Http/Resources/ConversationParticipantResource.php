@@ -16,7 +16,7 @@ class ConversationParticipantResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user' => new UserResource($this->user),
+            'user' => new ChatUserResource($this->user),
         ];
     }
 }
