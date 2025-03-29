@@ -85,6 +85,8 @@ class AuthService
             [
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
+                'middle_name' => $data['middle_name'] ?? null,
+                'personal_title' => $data['personal_title'] ?? null,
                 'email' => $data['email'],
                 'phone' => $data['phone'],
                 'password' => bcrypt($data['password']),
