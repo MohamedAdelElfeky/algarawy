@@ -19,6 +19,7 @@ class ConversationResource extends JsonResource
             'type' => $this->type,
             'name' => $this->name,
             'participants' => $this->participants->pluck('user_id')->toArray(),
+            'image' => $this->images ? ImageResource::collection($this->images) : null,
             'messages' => ChatMessageResource::collection($this->whenLoaded('messages')),
             'last_message' => new ChatMessageResource($this->messages()->latest()->first()),
             'last_created_at_message' => optional($this->messages()->latest('created_at')->first())->created_at?->format('Y-m-d H:i:s'),

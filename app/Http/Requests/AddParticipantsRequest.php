@@ -4,36 +4,37 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateConversationRequest extends FormRequest
+class AddParticipantsRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
-
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'type' => 'required|string|in:group,private,public',
             'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:users,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-
+            'user_ids.*' => 'exists:users,id'
         ];
     }
-
-    public function messages(): array
-    {
-        return [];
-    }
- 
-    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
         throw new \Illuminate\Validation\ValidationException($validator, response()->json([
             'message' => 'خطأ في التحقق من البيانات',
             'errors' => $validator->errors()->first(),
         ], 422));
+    }
+    public function messages(): array
+    {
+        return [];
     }
 }
