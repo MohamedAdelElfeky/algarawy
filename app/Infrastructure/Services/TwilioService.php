@@ -15,7 +15,7 @@ class TwilioService implements TwilioVerificationService
     public function __construct()
     {
         $this->twilio = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
-        $this->twilioPhoneNumber = env('TWILIO_FROM'); 
+        $this->twilioPhoneNumber = env('TWILIO_FROM');
     }
 
     public function sendOtp(PhoneNumber $phone): bool
@@ -60,16 +60,17 @@ class TwilioService implements TwilioVerificationService
             $this->twilio->messages->create(
                 $phone->getValue(),
                 [
-                    'from' => $this->twilioPhoneNumber, 
+                    'from' => $this->twilioPhoneNumber,
                     // 'from' => env('TWILIO_MESSAGE_SID'),
                     'messagingServiceSid' => env('TWILIO_MESSAGE_SID'),
-                    'body' => $message 
+                    'body' => $message
                 ]
             );
 
             return true;
         } catch (\Exception $e) {
-            throw new \Exception('فشل إرسال الرسالة: ' . $e->getMessage());
+            \Log::error("فشل التحقق من الرقم: " . $e->getMessage());
+            return false;
         }
     }
 }
