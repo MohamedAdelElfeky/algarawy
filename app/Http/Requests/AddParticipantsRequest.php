@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class AddParticipantsRequest extends FormRequest
 {
@@ -28,9 +29,12 @@ class AddParticipantsRequest extends FormRequest
     }
     public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        throw new \Illuminate\Validation\ValidationException($validator, response()->json([
-            'message' => 'خطأ في التحقق من البيانات',
-            'errors' => $validator->errors()->first(),
+        $firstError = collect($validator->errors()->all())->first();
+
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'error' => 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى',
+            'message' => $firstError,
         ], 422));
     }
     public function messages(): array

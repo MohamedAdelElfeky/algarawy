@@ -66,8 +66,8 @@ class UserRequest extends FormRequest
 
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى',
-            'error' => $firstError,
+            'error' => 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى',
+            'message' => $firstError,
         ], 422));
     }
 

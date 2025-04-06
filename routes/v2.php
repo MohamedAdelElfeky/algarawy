@@ -2,7 +2,8 @@
 
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V2\BlockedUserController;
+use App\Http\Controllers\Api\V2\SearchUserController;
+
 /*
 |--------------------------------------------------------------------------
 | V2 Routes
@@ -16,5 +17,6 @@ use App\Http\Controllers\Api\V2\BlockedUserController;
 
 
 Route::middleware(['blocked'])->group(function () {
+    Route::get('user/search', [SearchUserController::class, 'searchUser']);
    
 });
