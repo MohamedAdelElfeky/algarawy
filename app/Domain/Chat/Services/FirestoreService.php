@@ -5,6 +5,7 @@ namespace App\Domain\Chat\Services;
 use Google\Cloud\Firestore\FirestoreClient;
 use Kreait\Firebase\Factory;
 use App\Domain\Chat\Models\Conversation;
+use App\Domain\Chat\Models\Message;
 
 class FirestoreService
 {
@@ -18,47 +19,73 @@ class FirestoreService
             ->database();
     }
 
-    public function storeMessage($message)
+    public function syncConversation(Conversation $conversation, Message $message = null)
     {
-        $conversationId = (string) $message->conversation_id;
-        $conversation = Conversation::find($conversationId);
+        $conversationId = (string) $conversation->id;
+
+        $participants = $conversation->participants()->pluck('user_id')->map(fn($id) => (string) $id)->toArray();
+
+        $data = [
+            'id' => $conversationId,
+            'type' => $conversation->type,
+            'name' => $conversation->name,
+            'participants' => $participants,
+            'image' => $conversation->image ?? null,
+            'created_at' => $conversation->created_at->toDateTimeString(),
+            'updated_at' => now()->toDateTimeString(),
+        ];
+
+        if ($message) {
+            $data['last_message'] = [
+                'message' => $message->message,
+                'user_id' => (string) $message->user_id,
+                'created_at' => now()->toDateTimeString(),
+            ];
+        }
+
+        $this->firestore->collection('conversations')
+            ->document($conversationId)
+            ->set($data);
+    }
+
+    public function storeMessage(Message $message)
+    {
+        $conversation = $message->conversation;
 
         if (!$conversation) {
             return;
         }
 
-        $participants = $conversation->participants()->pluck('user_id')->map(fn($id) => (string) $id)->toArray();
-
-        $this->firestore->collection('conversations')
-            ->document($conversationId)
-            ->set([
-                'conversation_id' => $conversationId,
-                'conversation_name' => $conversation->name,
-                'type' => $conversation->type,
-                'created_at' => $conversation->created_at->toDateTimeString(),
-                'updated_at' => now()->toDateTimeString(),
-                'participants' => $participants, 
-            ], ['merge' => true]);
-
+        $conversationId = (string) $conversation->id;
+        $this->syncConversation($conversation, $message);
         $this->firestore->collection('conversations')
             ->document($conversationId)
             ->collection('messages')
             ->add([
-                'user_id' => (string) $message->user_id,
+                'id' => (string) $message->id,
+                'conversation_id' => $conversationId,
+                'user' => [
+                    'id' => (string) $message->user->id,
+                    'name' => $message->user->name,
+                    'image' => $message->user->image ?? null,
+                ],
                 'message' => $message->message,
-                'created_at' => now()->toDateTimeString(),
-                // 'participants' => $participants, 
+                'created_at' => $message->created_at->format('Y-m-d H:i:s'),
             ]);
     }
 
     public function addParticipants($conversationId, array $userIds)
     {
         $conversationRef = $this->firestore->collection('conversations')->document((string) $conversationId);
-        $conversationData = $conversationRef->snapshot()->data();
-        
-        $existingParticipants = $conversationData['participants'] ?? [];
-        $newParticipants = array_unique(array_merge($existingParticipants, $userIds));
+        $snapshot = $conversationRef->snapshot();
 
+        if (!$snapshot->exists()) {
+            return;
+        }
+
+        $existingParticipants = $snapshot->data()['participants'] ?? [];
+        $newParticipants = array_unique(array_merge($existingParticipants, $userIds));
+        
         $conversationRef->set(['participants' => $newParticipants], ['merge' => true]);
     }
 }
