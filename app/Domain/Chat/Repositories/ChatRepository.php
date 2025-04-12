@@ -93,4 +93,13 @@ class ChatRepository
 
         return $conversation->participants;
     }
+    
+    public function removeParticipants(int $conversationId, array $userIds)
+    {
+        $conversation = Conversation::findOrFail($conversationId);
+
+        $conversation->participants()->whereIn('user_id', $userIds)->delete();
+
+        return $conversation->participants;
+    }
 }

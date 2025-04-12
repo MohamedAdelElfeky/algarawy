@@ -65,6 +65,10 @@ class ChatService
 
     public function updateConversationPhoto(Request $request, Conversation $conversation)
     {
+        if ($request->filled('name')) {
+            $conversation->name = $request->input('name');
+            $conversation->save();
+        }
         if ($request->hasFile('image')) {
             $oldImage = $conversation->images()->first();
 
@@ -76,5 +80,10 @@ class ChatService
         }
 
         return $conversation->load('images');
+    }
+
+    public function removeParticipantsFromConversation(int $conversationId, array $userIds)
+    {
+        return $this->chatRepository->removeParticipants($conversationId, $userIds);
     }
 }

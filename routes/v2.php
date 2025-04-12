@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\Api\ChatController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V2\SearchUserController;
 
@@ -18,5 +18,7 @@ use App\Http\Controllers\Api\V2\SearchUserController;
 
 Route::middleware(['blocked'])->group(function () {
     Route::get('user/search', [SearchUserController::class, 'searchUser']);
+    Route::delete('/conversations/{id}/participants', [ChatController::class, 'removeParticipantsFromConversation']);
+
    
 });

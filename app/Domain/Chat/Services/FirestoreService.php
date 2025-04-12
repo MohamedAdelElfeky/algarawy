@@ -6,6 +6,7 @@ use Google\Cloud\Firestore\FirestoreClient;
 use Kreait\Firebase\Factory;
 use App\Domain\Chat\Models\Conversation;
 use App\Domain\Chat\Models\Message;
+use App\Http\Resources\ChatUserResource;
 
 class FirestoreService
 {
@@ -37,8 +38,9 @@ class FirestoreService
 
         if ($message) {
             $data['last_message'] = [
+                'id' => (string) $message->id,
                 'message' => $message->message,
-                'user_id' => (string) $message->user_id,
+                'user' => (new ChatUserResource($message->user))->resolve(),
                 'created_at' => now()->toDateTimeString(),
             ];
         }
@@ -57,18 +59,16 @@ class FirestoreService
         }
 
         $conversationId = (string) $conversation->id;
+        $messageId = (string) $message->id;
         $this->syncConversation($conversation, $message);
         $this->firestore->collection('conversations')
             ->document($conversationId)
             ->collection('messages')
-            ->add([
-                'id' => (string) $message->id,
+            ->document($messageId)
+            ->set([
+                'id' => $messageId,
                 'conversation_id' => $conversationId,
-                'user' => [
-                    'id' => (string) $message->user->id,
-                    'name' => $message->user->name,
-                    'image' => $message->user->image ?? null,
-                ],
+                'user' => (new ChatUserResource($message->user))->resolve(),
                 'message' => $message->message,
                 'created_at' => $message->created_at->format('Y-m-d H:i:s'),
             ]);
@@ -85,7 +85,7 @@ class FirestoreService
 
         $existingParticipants = $snapshot->data()['participants'] ?? [];
         $newParticipants = array_unique(array_merge($existingParticipants, $userIds));
-        
+
         $conversationRef->set(['participants' => $newParticipants], ['merge' => true]);
     }
 }

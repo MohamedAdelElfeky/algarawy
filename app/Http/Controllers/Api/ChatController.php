@@ -55,7 +55,7 @@ class ChatController extends Controller
         );
 
         $message = $this->chatService->sendMessage($dto);
-       
+
         return response()->json([
             'message' => 'تم إرسال الرسالة بنجاح.',
             'data' => new ChatMessageResource($message)
@@ -113,18 +113,33 @@ class ChatController extends Controller
         ]);
     }
 
-    public function updatePhoto(Request$request, Conversation $conversation): JsonResponse
-{
-    $request->validate([
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+    public function updatePhoto(Request $request, Conversation $conversation): JsonResponse
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name' => 'nulled|string|max:255',
+        ]);
 
-    $updatedConversation = $this->chatService->updateConversationPhoto($request, $conversation);
+        $updatedConversation = $this->chatService->updateConversationPhoto($request, $conversation);
 
-    return response()->json([
-        'message' => 'تم تحديث صورة المحادثة بنجاح.',
-        'data' => new ConversationResource($updatedConversation),
-    ]);
-}
+        return response()->json([
+            'message' => 'تم تحديث صورة المحادثة بنجاح.',
+            'data' => new ConversationResource($updatedConversation),
+        ]);
+    }
 
+    public function removeParticipantsFromConversation(Request $request, $conversationId): JsonResponse
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $participants = $this->chatService->removeParticipantsFromConversation($conversationId, $request->user_ids);
+
+        return response()->json([
+            'message' => 'تمت إزالة المستخدمين بنجاح',
+            'data' => ConversationParticipantResource::collection($participants)
+        ]);
+    }
 }
