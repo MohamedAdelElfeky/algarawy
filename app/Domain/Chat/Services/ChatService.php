@@ -8,11 +8,12 @@ use App\Domain\Chat\DTOs\ConversationDTO;
 use App\Domain\Chat\Models\Conversation;
 use App\Shared\Traits\HandlesFileDeletion;
 use App\Shared\Traits\HandlesSingleImageUpload;
+use App\Shared\Traits\PushNotificationOnly;
 use Illuminate\Http\Request;
 
 class ChatService
 {
-    use HandlesSingleImageUpload, HandlesFileDeletion;
+    use HandlesSingleImageUpload, HandlesFileDeletion,PushNotificationOnly;
 
     public function __construct(private ChatRepository $chatRepository, private FirestoreService $firestoreService) {}
 
@@ -29,7 +30,14 @@ class ChatService
     {
         $message = $this->chatRepository->sendMessage($dto);
         $this->firestoreService->storeMessage($message);
+        $conversation = $message->conversation()->with('users.devices')->first();
+        $otherUsers = $conversation->users->where('id', '!=', $dto->user_id);
 
+        $this->sendFCMNotificationToUsers(
+            $otherUsers->all(),
+            'رسالة جديدة',
+            $dto->message
+        );
         return $message;
     }
 

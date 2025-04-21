@@ -25,6 +25,8 @@ class LoginRequest extends FormRequest
         return [
             'national_id' => 'required|string',
             'password' => 'required|string',
+            'device_id' => 'nullable|string',
+            'notification_token' => 'nullable|string',
         ];
     }
 
@@ -43,5 +45,4 @@ class LoginRequest extends FormRequest
             'message' => $firstError,
         ], 422));
     }
-    
 }

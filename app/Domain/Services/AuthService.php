@@ -4,6 +4,7 @@ namespace App\Domain\Services;
 
 use App\Models\User;
 use App\Domain\Models\UserDetail;
+use App\Domain\Models\UserDevice;
 use App\Domain\Models\UserSetting;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class AuthService
 {
     use HandlesSingleImageUpload;
 
-    public function login(array $credentials)
+    public function login(array $credentials, $request)
     {
         $user = User::where('national_id', $credentials['national_id'])->first();
 
@@ -27,10 +28,18 @@ class AuthService
                 'status' => Response::HTTP_UNAUTHORIZED
             ];
         }
+        $token = $user->createToken('authToken')->plainTextToken;
 
+        UserDevice::updateOrCreate(
+            ['user_id' => $user->id, 'device_id' => $request->device_id],
+            [
+                'notification_token' => $request->notification_token,
+                'auth_token' => $token,
+            ]
+        );
         return [
             'user' => new UserResource($user),
-            'token' => $user->createToken('authToken')->plainTextToken,
+            'token' => $token,
             'status' => Response::HTTP_CREATED
         ];
     }
@@ -58,6 +67,13 @@ class AuthService
                     ['value' => $value]
                 );
             }
+            UserDevice::updateOrCreate(
+                ['user_id' => $user->id, 'device_id' => $request->device_id],
+                [
+                    'notification_token' => $request->notification_token,
+                    'auth_token' => null,
+                ]
+            );
             return [
                 'message' => 'تم التسجيل بنجاح',
                 'user' => new UserResource($user),

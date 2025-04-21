@@ -10,6 +10,7 @@ use App\Domain\Models\MembershipAssignment;
 use App\Domain\Models\Notification;
 use App\Domain\Models\Setting;
 use App\Domain\Models\UserDetail;
+use App\Domain\Models\UserDevice;
 use App\Domain\Models\UserSetting;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -114,5 +115,10 @@ class User extends Authenticatable
                 ['membership_id' => $membership->id]
             );
         }
+    }
+
+    public function devices()
+    {
+        return $this->hasMany(UserDevice::class);
     }
 }

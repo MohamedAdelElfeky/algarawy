@@ -44,7 +44,7 @@ class UserRequest extends FormRequest
                 'string',
                 'max:15',
                 Rule::unique('users', 'national_id')->ignore($user->id ?? null),
-            ],           
+            ],
             'occupation_category' => 'nullable|string|max:255',
             'is_whatsapp' => 'nullable|boolean',
             'occupation_id' => ['nullable', 'integer', 'exists:occupations,id'],
@@ -57,6 +57,8 @@ class UserRequest extends FormRequest
             'national_card_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'national_card_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'card_images' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'device_id' => 'nullable|string',
+            'notification_token' => 'nullable|string',
         ];
     }
 

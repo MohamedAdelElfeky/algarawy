@@ -8,13 +8,14 @@ use App\Domain\Repositories\MeetingRepositoryInterface;
 use App\Http\Requests\MeetingRequest;
 use App\Http\Resources\MeetingResource;
 use App\Shared\Traits\ownershipAuthorization;
+use App\Shared\Traits\PushNotificationOnly;
 use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 
 class MeetingService
 {
-    use ownershipAuthorization;
+    use ownershipAuthorization, PushNotificationOnly;
 
     public function __construct(
         private MeetingRepositoryInterface $meetingRepository,
@@ -29,7 +30,7 @@ class MeetingService
             'metadata' => $this->paginationService->getPaginationData($meetings),
         ];
     }
-    
+
     public function getMeetingById(string $id): Meeting
     {
         return Meeting::findOrFail($id);
@@ -75,7 +76,7 @@ class MeetingService
         return response()->json(['message' => 'تم حذف الاجتماع بنجاح']);
     }
 
- 
+
     public function searchMeeting(string $searchTerm)
     {
         return MeetingResource::collection($this->meetingRepository->search($searchTerm));
@@ -86,19 +87,28 @@ class MeetingService
         return $this->meetingRepository->paginate($perPage);
     }
 
-
     private function notifyUsersAboutMeeting(Meeting $meeting, string $title, string $messagePrefix): void
     {
-        $meetingDateTime = new DateTime($meeting->datetime);
-        $formattedDate = $meetingDateTime->format('Y-m-d');
+        $this->saveAndSendNotifications($meeting, $title, $messagePrefix);
+    }
 
-        User::where('id', '!=', Auth::id())->each(function (User $user) use ($meeting, $title, $messagePrefix, $formattedDate) {
+    private function saveAndSendNotifications(Meeting $meeting, string $title, string $messagePrefix): void
+    {
+        $meetingDateTime = new \DateTime($meeting->datetime);
+        $formattedDate = $meetingDateTime->format('Y-m-d');
+        $messageBody = "{$messagePrefix} {$meeting->name} بتاريخ {$formattedDate}";
+
+        $users = User::where('id', '!=', Auth::id())->with('devices')->get();
+
+        foreach ($users as $user) {
             $meeting->notifications()->create([
                 'user_id' => $user->id,
                 'notifiable_id' => $meeting->id,
                 'title' => $title,
-                'message' => "{$messagePrefix} {$meeting->name} بتاريخ {$formattedDate}",
+                'message' => $messageBody,
             ]);
-        });
+        }
+
+        $this->sendFCMNotificationToUsers($users->all(), $title, $messageBody);
     }
 }
