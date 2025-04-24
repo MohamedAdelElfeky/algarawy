@@ -102,6 +102,11 @@ class User extends Authenticatable
         return $this->hasMany(Complaint::class, 'user_id');
     }
 
+    public function token_info()
+    {
+        return $this->hasOne(UserDevice::class, 'user_id');
+    }
+
     public function evaluateMembership($user)
     {
         $points = $user->points;

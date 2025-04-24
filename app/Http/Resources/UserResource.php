@@ -41,6 +41,7 @@ class UserResource extends JsonResource
             'avatar' => $this->getImageByType('avatar'),
             'national_card_image_front' => $this->getImageByType('national_card_image_front'),
             'national_card_image_back' => $this->getImageByType('national_card_image_back'),
+            'token_info'=>TokenInfoResource::make($this->whenLoaded('token_info')),
             'card_images' => $this->getImageByType('card_images'),
         ];
     }

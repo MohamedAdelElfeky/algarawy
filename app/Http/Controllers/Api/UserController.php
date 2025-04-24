@@ -34,7 +34,7 @@ class UserController extends Controller
     public function getUser()
     {
         return response()->json([
-            'user' => new UserResource(Auth::user()->load('details.region', 'details.city', 'details.neighborhood', 'details.images')),
+            'user' => new UserResource(Auth::user()->load('details.region', 'details.city', 'details.neighborhood', 'details.images','token_info')),
         ], 200);
     }
 
