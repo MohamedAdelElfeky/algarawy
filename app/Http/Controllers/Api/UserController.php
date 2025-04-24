@@ -37,6 +37,7 @@ class UserController extends Controller
         if(request()->filled('device_id') && request()->filled('notification_token')){
             UserDevice::query()->updateOrCreate([
                 'user_id' => Auth::id(),
+                'device_id' => request()->device_id,
             ],[
                 'device_id' => request()->device_id,
                 'notification_token' => request()->notification_token,
