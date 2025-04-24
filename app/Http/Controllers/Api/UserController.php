@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Models\UserDevice;
 use App\Domain\Services\UserDataService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateProfileRequest;
@@ -33,8 +34,16 @@ class UserController extends Controller
 
     public function getUser()
     {
+        if(request()->filled('device_id') && request()->filled('notification_token')){
+            UserDevice::query()->updateOrCreate([
+                'user_id' => Auth::id(),
+            ],[
+                'device_id' => request()->device_id,
+                'notification_token' => request()->notification_token,
+            ]);
+        }
         return response()->json([
-            'user' => new UserResource(Auth::user()->load('details.region', 'details.city', 'details.neighborhood', 'details.images','token_info')),
+            'user' => new UserResource(Auth::user()->load('details.region', 'details.city', 'details.neighborhood', 'details.images')),
         ], 200);
     }
 
