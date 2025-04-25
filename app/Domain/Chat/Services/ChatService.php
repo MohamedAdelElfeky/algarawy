@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 
 class ChatService
 {
-    use HandlesSingleImageUpload, HandlesFileDeletion,PushNotificationOnly;
+    use HandlesSingleImageUpload, HandlesFileDeletion, PushNotificationOnly;
 
     public function __construct(private ChatRepository $chatRepository, private FirestoreService $firestoreService) {}
 
@@ -30,8 +30,8 @@ class ChatService
     {
         $message = $this->chatRepository->sendMessage($dto);
         $this->firestoreService->storeMessage($message);
-        $conversation = $message->conversation()->with('users.devices')->first();
-        $otherUsers = $conversation->users->where('id', '!=', $dto->user_id);
+        $participants = $message->conversation->participants()->with('user.devices')->get();
+        $otherUsers = $participants->pluck('user')->where('id', '!=', $dto->user_id);
 
         $this->sendFCMNotificationToUsers(
             $otherUsers->all(),
