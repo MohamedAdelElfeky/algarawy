@@ -5,15 +5,15 @@ namespace App\Shared\Traits;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
+use Illuminate\Support\Facades\Log;
 
 trait PushNotificationOnly
 {
-
     protected $messaging;
 
     public function __construct()
     {
-        $factory = (new Factory)->withServiceAccount(storage_path('firebase/firebase_credentials.json'));
+        $factory = (new Factory)->withServiceAccount(storage_path('app/firebase/serviceAccountKey.json'));
         $this->messaging = $factory->createMessaging();
     }
 
@@ -22,23 +22,43 @@ trait PushNotificationOnly
         foreach ($users as $user) {
             foreach ($user->devices as $device) {
                 if ($device->notification_token) {
-                    $this->sendFCM($device->notification_token, $title, $body, $dataPayload + ['user_id' => $user->id]);
+                    $cleanedData = $this->sanitizeData($dataPayload + ['user_id' => $user->id]);
+                    $this->sendFCM($device->notification_token, $title, $body, $cleanedData);
                 }
             }
         }
     }
-    
+
+    private function sanitizeData(array $data): array
+    {
+        return array_map(function ($value) {
+            if (is_object($value)) {
+                return method_exists($value, 'toArray')
+                    ? json_encode($value->toArray(request()))
+                    : (string) $value;
+            } elseif (is_array($value)) {
+                return json_encode($value);
+            }
+            return (string) $value;
+        }, $data);
+    }
+
+
     public function sendFCM(string $token, string $title, string $body, array $data = []): void
     {
+        if (!$this->messaging) {
+            $factory = (new Factory)->withServiceAccount(storage_path('app/firebase/serviceAccountKey.json'));
+            $this->messaging = $factory->createMessaging();
+        }
+
         $message = CloudMessage::withTarget('token', $token)
             ->withNotification(Notification::create($title, $body))
             ->withData($data);
 
         try {
             $this->messaging->send($message);
-            echo "Notification sent successfully!";
         } catch (\Exception $e) {
-            echo 'FCM Error: ' . $e->getMessage();
+            Log::error('FCM Error: ' . $e->getMessage());
         }
     }
 

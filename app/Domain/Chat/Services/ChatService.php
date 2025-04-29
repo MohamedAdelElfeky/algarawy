@@ -38,6 +38,7 @@ class ChatService
         $body = $message->user->name . ': ' . $message->message;
 
         $messageResource = new \App\Http\Resources\ChatMessageResource($message);
+        $messageArray = $messageResource->toArray(request());
 
         $this->sendFCMNotificationToUsers(
             $otherUsers->all(),
@@ -45,7 +46,7 @@ class ChatService
             $body,
             [
                 'type' => 'message',
-                'data' => $messageResource,
+                'data' => $messageArray,
             ]
         );
 

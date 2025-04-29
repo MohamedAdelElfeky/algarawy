@@ -93,14 +93,26 @@ class MeetingService
     }
 
     private function saveAndSendNotifications(Meeting $meeting, string $title, string $messagePrefix): void
-    {
+{
+    try {
         $formattedDate = (new \DateTime($meeting->datetime))->format('Y-m-d');
         $messageBody = "{$messagePrefix} {$meeting->name} بتاريخ {$formattedDate}";
 
         $users = User::where('id', '!=', Auth::id())->with('devices')->get();
+
+        if ($users->isEmpty()) {
+            \Log::warning('No users found for notifications.');
+            return;
+        }
+
         $meetingResource = new \App\Http\Resources\V2\MeetingResource($meeting);
 
         foreach ($users as $user) {
+            if ($user->devices->isEmpty()) {
+                \Log::info("User with ID {$user->id} has no devices.");
+                continue; 
+            }
+
             $meeting->notifications()->create([
                 'user_id' => $user->id,
                 'notifiable_id' => $meeting->id,
@@ -118,5 +130,11 @@ class MeetingService
                 'data' => $meetingResource,
             ]
         );
+    } catch (\Exception $e) {
+        \Log::error("Error sending notifications for meeting ID {$meeting->id}: " . $e->getMessage(), [
+            'exception' => $e
+        ]);
     }
+}
+
 }
