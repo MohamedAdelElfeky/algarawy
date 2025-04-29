@@ -20,7 +20,7 @@ class BankAccountResource extends JsonResource
             'iban' => $this->iban,
             'bank_name' => $this->bank_name,
             'swift_number' => $this->swift_number,
-            'type' => $this->type,
+            'type' => $this->type,      
             
             'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
             'updated_at' => optional($this->updated_at)->format('Y-m-d H:i:s'),
