@@ -55,7 +55,6 @@ class ChatController extends Controller
         );
 
         $message = $this->chatService->sendMessage($dto);
-        dd($message);
         return response()->json([
             'message' => 'تم إرسال الرسالة بنجاح.',
             'data' => new ChatMessageResource($message)
