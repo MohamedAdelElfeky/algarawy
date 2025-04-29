@@ -22,7 +22,17 @@ trait PushNotificationOnly
         foreach ($users as $user) {
             foreach ($user->devices as $device) {
                 if ($device->notification_token) {
-                    $cleanedData = $this->sanitizeData($dataPayload + ['user_id' => $user->id]);
+                    $cleanedData = $this->sanitizeData(
+                        $dataPayload + [
+                            'user_id' => $user->id,
+                            'notification' => [
+                                'data' => [
+                                    'title' => $title,
+                                    'body' => $body,
+                                ],
+                            ],
+                        ]
+                    );
                     $this->sendFCM($device->notification_token, $title, $body, $cleanedData);
                 }
             }
@@ -43,7 +53,6 @@ trait PushNotificationOnly
         }, $data);
     }
 
-
     public function sendFCM(string $token, string $title, string $body, array $data = []): void
     {
         if (!$this->messaging) {
@@ -61,6 +70,9 @@ trait PushNotificationOnly
             Log::error('FCM Error: ' . $e->getMessage());
         }
     }
+}
+
+
 
     // public function sendFCM(string $token, string $title, string $body, array $data = []): void
     // {
@@ -92,4 +104,3 @@ trait PushNotificationOnly
     //     curl_exec($ch);
     //     curl_close($ch);
     // }
-}
