@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\v2;
+namespace App\Http\Resources\V2;
 
 use App\Http\Resources\ImageResource;
 use Illuminate\Http\Request;

@@ -2,8 +2,21 @@
 
 namespace App\Shared\Traits;
 
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+
 trait PushNotificationOnly
 {
+
+    protected $messaging;
+
+    public function __construct()
+    {
+        $factory = (new Factory)->withServiceAccount(storage_path('firebase/firebase_credentials.json'));
+        $this->messaging = $factory->createMessaging();
+    }
+
     public function sendFCMNotificationToUsers(array $users, string $title, string $body, array $dataPayload): void
     {
         foreach ($users as $user) {
@@ -14,36 +27,49 @@ trait PushNotificationOnly
             }
         }
     }
-
-
+    
     public function sendFCM(string $token, string $title, string $body, array $data = []): void
     {
-        $SERVER_API_KEY = env('FCM_SERVER_KEY');
+        $message = CloudMessage::withTarget('token', $token)
+            ->withNotification(Notification::create($title, $body))
+            ->withData($data);
 
-        $headers = [
-            'Authorization: key=' . $SERVER_API_KEY,
-            'Content-Type: application/json',
-        ];
-
-        $payload = [
-            "registration_ids" => [$token],
-            "notification" => [
-                "title" => $title,
-                "body" => $body,
-                "sound" => "default",
-                "click_action" => "FLUTTER_NOTIFICATION_CLICK",
-            ],
-            "data" => $data + ["click_action" => "FLUTTER_NOTIFICATION_CLICK"]
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_exec($ch);
-        curl_close($ch);
+        try {
+            $this->messaging->send($message);
+            echo "Notification sent successfully!";
+        } catch (\Exception $e) {
+            echo 'FCM Error: ' . $e->getMessage();
+        }
     }
+
+    // public function sendFCM(string $token, string $title, string $body, array $data = []): void
+    // {
+    //     $SERVER_API_KEY = env('FCM_SERVER_KEY');
+
+    //     $headers = [
+    //         'Authorization: key=' . $SERVER_API_KEY,
+    //         'Content-Type: application/json',
+    //     ];
+
+    //     $payload = [
+    //         "registration_ids" => [$token],
+    //         "notification" => [
+    //             "title" => $title,
+    //             "body" => $body,
+    //             "sound" => "default",
+    //             "click_action" => "FLUTTER_NOTIFICATION_CLICK",
+    //         ],
+    //         "data" => $data + ["click_action" => "FLUTTER_NOTIFICATION_CLICK"]
+    //     ];
+
+    //     $ch = curl_init();
+    //     curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+    //     curl_setopt($ch, CURLOPT_POST, true);
+    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    //     curl_exec($ch);
+    //     curl_close($ch);
+    // }
 }
