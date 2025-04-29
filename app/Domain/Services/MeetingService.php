@@ -3,10 +3,10 @@
 namespace App\Domain\Services;
 
 use App\Domain\Models\Meeting;
-use App\Domain\Models\User;
 use App\Domain\Repositories\MeetingRepositoryInterface;
 use App\Http\Requests\MeetingRequest;
 use App\Http\Resources\MeetingResource;
+use App\Models\User;
 use App\Shared\Traits\ownershipAuthorization;
 use App\Shared\Traits\PushNotificationOnly;
 use DateTime;
@@ -94,11 +94,11 @@ class MeetingService
 
     private function saveAndSendNotifications(Meeting $meeting, string $title, string $messagePrefix): void
     {
-        $meetingDateTime = new \DateTime($meeting->datetime);
-        $formattedDate = $meetingDateTime->format('Y-m-d');
+        $formattedDate = (new \DateTime($meeting->datetime))->format('Y-m-d');
         $messageBody = "{$messagePrefix} {$meeting->name} بتاريخ {$formattedDate}";
 
         $users = User::where('id', '!=', Auth::id())->with('devices')->get();
+        $meetingResource = new \App\Http\Resources\V2\MeetingResource($meeting);
 
         foreach ($users as $user) {
             $meeting->notifications()->create([
@@ -109,6 +109,14 @@ class MeetingService
             ]);
         }
 
-        $this->sendFCMNotificationToUsers($users->all(), $title, $messageBody);
+        $this->sendFCMNotificationToUsers(
+            $users->all(),
+            $title,
+            $messageBody,
+            [
+                'type' => 'meeting',
+                'data' => $meetingResource,
+            ]
+        );
     }
 }

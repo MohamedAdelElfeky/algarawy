@@ -30,16 +30,28 @@ class ChatService
     {
         $message = $this->chatRepository->sendMessage($dto);
         $this->firestoreService->storeMessage($message);
+
         $participants = $message->conversation->participants()->with('user.devices')->get();
         $otherUsers = $participants->pluck('user')->where('id', '!=', $dto->user_id);
 
+        $title = $message->conversation->name ?? 'محادثة جديدة';
+        $body = $message->user->name . ': ' . $message->message;
+
+        $messageResource = new \App\Http\Resources\ChatMessageResource($message);
+
         $this->sendFCMNotificationToUsers(
             $otherUsers->all(),
-            'رسالة جديدة',
-            $dto->message
+            $title,
+            $body,
+            [
+                'type' => 'message',
+                'data' => $messageResource,
+            ]
         );
+
         return $message;
     }
+
 
     public function getMessages(int $conversationId, ?int $perPage = null, ?int $page = null)
     {
