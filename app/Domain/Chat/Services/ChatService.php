@@ -22,6 +22,7 @@ class ChatService
         $conversation = $this->chatRepository->createConversation($dto);
 
         $this->uploadSingleImage($request, $conversation, 'conversations', 'conversation', 'image', 'profile');
+        $this->firestoreService->syncConversation($conversation);
 
         return $conversation;
     }

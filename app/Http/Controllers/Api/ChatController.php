@@ -115,8 +115,8 @@ class ChatController extends Controller
     public function updatePhoto(Request $request, Conversation $conversation): JsonResponse
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'name' => 'nulled|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name' => 'nullable|string|max:255',
         ]);
 
         $updatedConversation = $this->chatService->updateConversationPhoto($request, $conversation);
