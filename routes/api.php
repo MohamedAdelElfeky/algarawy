@@ -42,6 +42,7 @@ use App\Http\Controllers\UserSettingController;
 
 Route::post('/p-send-otp', [OtpController::class, 'sendOtp']);
 Route::post('/p-reset-password', [OtpController::class, 'verifyOtp']);
+Route::post('/verify-otp-register', [OtpController::class, 'verifyOtpRegister']);
 Route::post('/send-message', [OtpController::class, 'sendMessage']);
 
 Route::POST('/register', [AuthController::class, 'register']);

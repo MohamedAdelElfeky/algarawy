@@ -14,9 +14,9 @@ class PhoneNumber
 
     private function validate(string $number): void
     {
-        if (!preg_match('/^\+\d{10,15}$/', $number)) {
-            throw new \InvalidArgumentException("Invalid phone number format.");
-        }
+        // if (!preg_match('/^\+\d{10,15}$/', $number)) {
+        //     throw new \InvalidArgumentException("Invalid phone number format.");
+        // }
     }
 
     public function getValue(): string

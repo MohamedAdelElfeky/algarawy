@@ -2,11 +2,13 @@
 
 namespace App\Domain\Services;
 
+use App\Domain\Entities\PhoneNumber;
 use App\Models\User;
 use App\Domain\Models\UserDetail;
 use App\Domain\Models\UserDevice;
 use App\Domain\Models\UserSetting;
 use App\Http\Resources\UserResource;
+use App\Infrastructure\Services\TwilioService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Shared\Traits\HandlesSingleImageUpload;
@@ -17,6 +19,7 @@ use Spatie\Permission\Models\Role;
 class AuthService
 {
     use HandlesSingleImageUpload;
+    public function __construct(private TwilioService $twilioService) {}
 
     public function login(array $credentials, $request)
     {
@@ -74,6 +77,8 @@ class AuthService
                     'auth_token' => null,
                 ]
             );
+            $phone = new PhoneNumber($request->phone);
+            $this->twilioService->sendOtp($phone);
             return [
                 'message' => 'تم التسجيل بنجاح',
                 'user' => new UserResource($user),

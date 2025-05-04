@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\OtpVerifyRequest;
 use App\Infrastructure\Services\TwilioService;
 use App\Models\User;
 
@@ -61,6 +62,25 @@ class OtpController extends Controller
             }
 
             return response()->json(['message' => 'OTP غير صالح.'], 400);
+        } catch (\Exception $e) {
+            return $this->serverError($e);
+        }
+    }
+
+    public function verifyOtpRegister(OtpVerifyRequest $request): JsonResponse
+    {
+        try {
+            $phone = new PhoneNumber($request->phone);
+            $otp = new OTP($request->otp);
+
+            $this->twilioService->verifyOtp($phone, $otp);
+
+            return response()->json(['message' => 'تم التحقق من الرمز بنجاح.'], 200);
+        } catch (\Twilio\Exceptions\RestException $e) {
+            return response()->json([
+                'message' => 'فشل في التحقق من الرمز. الرجاء المحاولة مرة أخرى.',
+                'error' => $e->getMessage()
+            ], 422);
         } catch (\Exception $e) {
             return $this->serverError($e);
         }
@@ -139,6 +159,6 @@ class OtpController extends Controller
 
     function serverError(\Exception $e): JsonResponse
     {
-        return response()->json(['message' => $e->getMessage()], 500);
+        return response()->json(['message' => $e->getMessage()], 400);
     }
 }
