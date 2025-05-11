@@ -69,7 +69,7 @@ class UserDataService
     public function updateProfile(UpdateProfileRequest $request, User $user)
     {
         $this->uploadSingleImage($request, $user, 'user', 'avatar', 'avatar', 'images');
-        $user->update($request->only(['first_name', 'last_name', 'email', 'phone']));
+        $user->update($request->only(['first_name', 'middle_name', 'personal_title', 'last_name', 'email']));
 
         return $user;
     }

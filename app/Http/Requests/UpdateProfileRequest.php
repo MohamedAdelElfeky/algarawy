@@ -23,10 +23,12 @@ class UpdateProfileRequest extends FormRequest
     {
         $userId = auth()->id();
         return [
-           'first_name' => 'nullable|string',
+            'first_name' => 'nullable|string',
+            'middle_name' => 'nullable|string',
             'last_name' => 'nullable|string',
+            'personal_title' => 'nullable|string',
             'email' => 'nullable|email|unique:users,email,' . $userId,
-            'phone' => 'nullable|string|unique:users,phone,' . $userId,
+            // 'phone' => 'nullable|string|unique:users,phone,' . $userId,
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'is_avatar_deleted' => 'nullable|boolean',
         ];
