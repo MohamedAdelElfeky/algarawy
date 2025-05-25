@@ -25,6 +25,7 @@ class CheckUserExistsRequest extends FormRequest
         return [
             'email' => 'required|email',
             'phone' => 'required|string|min:8',
+            'national_id' => 'required|string',
         ];
     }
     public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)

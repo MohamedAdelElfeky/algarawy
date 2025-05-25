@@ -19,13 +19,15 @@ class AuthController extends Controller
     public function checkUserExists(CheckUserExistsRequest $request)
     {
         $validatedData = $request->validated();
-
         return $this->successResponse([
             'email_exists' => isset($validatedData['email'])
                 ? $this->userCheckService->checkEmailExists($validatedData['email'])
                 : false,
             'phone_exists' => isset($validatedData['phone'])
                 ? $this->userCheckService->checkPhoneExists($validatedData['phone'])
+                : false,
+            'national_id_exists' => isset($validatedData['national_id'])
+                ? $this->userCheckService->checkNationalIdExists($validatedData['national_id'])
                 : false,
         ], 'تم التحقق من وجود المستخدم بنجاح');
     }

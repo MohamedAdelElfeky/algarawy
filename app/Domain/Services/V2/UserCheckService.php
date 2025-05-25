@@ -34,6 +34,11 @@ class UserCheckService
             ->whereNull('deleted_at')
             ->exists();
     }
+    
+    public function checkNationalIdExists(string $nationalId): bool
+    {
+        return $this->checkVerifiedUser('national_id', $nationalId);
+    }
 
     // private function sanitizePhone(string $phone): string
     // {
